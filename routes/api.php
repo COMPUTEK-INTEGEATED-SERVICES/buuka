@@ -26,5 +26,5 @@ Route::middleware('cors')->group(function (){
     Route::post('submit_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'submitPasswordResetToken']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
-    //authenticated routes
+
 });
