@@ -12,6 +12,7 @@ use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AuthenticationController extends Controller
@@ -43,12 +44,21 @@ class AuthenticationController extends Controller
     }
 
     public function register (Request $request) {
-        ValidationAction::validate($request, [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+        $v = Validator::make( $request->all(), [
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+            'first_name' => 'required|string|min:3',
+            'last_name' => 'required|string|min:3',
         ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Registration Failed',
+                'data' => $v->errors()
+            ], 422);
+
+        }
 
         $request['type'] = $request['type'] ? $request['type']  : 'user';
         $request['password']=Hash::make($request['password']);
