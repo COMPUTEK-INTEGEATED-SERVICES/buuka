@@ -19,10 +19,18 @@ class AuthenticationController extends Controller
 {
     public function login (Request $request) {
 
-        ValidationAction::validate($request, [
+        $v = Validator::make( $request->all(), [
             'email' => 'required|string|email|max:255',
             'password' => 'required|string',
         ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Registration Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
 
         if (!auth()->attempt($request->all()))
         {
@@ -45,10 +53,10 @@ class AuthenticationController extends Controller
 
     public function register (Request $request) {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8',
-            'first_name' => 'required|string|min:3',
-            'last_name' => 'required|string|min:3',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         if($v->fails()){
@@ -57,7 +65,6 @@ class AuthenticationController extends Controller
                 'message' => 'Registration Failed',
                 'data' => $v->errors()
             ], 422);
-
         }
 
         $request['type'] = $request['type'] ? $request['type']  : 'user';
