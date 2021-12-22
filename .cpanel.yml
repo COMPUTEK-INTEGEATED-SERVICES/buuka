@@ -1,4 +1,5 @@
+---
 deployment:
   tasks:
     - export DEPLOYPATH=/home/admin/public_html/buuka
-    - /bin/cp -R / $DEPLOYPATH
+    - /bin/cp -R app $DEPLOYPATH
