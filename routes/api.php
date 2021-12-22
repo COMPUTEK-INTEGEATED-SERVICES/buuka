@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-Route::middleware(['cors', 'auth:guest'])->group(function (){
+Route::middleware(['cors'])->group(function (){
     Route::post('register', [\App\Http\Controllers\API\AuthenticationController::class, 'register'])->name('register');
     Route::post('login', [\App\Http\Controllers\API\AuthenticationController::class, 'login'])->name('login');
     Route::get('logout', [\App\Http\Controllers\API\AuthenticationController::class, 'logout']);
