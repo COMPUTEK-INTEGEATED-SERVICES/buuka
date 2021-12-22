@@ -49,6 +49,7 @@ class AuthenticationController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
         $request['type'] = $request['type'] ? $request['type']  : 'user';
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
