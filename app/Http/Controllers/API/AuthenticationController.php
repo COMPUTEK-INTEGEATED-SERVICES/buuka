@@ -57,6 +57,7 @@ class AuthenticationController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10",
         ]);
 
         if($v->fails()){
@@ -67,7 +68,6 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
-        $request['type'] = $request['type'] ? $request['type']  : 'user';
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
         $user = User::create($request->toArray());

@@ -15,6 +15,7 @@ class InitController extends Controller
 
     public function __construct()
     {
+        $this->middleware('auth:api');
         $this->user = auth()->guard('api')->user();
     }
 
@@ -24,7 +25,8 @@ class InitController extends Controller
             'status'=>true,
             'message'=>'',
             'data'=>[
-                'user'=>$this->user
+                'user'=>$this->user,
+                'notifications'=>$this->user->unreadNotifications,
             ]
         ]);
     }

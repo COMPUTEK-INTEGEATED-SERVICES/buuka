@@ -14,7 +14,7 @@ class UpdateUsersTableToIncludeType extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('type',['user', 'vendor']);
+            $table->tinyInteger('is_vendor');
         });
     }
 
@@ -26,7 +26,7 @@ class UpdateUsersTableToIncludeType extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            Schema::dropIfExists('types');
+            Schema::dropIfExists('is_vendor');
         });
     }
 }

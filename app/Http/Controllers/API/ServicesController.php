@@ -9,9 +9,11 @@ use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCategory;
 use App\Models\ServiceImages;
+use App\Models\ServiceLocation;
 use App\Models\ServicePrices;
 use App\Models\Services;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ServicesController extends Controller
 {
@@ -32,11 +34,22 @@ class ServicesController extends Controller
 
     public function addService(Request $request)
     {
-        ValidationAction::validate($request, [
-           'name'=>'required|string',
+        $v = Validator::make( $request->all(), [
+            'name'=>'required|string',
             'description'=>'string|required',
-            'category_id'=>'required'
+            'category_id'=>'required',
+            'country'=>'required|string',
+            'state'=>'required|string',
+            'city'=>'string'
         ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Registration Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
 
         try {
             //store the service
@@ -53,6 +66,14 @@ class ServicesController extends Controller
                     'category'=>$category
                 ]);
             }
+
+            //store the service location
+            ServiceLocation::create([
+                'service_id'=>$service->id,
+                'country'=>$request->input('country'),
+                'state'=>$request->input('state'),
+                'city'=>$request->input('city')
+            ]);
 
             //store the images
             if($request->file){
@@ -85,5 +106,10 @@ class ServicesController extends Controller
         {
             report($throwable);
         }
+        return response([
+            'status'=>false,
+            'message'=>'An error occurred',
+            'data'=>[]
+        ]);
     }
 }
