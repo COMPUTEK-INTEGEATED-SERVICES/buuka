@@ -75,7 +75,7 @@ class AuthenticationController extends Controller
         $data = ['token' => $token];
         return response([
             'status'=>true,
-            'message'=>'',
+            'message'=>'Registration is successful',
             'data'=>$data
         ]);
     }
