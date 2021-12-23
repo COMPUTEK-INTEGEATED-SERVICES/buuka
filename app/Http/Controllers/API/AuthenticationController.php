@@ -57,7 +57,7 @@ class AuthenticationController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10",
+            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10"
         ]);
 
         if($v->fails()){
