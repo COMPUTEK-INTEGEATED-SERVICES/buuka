@@ -97,7 +97,7 @@ class ServicesController extends Controller
                     ServicePrices::create([
                         'name'=>$price->name,
                         'service_id'=>$service->id,
-                        'price'
+                        'price'=>$price->amount
                     ]);
                 }
             }
