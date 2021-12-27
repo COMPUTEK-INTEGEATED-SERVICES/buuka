@@ -8,7 +8,7 @@ use App\Events\Chat\NewChatMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
@@ -99,16 +99,15 @@ class ChatController extends Controller
             $chat = Chat::where(function ($query) use ($request) {
                 $query->where('user_1', $this->user->id)
                     ->where('user_2', $request->input('to_user_id'));
-            })->where(function ($query) use ($request) {
+            })->orWhere(function ($query) use ($request) {
                 $query->where('user_1', $request->input('to_user_id'))
                     ->where('user_2', $this->user->id);
             })->latest()->paginate(10);
 
             return response([
                 'status'=>true,
-                'message'=>'Chat sent',
+                'message'=>'',
                 'data'=>[
-                    'user'=>$this->user,
                     'chat'=>$chat
                 ]
             ]);

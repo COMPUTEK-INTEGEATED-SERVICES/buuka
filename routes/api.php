@@ -24,19 +24,21 @@ Route::middleware(['cors', 'json.response', 'guest'])->group(function (){
 
     Route::post('send_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'sendPasswordResetToken']);
     Route::post('submit_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'submitPasswordResetToken']);
+
+    Route::get('service/{service_id}', [\App\Http\Controllers\API\ServicesController::class, 'getService']);
 });
 Route::middleware(['auth:api', 'cors', 'json.response'])->group(function (){
     Route::get('config', [\App\Http\Controllers\API\InitController::class, 'config']);
 
     //service routes
-    Route::post('create_service', [\App\Http\Controllers\API\ServicesController::class, 'addService']);
-    Route::post('edit_service', [\App\Http\Controllers\API\ServicesController::class, 'editService']);
-    Route::post('delete_service', [\App\Http\Controllers\API\ServicesController::class, 'deleteService']);
-    Route::post('delete_service_image', [\App\Http\Controllers\API\ServicesController::class, 'deleteServiceImage']);
-    Route::post('add_service_image', [\App\Http\Controllers\API\ServicesController::class, 'addServiceImage']);
+    Route::post('service/create', [\App\Http\Controllers\API\ServicesController::class, 'addService']);
+    Route::post('service/edit', [\App\Http\Controllers\API\ServicesController::class, 'editService']);
+    Route::post('service/delete', [\App\Http\Controllers\API\ServicesController::class, 'deleteService']);
+    Route::post('service/delete_image', [\App\Http\Controllers\API\ServicesController::class, 'deleteServiceImage']);
+    Route::post('service/add_image', [\App\Http\Controllers\API\ServicesController::class, 'addServiceImage']);
 
     //chat routes
-    Route::post('send_message', [\App\Http\Controllers\API\ChatController::class, 'sendMessage']);
-    Route::post('get_message', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
+    Route::post('chat/send_message', [\App\Http\Controllers\API\ChatController::class, 'sendMessage']);
+    Route::get('chat/get_messages', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
 
 });
