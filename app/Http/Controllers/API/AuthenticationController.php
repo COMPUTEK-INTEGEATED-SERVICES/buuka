@@ -8,6 +8,7 @@ use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\PasswordReset;
+use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -73,6 +74,12 @@ class AuthenticationController extends Controller
         $user = User::create($request->toArray());
         $token = $user->createToken(Str::random(5))->accessToken;
         $data = ['token' => $token];
+        try {
+            $user->notify(new RegistrationNotification::class);
+        }catch (\Throwable $throwable)
+        {
+            report($throwable);
+        }
         return response([
             'status'=>true,
             'message'=>'Registration is successful',

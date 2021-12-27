@@ -27,4 +27,15 @@ class Services extends Model
     {
         return $this->hasOne(Category::class, 'category_id', 'id');
     }
+
+    public function review()
+    {
+        return $this->hasMany(Review::class, 'service_id', 'id');
+    }
+
+    public static function userOwnsService($user_id, $service_id)
+    {
+        $c = self::find($service_id);
+        return $c->user_id == $user_id;
+    }
 }
