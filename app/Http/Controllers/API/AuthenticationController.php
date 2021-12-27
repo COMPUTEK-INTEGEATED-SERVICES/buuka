@@ -58,7 +58,7 @@ class AuthenticationController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10"
+            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
         ]);
 
         if($v->fails()){
@@ -72,10 +72,10 @@ class AuthenticationController extends Controller
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
         $user = User::create($request->toArray());
-        $token = $user->createToken(Str::random(5))->accessToken;
-        $data = ['token' => $token];
+        //$token = $user->createToken(Str::random(5))->accessToken;
+        //$data = ['token' => $token];
         try {
-            $user->notify(new RegistrationNotification::class);
+            $this->user->notify(new RegistrationNotification());
         }catch (\Throwable $throwable)
         {
             report($throwable);
@@ -83,7 +83,7 @@ class AuthenticationController extends Controller
         return response([
             'status'=>true,
             'message'=>'Registration is successful',
-            'data'=>$data
+            'data'=>[]
         ]);
     }
 
