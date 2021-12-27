@@ -26,6 +26,8 @@ Route::middleware(['cors', 'json.response', 'guest'])->group(function (){
     Route::post('submit_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'submitPasswordResetToken']);
 
     Route::get('service/{service_id}', [\App\Http\Controllers\API\ServicesController::class, 'getService']);
+
+    Route::get('category/all', [\App\Http\Controllers\API\CategoryController::class, 'getAllCategories']);
 });
 Route::middleware(['auth:api', 'cors', 'json.response'])->group(function (){
     Route::get('config', [\App\Http\Controllers\API\InitController::class, 'config']);
@@ -41,4 +43,9 @@ Route::middleware(['auth:api', 'cors', 'json.response'])->group(function (){
     Route::post('chat/send_message', [\App\Http\Controllers\API\ChatController::class, 'sendMessage']);
     Route::get('chat/get_messages', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
 
+    //category routes
+    //TODO limit this route set to spartie permission
+    Route::post('category/add', [\App\Http\Controllers\API\CategoryController::class, 'addCategory']);
+    Route::post('category/edit', [\App\Http\Controllers\API\CategoryController::class, 'editCategory']);
+    Route::get('category/delete', [\App\Http\Controllers\API\CategoryController::class, 'deleteCategory']);
 });
