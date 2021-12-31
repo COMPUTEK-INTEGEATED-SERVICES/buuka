@@ -34,13 +34,13 @@ class ChatController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation error',
                 'data' => $v->errors()
             ], 422);
         }
 
-        if ($this->canParticipate($this->user->id, $request->input('to_user_id')))
+        if ($this->senderIsNotReceiver($this->user->id, $request->input('to_user_id')))
         {
             if($request->file){
                 //upload file
@@ -75,7 +75,7 @@ class ChatController extends Controller
         ], 401);
     }
 
-    private function canParticipate($user_id, $to_user_id):bool
+    private function senderIsNotReceiver($user_id, $to_user_id):bool
     {
         return $user_id != $to_user_id;
     }
@@ -88,13 +88,13 @@ class ChatController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation error',
                 'data' => $v->errors()
             ], 422);
         }
 
-        if($this->canParticipate($this->user->id, $request->input('to_user_id')))
+        if($this->senderIsNotReceiver($this->user->id, $request->input('to_user_id')))
         {
             $chat = Chat::where(function ($query) use ($request) {
                 $query->where('user_1', $this->user->id)
@@ -104,12 +104,20 @@ class ChatController extends Controller
                     ->where('user_2', $this->user->id);
             })->latest()->paginate(10);
 
+            if ($this->user->can('participate', $chat))
+            {
+                return response([
+                    'status'=>true,
+                    'message'=>'',
+                    'data'=>[
+                        'chat'=>$chat
+                    ]
+                ]);
+            }
             return response([
-                'status'=>true,
-                'message'=>'',
-                'data'=>[
-                    'chat'=>$chat
-                ]
+                'status'=>false,
+                'message'=>'Access denied',
+                'data'=>[]
             ]);
         }
 

@@ -27,7 +27,7 @@ class AuthenticationController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Registration Failed',
                 'data' => $v->errors()
             ], 422);
@@ -63,7 +63,7 @@ class AuthenticationController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Registration Failed',
                 'data' => $v->errors()
             ], 422);
@@ -71,9 +71,7 @@ class AuthenticationController extends Controller
 
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
-        $user = User::create($request->toArray());
-        //$token = $user->createToken(Str::random(5))->accessToken;
-        //$data = ['token' => $token];
+        User::create($request->toArray());
         try {
             $this->user->notify(new RegistrationNotification());
         }catch (\Throwable $throwable)

@@ -10,6 +10,17 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends \App\Http\Controllers\Controller
 {
+    /**
+     * @var \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    private $user;
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+        $this->user = auth()->guard('api')->user();
+    }
+
     public function addCategory(Request $request)
     {
         $v = Validator::make( $request->all(), [
@@ -20,28 +31,37 @@ class CategoryController extends \App\Http\Controllers\Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
 
-        if($request->file){
-            //upload file
-            $image =  $request->file('file')->store('public/attachments/category');
+        if ($this->user->can('perform_admin_task', Category::class))
+        {
+            if($request->file){
+                //upload file
+                $image =  $request->file('file')->store('public/attachments/category');
+            }
+
+            Category::create([
+                'name'=>$request->input('name'),
+                'description'=>$request->input('description'),
+                'image'=>$image??null
+            ]);
+
+            return response([
+                'status'=>true,
+                'message'=>'Category created',
+                'data'=>[]
+            ]);
         }
 
-        Category::create([
-            'name'=>$request->input('name'),
-            'description'=>$request->input('description'),
-            'image'=>$image??null
-        ]);
-
         return response([
-            'status'=>true,
-            'message'=>'Category created',
+            'status'=>false,
+            'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 403);
     }
 
     public function editCategory(Request $request)
@@ -55,28 +75,37 @@ class CategoryController extends \App\Http\Controllers\Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
 
-        if($request->file){
-            //upload file
-            $image =  $request->file('file')->store('public/attachments/category');
+        if ($this->user->can('perform_admin_task', Category::class))
+        {
+            if($request->file){
+                //upload file
+                $image =  $request->file('file')->store('public/attachments/category');
+            }
+
+            $category = Category::find($request->category_id);
+            $category->name = $request->input('name', $category->name);
+            $category->description = $request->input('description', $category->description);
+            $category->image = $image ?? $category->image;
+            $category->save();
+
+            return response([
+                'status'=>true,
+                'message'=>'Category updated',
+                'data'=>[]
+            ]);
         }
 
-        $category = Category::find($request->category_id);
-        $category->name = $request->input('name', $category->name);
-        $category->description = $request->input('description', $category->description);
-        $category->image = $image ?? $category->image;
-        $category->save();
-
         return response([
-            'status'=>true,
-            'message'=>'Category updated',
+            'status'=>false,
+            'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 403);
     }
 
     public function deleteCategory(Request $request)
@@ -87,31 +116,26 @@ class CategoryController extends \App\Http\Controllers\Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
 
-        //TODO make sure only authorized users can delete messages
-        Category::where('id', $request->input('category_id'))->delete();
+        if ($this->user->can('perform_admin_task', Category::class))
+        {
+            Category::where('id', $request->input('category_id'))->delete();
+            return response([
+                'status'=>true,
+                'message'=>'Category deleted',
+                'data'=>[]
+            ]);
+        }
+
         return response([
-            'status'=>true,
-            'message'=>'Category deleted',
+            'status'=>false,
+            'message'=>'Access denied',
             'data'=>[]
-        ]);
-    }
-
-    public function getAllCategories()
-    {
-        $category = Category::all();
-
-        return response([
-            'status'=>true,
-            'message'=>'',
-            'data'=>[
-                'category'=>$category
-            ]
-        ]);
+        ], 403);
     }
 }

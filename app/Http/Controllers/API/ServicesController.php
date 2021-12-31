@@ -11,8 +11,9 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceImages;
 use App\Models\ServiceLocation;
 use App\Models\ServicePrices;
-use App\Models\Services;
-use Illuminate\Support\Facades\Request;
+use App\Models\Service;
+use App\Models\Vendor;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ServicesController extends Controller
@@ -37,23 +38,22 @@ class ServicesController extends Controller
         $v = Validator::make( $request->all(), [
             'name'=>'required|string',
             'description'=>'string|required',
-            'category_id'=>'required',
-            'country'=>'required|string',
-            'state'=>'required|string',
-            'city'=>'string'
+            'category_id'=>'nullable|array',
         ]);
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
 
-        try {
+        if ($this->user->can('interact', Vendor::class))
+        {
             //store the service
-            $service = Services::create([
+            $service = Service::create([
+                'vendor_id'=>$this->user->id,
                 'name'=>$request->input('name'),
                 'description'=>$request->input('description'),
             ]);
@@ -66,14 +66,6 @@ class ServicesController extends Controller
                     'category'=>$category
                 ]);
             }
-
-            //store the service location
-            ServiceLocation::create([
-                'service_id'=>$service->id,
-                'country'=>$request->input('country'),
-                'state'=>$request->input('state'),
-                'city'=>$request->input('city')
-            ]);
 
             //store the images
             if($request->file){
@@ -91,57 +83,18 @@ class ServicesController extends Controller
                 }
             }
 
-            //store the prices
-            if ($request->input('prices')){
-                foreach ($request->input('prices') as $price){
-                    ServicePrices::create([
-                        'name'=>$price->name,
-                        'service_id'=>$service->id,
-                        'price'=>$price->amount
-                    ]);
-                }
-            }
             return response([
                 'status'=>true,
                 'message'=>'Service created',
                 'data'=>[]
             ]);
-
-        }catch (\Throwable $throwable)
-        {
-            report($throwable);
         }
+
         return response([
             'status'=>false,
-            'message'=>'An error occurred',
+            'message'=>'Access denied',
             'data'=>[]
-        ]);
-    }
-
-    public function getService(Request $request)
-    {
-        $v = Validator::make( $request->all(), [
-            'service_id' => 'required|integer|exists:services,id',
-        ]);
-
-        if($v->fails()){
-            return response()->json([
-                'status' => 'false',
-                'message' => 'Validation Failed',
-                'data' => $v->errors()
-            ], 422);
-        }
-
-        $service = Services::with(['images', 'prices', 'category', 'review'])->first();
-
-        return response([
-            'status'=>true,
-            'message'=>'Chat sent',
-            'data'=>[
-                'user'=>$this->user,
-                'service'=>$service
-            ]
-        ]);
+        ], 403);
     }
 
     public function editService(Request $request)
@@ -151,39 +104,39 @@ class ServicesController extends Controller
             'name'=>'nullable|string',
             'description'=>'string|nullable',
             'category_id'=>'nullable',
-            'country'=>'nullable|string',
-            'state'=>'nullable|string',
-            'city'=>'string'
         ]);
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
 
-        $service = Services::find($request->input('service_id'));
-        $service->name = $request->input('name', $service->name);
-        $service->description = $request->input('description', $service->description);
-        $service->save();
+        if ($this->user->can('interact', Vendor::class) && $this->user->can('interact', Service::class))
+        {
+            //todo: service should not have an open order
+            $service = Service::find($request->input('service_id'));
+            $service->name = $request->input('name', $service->name);
+            $service->description = $request->input('description', $service->description);
+            $service->save();
 
-        $category = ServiceCategory::where('service_id', $request->input('service_id'));
-        $category->category_id = $request->input('category_id', $category->category_id);
-        $category->save();
+            $category = ServiceCategory::where('service_id', $request->input('service_id'));
+            $category->category_id = $request->input('category_id', $category->category_id);
+            $category->save();
 
-        $location = ServiceLocation::where('service_id', $request->input('service_id'));
-        $location->country = $request->input('country', $location->country);
-        $location->state = $request->input('state', $location->state);
-        $location->city = $request->input('city', $location->city);
-        $location->save();
-
+            return response([
+                'status'=>true,
+                'message'=>'Service updated',
+                'data'=>[]
+            ]);
+        }
         return response([
             'status'=>true,
-            'message'=>'Service updated',
+            'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 401);
     }
 
     public function deleteServiceImage(Request $request)
@@ -195,12 +148,12 @@ class ServicesController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
-        if (Services::userOwnsService($this->user->id, $request->input('service_id')))
+        if ($this->user->can('interact', Vendor::class) && $this->user->can('interact', Service::class))
         {
             ServiceImages::destroy($request->input('image_id'));
 
@@ -212,9 +165,9 @@ class ServicesController extends Controller
         }
         return response([
             'status'=>false,
-            'message'=>'Not authorized',
+            'message'=>'Access denied',
             'data'=>[]
-        ], 401);
+        ], 403);
     }
 
     public function deleteService(Request $request)
@@ -225,12 +178,12 @@ class ServicesController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
-        if (Services::userOwnsService($this->user->id, $request->input('service_id')))
+        if ($this->user->can('interact', Vendor::class) && $this->user->can('interact', Service::class))
         {
             //make sure that no book is on for this service
             //unlink the images
@@ -243,12 +196,10 @@ class ServicesController extends Controller
                 {
                     report($throwable);
                 }
+                ServiceImages::find($image->id)->delete();
             }
-            Services::where('id', $request->input('service_id'))->delete();
-            ServiceImages::where('service_id', $request->input('service_id'))->delete();
+            Service::find($request->input('service_id'))->delete();
             ServiceCategory::where('service_id', $request->input('service_id'))->delete();
-            ServicePrices::where('service_id', $request->input('service_id'))->delete();
-            ServiceLocation::where('service_id', $request->input('service_id'))->delete();
 
             return response([
                 'status'=>true,
@@ -258,9 +209,9 @@ class ServicesController extends Controller
         }
         return response([
             'status'=>false,
-            'message'=>'Not authorized',
+            'message'=>'Access denied',
             'data'=>[]
-        ], 401);
+        ], 403);
     }
 
     public function addServiceImage(Request $request)
@@ -272,12 +223,12 @@ class ServicesController extends Controller
 
         if($v->fails()){
             return response()->json([
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
         }
-        if (Services::userOwnsService($this->user->id, $request->input('service_id')))
+        if ($this->user->can('interact', Vendor::class) && $this->user->can('interact', Service::class))
         {
             if($request->file){
                 //upload file
@@ -300,8 +251,8 @@ class ServicesController extends Controller
         }
         return response([
             'status'=>false,
-            'message'=>'Not authorized',
+            'message'=>'Access denied',
             'data'=>[]
-        ], 401);
+        ], 403);
     }
 }

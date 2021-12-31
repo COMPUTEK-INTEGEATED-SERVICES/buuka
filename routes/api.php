@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-Route::middleware(['cors', 'json.response', 'guest'])->group(function (){
+Route::middleware(['cors', 'guest'])->group(function (){
     Route::post('register', [\App\Http\Controllers\API\AuthenticationController::class, 'register'])->name('register');
     Route::post('login', [\App\Http\Controllers\API\AuthenticationController::class, 'login'])->name('login');
     Route::get('logout', [\App\Http\Controllers\API\AuthenticationController::class, 'logout']);
@@ -25,11 +25,17 @@ Route::middleware(['cors', 'json.response', 'guest'])->group(function (){
     Route::post('send_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'sendPasswordResetToken']);
     Route::post('submit_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'submitPasswordResetToken']);
 
-    Route::get('service/{service_id}', [\App\Http\Controllers\API\ServicesController::class, 'getService']);
+    Route::get('service/{service_id}', [\App\Http\Controllers\API\SupportController::class, 'getService']);
+    Route::get('services', [\App\Http\Controllers\API\SupportController::class, 'getServices']);
 
-    Route::get('category/all', [\App\Http\Controllers\API\CategoryController::class, 'getAllCategories']);
+    //support routes
+    Route::get('countries', [\App\Http\Controllers\API\SupportController::class, 'getCountries']);
+    Route::get('states', [\App\Http\Controllers\API\SupportController::class, 'getStates']);
+    Route::get('cities', [\App\Http\Controllers\API\SupportController::class, 'getCities']);
+    Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
 });
-Route::middleware(['auth:api', 'cors', 'json.response'])->group(function (){
+Route::middleware(['auth:api', 'cors'])->group(function (){
+    //config route
     Route::get('config', [\App\Http\Controllers\API\InitController::class, 'config']);
 
     //service routes
@@ -44,8 +50,32 @@ Route::middleware(['auth:api', 'cors', 'json.response'])->group(function (){
     Route::get('chat/get_messages', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
 
     //category routes
-    //TODO limit this route set to spartie permission
     Route::post('category/add', [\App\Http\Controllers\API\CategoryController::class, 'addCategory']);
     Route::post('category/edit', [\App\Http\Controllers\API\CategoryController::class, 'editCategory']);
     Route::get('category/delete', [\App\Http\Controllers\API\CategoryController::class, 'deleteCategory']);
+
+    //review routes
+    Route::post('review/add', [\App\Http\Controllers\API\ReviewController::class, 'addReview']);
+    Route::get('review/{review_id}', [\App\Http\Controllers\API\ReviewController::class, 'viewReview']);
+    Route::get('my/reviews', [\App\Http\Controllers\API\ReviewController::class, 'getMyReviews']);
+
+    //vendor routes
+    Route::post('vendor/create', [\App\Http\Controllers\API\VendorController::class, 'becomeAVendor']);
+    Route::post('vendor/edit', [\App\Http\Controllers\API\VendorController::class, 'editVendorDetails']);
+
+    //product routes
+    Route::post('product/create', [\App\Http\Controllers\API\ProductController::class, 'createProduct']);
+    Route::post('product/edit', [\App\Http\Controllers\API\ProductController::class, 'editProduct']);
+    Route::post('product/delete', [\App\Http\Controllers\API\ProductController::class, 'deleteProduct']);
+
+    //support routes
+    Route::post('country/add', [\App\Http\Controllers\API\SupportController::class, 'addCountry']);
+    Route::post('state/add', [\App\Http\Controllers\API\SupportController::class, 'addStates']);
+    Route::post('city/add', [\App\Http\Controllers\API\SupportController::class, 'addCities']);
+    Route::post('country/edit', [\App\Http\Controllers\API\SupportController::class, 'editCountry']);
+    Route::post('state/edit', [\App\Http\Controllers\API\SupportController::class, 'editState']);
+    Route::post('city/edit', [\App\Http\Controllers\API\SupportController::class, 'editCity']);
+    Route::post('country/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteCountry']);
+    Route::post('state/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteState']);
+    Route::post('city/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteCity']);
 });

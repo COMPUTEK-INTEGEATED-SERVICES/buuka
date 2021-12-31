@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Review extends Model
+class Country extends Model
 {
     use HasFactory;
 
+    protected $table = 'countries';
+
     protected $fillable = [
-        'service_id', 'user_id', 'comment', 'star'
+        'name', 'initial'
     ];
 }
