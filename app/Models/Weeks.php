@@ -5,11 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceCategory extends Model
+class Weeks extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'service_id', 'category_id'
-    ];
+    protected $fillable = ['day'];
 }

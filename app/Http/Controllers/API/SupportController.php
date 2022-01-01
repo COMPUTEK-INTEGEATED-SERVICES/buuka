@@ -4,16 +4,32 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Http\Controllers\Action\AddressAction;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Service;
 use App\Models\State;
+use App\Models\Weeks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SupportController
 {
+    /**
+     * @var AddressAction
+     */
+    private $address;
+    private $city;
+    private $country;
+    private $state;
+
+    public function __construct()
+    {
+        //$this->address = (new AddressAction())->getDetails();
+        //$this->userCurrentLocationToRowNumber();
+    }
+
     public function getCountries(): \Illuminate\Http\JsonResponse
     {
         return response()->json([
@@ -446,13 +462,31 @@ class SupportController
 
     public function getServices(Request $request)
     {
-        $services = Service::with(['images', 'products', 'category'])
+        $services = Service::with(['images', 'products', 'categories', 'vendor'])
             ->where('status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
                 {
                     $query->where('name', 'Like', '%' . $request->input('query') . '%');
                 }
+                /*if ($request->input('city') != null)
+                {
+                    $query->leftJoin('vendors', 'vendors.city_id', '=', $request->input('city'));
+                }else{
+                    $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
+                }
+                if ($request->input('state') != null)
+                {
+                    $query->leftJoin('vendors', 'vendors.state_id', '=', $request->input('state'));
+                }else{
+                    $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
+                }
+                if ($request->input('country') != null)
+                {
+                    $query->leftJoin('vendors', 'vendors.country_id', '=', $request->input('country'));
+                }else{
+                    $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
+                }*/
             })
             ->latest()->paginate(10);
 
@@ -479,15 +513,32 @@ class SupportController
             ], 422);
         }
 
-        $service = Service::with(['images', 'products', 'category'])->first();
+        $service = Service::with(['images', 'products', 'categories', 'vendor'])->find($request->service_id);
 
         return response([
             'status'=>true,
-            'message'=>'Chat sent',
+            'message'=>'',
             'data'=>[
-                'user'=>$this->user,
-                'service'=>$service
+                'service'=>$service,
             ]
         ]);
+    }
+
+    public function getWeeks()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'category'=>Weeks::all()
+            ]
+        ]);
+    }
+
+    private function userCurrentLocationToRowNumber()
+    {
+        $this->city = City::where('name', 'Like', '%' . $this->address->city . '%')->first()->id;
+        $this->country = Country::where('name', 'Like', '%' . $this->address->country . '%')->first()->id;
+        $this->state = Country::where('name', 'Like', '%' . $this->address->state . '%')->first()->id;
     }
 }

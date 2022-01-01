@@ -25,7 +25,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::post('send_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'sendPasswordResetToken']);
     Route::post('submit_password_reset_token', [\App\Http\Controllers\API\AuthenticationController::class, 'submitPasswordResetToken']);
 
-    Route::get('service/{service_id}', [\App\Http\Controllers\API\SupportController::class, 'getService']);
+    Route::get('service', [\App\Http\Controllers\API\SupportController::class, 'getService']);
     Route::get('services', [\App\Http\Controllers\API\SupportController::class, 'getServices']);
 
     //support routes
@@ -33,6 +33,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('states', [\App\Http\Controllers\API\SupportController::class, 'getStates']);
     Route::get('cities', [\App\Http\Controllers\API\SupportController::class, 'getCities']);
     Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
+    Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
     //config route

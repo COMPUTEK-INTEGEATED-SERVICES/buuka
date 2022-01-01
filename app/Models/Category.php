@@ -14,4 +14,9 @@ class Category extends Model
     protected $fillable = [
         'name', 'description', 'image'
     ];
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'service_categories', 'category_id', 'service_id');
+    }
 }

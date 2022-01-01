@@ -19,12 +19,12 @@ class VendorController extends Controller
         $v = Validator::make( $request->all(), [
             'business_name' => 'required|string|unique:vendors',
             'description' => 'required|string',
-            'country' => 'required|int',
-            'state' => 'required|int',
-            'city' => 'required|int',
+            'country' => 'nullable|int|exists:countries,id',
+            'state' => 'nullable|int|exists:states,id',
+            'city' => 'nullable|int|exists:cities,id',
             'address' => 'required|string',
-            'week_start'=>'required|int',
-            'week_end'=>'required|int',
+            'week_start'=>'required|int|exists:weeks,id',
+            'week_end'=>'required|int|exists:weeks,id',
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
             'instagram'=>'nullable|string|url'
@@ -71,8 +71,12 @@ class VendorController extends Controller
             }
         }
 
-        $user->notify( new VendorCreatedNotification());
+        try {
+            $user->notify( new VendorCreatedNotification());
 
+        }catch (\Throwable $throwable){
+            report($throwable);
+        }
         return response([
             'status'=>true,
             'message'=>'Vendor account created',
@@ -89,12 +93,12 @@ class VendorController extends Controller
 
         $user = auth()->guard('api')->user();
         $v = Validator::make( $request->all(), [
-            'vendor_id'=> 'required|int|unique:vendors,id',
+            'vendor_id'=> 'required|int|exists:vendors,id',
             'business_name' => 'nullable|string|unique:vendors',
             'description' => 'nullable|string',
-            'country' => 'nullable|int',
-            'state' => 'nullable|int',
-            'city' => 'nullable|int',
+            'country' => 'nullable|int|exists:countries,id',
+            'state' => 'nullable|int|exists:states,id',
+            'city' => 'nullable|int|exists:cities,id',
             'address' => 'nullable|string',
             'week_start'=>'nullable|int',
             'week_end'=>'nullable|int',

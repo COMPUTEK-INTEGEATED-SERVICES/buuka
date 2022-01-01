@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateServicePricesTable extends Migration
+class CreateWeeksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateServicePricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('service_prices', function (Blueprint $table) {
+        Schema::create('weeks', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->integer('service_id');
-            $table->string('price');
+            $table->string('day');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ class CreateServicePricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('service_prices');
+        Schema::dropIfExists('weeks');
     }
 }

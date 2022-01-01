@@ -38,7 +38,7 @@ class ServicesController extends Controller
         $v = Validator::make( $request->all(), [
             'name'=>'required|string',
             'description'=>'string|required',
-            'category_id'=>'nullable|array',
+            'category_id'=>'required|array',
         ]);
 
         if($v->fails()){
@@ -49,7 +49,7 @@ class ServicesController extends Controller
             ], 422);
         }
 
-        if ($this->user->can('interact', Vendor::class))
+        if ($this->user->can('interact', Vendor::where('user_id', $this->user->id)->first()))
         {
             //store the service
             $service = Service::create([
@@ -59,11 +59,11 @@ class ServicesController extends Controller
             ]);
 
             //store service categories
-            foreach ($request->input('category') as $category)
+            foreach ($request->input('category_id') as $category)
             {
                 ServiceCategory::create([
                     'service_id'=>$service->id,
-                    'category'=>$category
+                    'category_id'=>$category
                 ]);
             }
 
