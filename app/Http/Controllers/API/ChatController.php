@@ -29,7 +29,13 @@ class ChatController extends Controller
         $v = Validator::make( $request->all(), [
             'message' => 'required_without:file|string',
             'to_user_id' => 'required|integer|exists:users,id',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'book'=>'nullable|array',
+            'book.product'=>'integer|exists:products,id',
+            'book.amount'=>'string',
+            'book.scheduled'=>'string',
+            'book.extras'=>'string',
+            'book.vendor_id'=>'int',
         ]);
 
         if($v->fails()){
@@ -52,6 +58,13 @@ class ChatController extends Controller
                 $message = $request->message;
             }
 
+            if ($request->book)
+            {
+                $message = (new OrderController())->customBook($request->input('book'))->id;
+                //type is book to show that a book was made here
+                $type = 'book';
+            }
+
             $chat = Chat::create([
                 'user_1'=>$this->user->id,
                 'user_2'=>$request->input('to_user_id'),
@@ -59,7 +72,11 @@ class ChatController extends Controller
                 'message'=>$message
             ]);
 
-            broadcast( new NewChatMessage($chat, $this->user, User::find($request->input('to_user_id'))));
+            try {
+                broadcast( new NewChatMessage($chat, $this->user, User::find($request->input('to_user_id'))));
+            }catch (\Throwable $throwable){
+                report($throwable);
+            }
 
             return response([
                 'status'=>true,
