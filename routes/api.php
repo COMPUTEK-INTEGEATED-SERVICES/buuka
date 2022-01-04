@@ -96,5 +96,6 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('card/save', [\App\Http\Controllers\API\CreditCardController::class, 'verifyCardAdd']);
 
     //withdrawal routes
+    Route::post('withdrawal/create', [\App\Http\Controllers\API\WithdrawalController::class, 'storeWithdrawalRequest']);
     Route::get('account/verify', [\App\Http\Controllers\API\WithdrawalController::class, 'getUserBankName']);
 });

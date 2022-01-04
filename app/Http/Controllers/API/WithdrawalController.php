@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace App\Http\Controllers\API;
 
@@ -27,7 +27,7 @@ class WithdrawalController extends Controller
     public function storeWithdrawalRequest(Request $request): \Illuminate\Http\JsonResponse
     {
         $v = Validator::make( $request->all(), [
-            'user_id' => 'required|integer|exists:banks,id',
+            'bank_id' => 'required|integer|exists:banks,id',
             'amount'=>'required|string',
             'account_name'=>'string|required',
             'account_number'=>'string|required',
@@ -54,8 +54,9 @@ class WithdrawalController extends Controller
         (new WalletController())->debit($request->input('amount'));
 
         WithdrawalRequest::create([
-            'user_id'=>$request->input('name'),
-            'amount'=>$request->input('description'),
+            'user_id'=>$this->user->id,
+            'bank_id'=>$request->input('bank_id'),
+            'amount'=>$request->input('amount'),
             'account_name'=>$request->input('account_name'),
             'account_number'=>$request->input('account_number')
         ]);
