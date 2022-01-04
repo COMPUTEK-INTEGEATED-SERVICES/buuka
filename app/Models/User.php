@@ -52,6 +52,6 @@ class User extends Authenticatable
 
     public function withdrawalRequest(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(WithdrawalRequest::class, 'user_id', 'id');
+        return $this->hasMany(WithdrawalRequest::class, 'user_id', 'id');
     }
 }
