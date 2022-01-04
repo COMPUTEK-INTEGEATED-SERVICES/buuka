@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Vendor;
 
 class InitController extends Controller
 {
@@ -27,6 +28,10 @@ class InitController extends Controller
             'data'=>[
                 'user'=>$this->user,
                 'notifications'=>$this->user->unreadNotifications,
+                'vendor'=>[
+                    'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
+                    'vendor_id'=> Vendor::where('user_id', $this->user->id)->first()->id,
+                ],
             ]
         ]);
     }

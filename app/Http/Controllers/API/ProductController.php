@@ -41,11 +41,16 @@ class ProductController extends Controller
             ], 422);
         }
 
-        if ($this->user->can('create', Service::find($request->service_id)))
+        if ($this->user->can('interact', Service::find($request->service_id)))
         {
             $product = Product::create($request->toArray());
 
-            $this->user->notify(new ProductCreatedNotification($product));
+            try {
+                $this->user->notify(new ProductCreatedNotification($product));
+            }catch (\Throwable $throwable)
+            {
+                report($throwable);
+            }
 
             return response([
                 'status'=>true,
@@ -81,7 +86,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $service = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, $service))
+        if ($this->user->can('interact', $service))
         {
             $product->name = $request->input('name', $product->name);
             $product->duration = $request->input('duration', $product->duration);
@@ -121,6 +126,7 @@ class ProductController extends Controller
         $services = Service::find($request->service_id);
         if ($this->user->can('interact', $product, $services))
         {
+            //todo: must not have an open order
             $product->delete();
 
             return response([

@@ -26,4 +26,9 @@ class Vendor extends Model
     {
         $this->hasMany(Service::class, 'vendor_id', 'id');
     }
+
+    public function user()
+    {
+        $this->belongsTo(User::class, 'id', 'user_id');
+    }
 }

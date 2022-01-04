@@ -34,6 +34,11 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('cities', [\App\Http\Controllers\API\SupportController::class, 'getCities']);
     Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
+
+    //payment routes
+    Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
+    Route::get('payment_methods', [\App\Http\Controllers\API\PaymentController::class, 'payment_methods']);
+    Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
     //config route
@@ -79,4 +84,12 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('country/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteCountry']);
     Route::post('state/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteState']);
     Route::post('city/delete', [\App\Http\Controllers\API\SupportController::class, 'deleteCity']);
+
+    //order book routes
+    Route::post('book/new/fixed', [\App\Http\Controllers\API\OrderController::class, 'fixedBook']);
+    Route::post('book/custom/accept', [\App\Http\Controllers\API\OrderController::class, 'acceptOrderProposal']);
+
+    //credit card routes
+    Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);
+    Route::post('card/save', [\App\Http\Controllers\API\CreditCardController::class, 'verifyCardAdd']);
 });
