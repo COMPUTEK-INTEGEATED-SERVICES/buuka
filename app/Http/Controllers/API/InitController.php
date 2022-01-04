@@ -30,7 +30,7 @@ class InitController extends Controller
                 'notifications'=>$this->user->unreadNotifications,
                 'vendor'=>[
                     'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
-                    'vendor_id'=> Vendor::where('user_id', $this->user->id)->first()->id,
+                    'vendor_id'=> Vendor::where('user_id', $this->user->id)->first()->id??null,
                 ],
                'wallet'=>$this->user->wallet,
             ]
