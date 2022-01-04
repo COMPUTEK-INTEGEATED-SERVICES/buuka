@@ -27,6 +27,7 @@ class InitController extends Controller
             'data'=>[
                 'user'=>$this->user,
                 'notifications'=>$this->user->unreadNotifications,
+                'wallet'=>$this->user->wallet,
             ]
         ]);
     }

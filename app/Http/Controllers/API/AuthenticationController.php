@@ -8,6 +8,7 @@ use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\PasswordReset;
+use App\Models\Wallet;
 use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
@@ -71,7 +72,13 @@ class AuthenticationController extends Controller
 
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
-        User::create($request->toArray());
+        $user = User::create($request->toArray());
+
+        //This will handle creating a wallet for the user
+        Wallet::create([
+            'user_id'=>$user->id,
+        ]);
+
         try {
             $this->user->notify(new RegistrationNotification());
         }catch (\Throwable $throwable)

@@ -36,6 +36,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
+
     //config route
     Route::get('config', [\App\Http\Controllers\API\InitController::class, 'config']);
 
