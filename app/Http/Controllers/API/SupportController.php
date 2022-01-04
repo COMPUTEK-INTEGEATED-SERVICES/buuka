@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Action\AddressAction;
+use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
@@ -531,6 +532,17 @@ class SupportController
             'message'=>'',
             'data'=>[
                 'category'=>Weeks::all()
+            ]
+        ]);
+    }
+
+    public function getBanks()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'banks'=>Bank::where('status', 1)->get()
             ]
         ]);
     }

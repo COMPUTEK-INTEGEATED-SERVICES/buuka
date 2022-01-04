@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bank;
+use App\Models\PaymentChannel;
 use App\Models\Wallet;
 use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class WithdrawalController extends Controller
         $this->user = auth()->guard('api')->user();
     }
 
-    public function storeWithdrawalRequest(Request $request)
+    public function storeWithdrawalRequest(Request $request): \Illuminate\Http\JsonResponse
     {
         $v = Validator::make( $request->all(), [
             'user_id' => 'required|integer|exists:banks,id',
@@ -66,5 +67,52 @@ class WithdrawalController extends Controller
         ]);
 
 
+    }
+
+    public function getUserBankName(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = Validator::make( $request->all(), [
+            'bank_id' => 'required|integer|exists:banks,id',
+            'account_number'=>'string|required',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $bank = Bank::find($request->bank_id);
+        $secret_key = PaymentChannel::find(1)->secret_key;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.paystack.co/bank/resolve?account_number={$request->input('account_number')}&bank_code=$bank->code",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: Bearer $secret_key",
+                "Cache-Control: no-cache",
+            ),
+        ));
+        $response = json_decode(curl_exec($curl));
+        $err = curl_error($curl);
+        curl_close($curl);
+        if (!$err) {
+            return response()->json([
+                'status' => true,
+                'message' => $response->message,
+                'data' => $response->data
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Invalid Account number supplied',
+            'data' => []
+        ]);
     }
 }

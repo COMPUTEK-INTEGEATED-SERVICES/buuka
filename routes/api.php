@@ -34,6 +34,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('cities', [\App\Http\Controllers\API\SupportController::class, 'getCities']);
     Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
+    Route::get('banks', [\App\Http\Controllers\API\SupportController::class, 'getBanks']);
 
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
@@ -93,4 +94,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //credit card routes
     Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);
     Route::post('card/save', [\App\Http\Controllers\API\CreditCardController::class, 'verifyCardAdd']);
+
+    //withdrawal routes
+    Route::get('account/verify', [\App\Http\Controllers\API\WithdrawalController::class, 'getUserBankName']);
 });
