@@ -88,7 +88,7 @@ class CreditCardController extends Controller
                                 }
                             }
                             //credit the user 50 Naira from the amount used to verify card
-                            (new Wallet())->credit(50);
+                            (new WalletController())->credit(50);
                             return response([
                                 'status'=>true,
                                 'message'=>$m??'Card is not reusable',
