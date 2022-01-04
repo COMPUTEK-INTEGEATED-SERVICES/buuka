@@ -32,6 +32,7 @@ class InitController extends Controller
                     'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
                     'vendor_id'=> Vendor::where('user_id', $this->user->id)->first()->id,
                 ],
+               'wallet'=>$this->user->wallet,
             ]
         ]);
     }

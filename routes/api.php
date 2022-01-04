@@ -41,6 +41,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
+
     //config route
     Route::get('config', [\App\Http\Controllers\API\InitController::class, 'config']);
 
