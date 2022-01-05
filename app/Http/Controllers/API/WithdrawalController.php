@@ -112,7 +112,7 @@ class WithdrawalController extends Controller
         }
         return response()->json([
             'status' => false,
-            'message' => 'Invalid Account number supplied',
+            'message' => $err??'Invalid Account number supplied',
             'data' => []
         ]);
     }
