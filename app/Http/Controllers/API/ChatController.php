@@ -144,4 +144,83 @@ class ChatController extends Controller
             'data'=>[]
         ], 401);
     }
+
+    public function getStarredMessages(Request $request)
+    {
+        $chat = Chat::where(function ($query) use ($request) {
+            $query->where('user_1', $this->user->id)
+                ->where('user_2', '!=', $this->user->id);
+        })->orWhere(function ($query) use ($request) {
+            $query->where('user_1', '!=', $this->user->id)
+                ->where('user_2', $this->user->id);
+        })->where('starred', 1)
+            ->latest()->paginate(10);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'chat'=>$chat
+            ]
+        ]);
+    }
+
+    public function getAllMessages(Request $request)
+    {
+        $chat = Chat::where(function ($query) use ($request) {
+            $query->where('user_1', $this->user->id)
+                ->where('user_2', '!=', $this->user->id);
+        })->orWhere(function ($query) use ($request) {
+            $query->where('user_1', '!=', $this->user->id)
+                ->where('user_2', $this->user->id);
+        })->latest()->paginate(10);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'chat'=>$chat
+            ]
+        ]);
+    }
+
+    public function getDeletedMessages(Request $request)
+    {
+        $chat = Chat::where(function ($query) use ($request) {
+            $query->where('user_1', $this->user->id)
+                ->where('user_2', '!=', $this->user->id);
+        })->orWhere(function ($query) use ($request) {
+            $query->where('user_1', '!=', $this->user->id)
+                ->where('user_2', $this->user->id);
+        })->where('deleted', 1)
+            ->latest()->paginate(10);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'chat'=>$chat
+            ]
+        ]);
+    }
+
+    public function getNewMessages(Request $request)
+    {
+        $chat = Chat::where(function ($query) use ($request) {
+            $query->where('user_1', $this->user->id)
+                ->where('user_2', '!=', $this->user->id);
+        })->orWhere(function ($query) use ($request) {
+            $query->where('user_1', '!=', $this->user->id)
+                ->where('user_2', $this->user->id);
+        })->where('read', 1)
+            ->latest()->paginate(10);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'chat'=>$chat
+            ]
+        ]);
+    }
 }

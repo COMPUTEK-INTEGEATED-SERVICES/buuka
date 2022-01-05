@@ -55,7 +55,11 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
 
     //chat routes
     Route::post('chat/send_message', [\App\Http\Controllers\API\ChatController::class, 'sendMessage']);
-    Route::get('chat/get_messages', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
+    Route::get('chat/get_messages_with_user', [\App\Http\Controllers\API\ChatController::class, 'getMessages']);
+    Route::get('chat/get_new_messages', [\App\Http\Controllers\API\ChatController::class, 'getNewMessages']);
+    Route::get('chat/get_all_messages', [\App\Http\Controllers\API\ChatController::class, 'getAllMessages']);
+    Route::get('chat/get_starred_messages', [\App\Http\Controllers\API\ChatController::class, 'getStarredMessages']);
+    Route::get('chat/get_deleted_messages', [\App\Http\Controllers\API\ChatController::class, 'getDeletedMessages']);
 
     //category routes
     Route::post('category/add', [\App\Http\Controllers\API\CategoryController::class, 'addCategory']);
