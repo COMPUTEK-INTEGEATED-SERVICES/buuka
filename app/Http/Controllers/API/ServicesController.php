@@ -7,6 +7,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Action\AddressAction;
 use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
+use App\Models\Resource;
 use App\Models\ServiceCategory;
 use App\Models\ServiceImages;
 use App\Models\ServiceLocation;
@@ -75,10 +76,10 @@ class ServicesController extends Controller
                     $message =  $file->store('public/images/service/attachments');
                     $type = $file->getMimeType();
 
-                    ServiceImages::create([
-                        'service_id'=>$service->id,
-                        'image'=>$message,
-                        'type'=>$type
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$service->id,
+                        'resourceable_type'=>'App\Models\Service'
                     ]);
                 }
             }
@@ -155,7 +156,7 @@ class ServicesController extends Controller
         }
         if ($this->user->can('interact', Vendor::class) && $this->user->can('interact', Service::class))
         {
-            ServiceImages::destroy($request->input('image_id'));
+            Resource::destroy($request->input('image_id'));
 
             return response([
                 'status'=>true,
@@ -196,7 +197,7 @@ class ServicesController extends Controller
                 {
                     report($throwable);
                 }
-                ServiceImages::find($image->id)->delete();
+                Resource::find($image->id)->delete();
             }
             Service::find($request->input('service_id'))->delete();
             ServiceCategory::where('service_id', $request->input('service_id'))->delete();
@@ -236,15 +237,15 @@ class ServicesController extends Controller
 
                 $type = $request->file('file')->getMimeType();
 
-                ServiceImages::create([
-                    'service_id'=>$request->input('service_id'),
-                    'image'=>$file,
-                    'type'=>$type
+                Resource::create([
+                    'path'=>$file,
+                    'resourceable_id'=>$request->input('service_id'),
+                    'resourceable_type'=>'App\Models\Service'
                 ]);
 
                 return response([
                     'status'=>true,
-                    'message'=>'Service image deleted',
+                    'message'=>'Service image added',
                     'data'=>[]
                 ]);
             }

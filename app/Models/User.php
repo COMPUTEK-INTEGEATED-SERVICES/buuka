@@ -50,8 +50,13 @@ class User extends Authenticatable
         return $this->hasOne(Wallet::class, 'user_id', 'id');
     }
 
-    public function withdrawalRequest(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function withdrawalRequest(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(WithdrawalRequest::class, 'user_id', 'id');
+    }
+
+    public function photo()
+    {
+
     }
 }

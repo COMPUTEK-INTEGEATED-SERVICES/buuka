@@ -13,9 +13,9 @@ class Service extends Model
         'name', 'description', 'vendor_id'
     ];
 
-    public function images(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function images(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->hasMany(ServiceImages::class, 'service_id', 'id');
+        return $this->morphMany(Resource::class, 'resourceable');
     }
 
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo

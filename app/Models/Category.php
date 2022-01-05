@@ -15,7 +15,7 @@ class Category extends Model
         'name', 'description', 'image'
     ];
 
-    public function services()
+    public function services(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_categories', 'category_id', 'service_id');
     }

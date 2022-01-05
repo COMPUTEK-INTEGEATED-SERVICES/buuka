@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Resource;
 use App\Models\Vendor;
 use App\Models\VendorImages;
 use App\Notifications\Vendor\VendorCreatedNotification;
@@ -27,7 +28,8 @@ class VendorController extends Controller
             'week_end'=>'required|int|exists:weeks,id',
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
-            'instagram'=>'nullable|string|url'
+            'instagram'=>'nullable|string|url',
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
         ]);
 
         if($v->fails()){
@@ -63,10 +65,10 @@ class VendorController extends Controller
                 $message =  $file->store('public/images/vendor/attachments');
                 $type = $file->getMimeType();
 
-                VendorImages::create([
-                    'vendor_id'=>$vendor->id,
-                    'image'=>$message,
-                    'type'=>$type
+                Resource::create([
+                    'path'=>$message,
+                    'resourceable_id'=>$vendor->id,
+                    'resourceable_type'=>'App\Models\Vendor'
                 ]);
             }
         }

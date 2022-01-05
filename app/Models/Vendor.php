@@ -22,13 +22,18 @@ class Vendor extends Model
         'socials'
     ];
 
-    public function services()
+    public function services(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        $this->hasMany(Service::class, 'vendor_id', 'id');
+        return $this->hasMany(Service::class, 'vendor_id', 'id');
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        $this->belongsTo(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'id', 'user_id');
+    }
+
+    public function images(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Resource::class, 'resourceable');
     }
 }

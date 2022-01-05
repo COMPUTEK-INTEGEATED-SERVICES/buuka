@@ -13,8 +13,8 @@ class Product extends Model
         'service_id','name', 'amount', 'duration'
     ];
 
-    public function service()
+    public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        $this->belongsTo(Service::class, 'service_id', 'id');
+        return $this->belongsTo(Service::class, 'service_id', 'id');
     }
 }

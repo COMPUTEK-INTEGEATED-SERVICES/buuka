@@ -102,4 +102,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //withdrawal routes
     Route::post('withdrawal/create', [\App\Http\Controllers\API\WithdrawalController::class, 'storeWithdrawalRequest']);
     Route::get('account/verify', [\App\Http\Controllers\API\WithdrawalController::class, 'getUserBankName']);
+
+    //user routes
+    Route::post('user/upload_photo', [\App\Http\Controllers\API\UserController::class, 'uploadPhoto']);
 });
