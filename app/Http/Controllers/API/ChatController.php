@@ -113,7 +113,7 @@ class ChatController extends Controller
 
         if($this->senderIsNotReceiver($this->user->id, $request->input('to_user_id')))
         {
-            $chat = Chat::where(function ($query) use ($request) {
+            $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
                 $query->where('user_1', $this->user->id)
                     ->where('user_2', $request->input('to_user_id'));
             })->orWhere(function ($query) use ($request) {
@@ -147,7 +147,7 @@ class ChatController extends Controller
 
     public function getStarredMessages(Request $request)
     {
-        $chat = Chat::where(function ($query) use ($request) {
+        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
         })->orWhere(function ($query) use ($request) {
@@ -167,7 +167,7 @@ class ChatController extends Controller
 
     public function getAllMessages(Request $request)
     {
-        $chat = Chat::where(function ($query) use ($request) {
+        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
         })->orWhere(function ($query) use ($request) {
@@ -186,7 +186,7 @@ class ChatController extends Controller
 
     public function getDeletedMessages(Request $request)
     {
-        $chat = Chat::where(function ($query) use ($request) {
+        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
         })->orWhere(function ($query) use ($request) {
@@ -206,7 +206,7 @@ class ChatController extends Controller
 
     public function getNewMessages(Request $request)
     {
-        $chat = Chat::where(function ($query) use ($request) {
+        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
         })->orWhere(function ($query) use ($request) {
