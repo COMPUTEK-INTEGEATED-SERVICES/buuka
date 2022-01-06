@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPhotoToUserTable extends Migration
+class AddGenderDateOfBirthToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddPhotoToUserTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('photo')->after('phone')->nullable();
+            $table->string('gender')->after('photo')->nullable();
+            $table->string('date_of_birth')->after('gender')->nullable();
         });
     }
 
@@ -26,7 +27,8 @@ class AddPhotoToUserTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('photo');
+            $table->dropColumn('gender');
+            $table->dropColumn('date_of_birth');
         });
     }
 }

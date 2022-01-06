@@ -12,6 +12,7 @@ use App\Models\Wallet;
 use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -72,6 +73,7 @@ class AuthenticationController extends Controller
 
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
+        $request['last_seen'] = Carbon::now();
         $user = User::create($request->toArray());
 
         //This will handle creating a wallet for the user

@@ -105,4 +105,6 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
 
     //user routes
     Route::post('user/upload_photo', [\App\Http\Controllers\API\UserController::class, 'uploadPhoto']);
+    Route::post('user/edit_profile', [\App\Http\Controllers\API\UserController::class, 'editUserProfile']);
+    Route::get('user/last_seen', [\App\Http\Controllers\API\UserController::class, 'userLastProfile']);
 });

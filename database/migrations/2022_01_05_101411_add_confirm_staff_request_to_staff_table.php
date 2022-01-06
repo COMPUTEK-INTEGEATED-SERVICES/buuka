@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPhotoToUserTable extends Migration
+class AddConfirmStaffRequestToStaffTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPhotoToUserTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('photo')->after('phone')->nullable();
+        Schema::table('staff', function (Blueprint $table) {
+            $table->integer('confirm_staff_request')->default(0)->after('user_id');
         });
     }
 
@@ -25,8 +25,8 @@ class AddPhotoToUserTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('photo');
+        Schema::table('staff', function (Blueprint $table) {
+            $table->dropColumn('confirm_staff_request');
         });
     }
 }

@@ -22,8 +22,14 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'email_verified',
         'password',
         'phone',
+        'phone_verified',
+        'photo',
+        'gender',
+        'date_of_birth',
+        'last_seen'
     ];
 
     /**
@@ -58,5 +64,10 @@ class User extends Authenticatable
     public function photo()
     {
 
+    }
+
+    public function staff(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        $this->hasMany(Staff::class, 'user_id', 'id');
     }
 }
