@@ -97,7 +97,7 @@ class AuthenticationController extends Controller
                 $otp = random_int(100000, 999999);
                 //send verification code to email
                 $verification->sms_otp = Hash::make($otp);
-                $message = "Welcome to ". getenv('APP_NAME'). "here is your OTP:".$otp;
+                $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
                 send_sms($request->phone, $message);
             }
             if (general_settings()->email_verify == 1)
