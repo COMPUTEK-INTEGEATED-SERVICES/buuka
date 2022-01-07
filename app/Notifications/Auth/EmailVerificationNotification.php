@@ -45,8 +45,7 @@ class EmailVerificationNotification extends Notification
         return (new MailMessage)
                     ->line('Welcome to Buuka Application.')
                     ->line("Use this One Time Password to verify your email address")
-                    ->line($this->otp)
-                    ->action('Notification Action', url('/'))
+                    ->action($this->otp, url('#'))
                     ->line('Thank you for using our application!');
     }
 
