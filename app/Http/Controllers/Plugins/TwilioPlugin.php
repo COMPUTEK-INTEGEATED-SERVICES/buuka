@@ -21,7 +21,7 @@ class TwilioPlugin
     public function notify(string $number, string $message): void
     {
         try {
-            $this->client->messages->create($number, [
+            $this->client->messages->create('+'.$number, [
                 'from' => getenv('TWILIO_FROM'),
                 'body' => $message
             ]);
