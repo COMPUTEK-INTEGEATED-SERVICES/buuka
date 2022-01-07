@@ -7,6 +7,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -47,5 +48,57 @@ class UserController extends Controller
             'message' => 'Photo uploaded',
             'data' => []
         ]);
+    }
+
+    public function editUserProfile(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'email' => 'string|email',
+            'phone' => 'string',
+            'gender' => 'string',
+            'date_of_birth' => 'string'
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+              'status' => false,
+              'message' => 'Validation Error',
+              'data' => $v->errors(),
+            ], 422);
+        }
+
+        $user = User::find($this->user->id);
+        $user->first_name = $request->input('first_name', $user->first_name);
+        $user->last_name = $request->input('last_name', $user->last_name);
+        $user->email = $request->input('email', $user->email);
+        $user->email_verified = (!empty($request->email) && $user->email != $request->email)?0:$user->email_verified;
+        $user->phone = $request->input('phone', $user->phone);
+        $user->phone_verified = (!empty($request->phone) && $user->phone != $request->phone)?0:$user->phone_verified;
+        $user->gender = $request->input('gender', $user->gender);
+        $user->date_of_birth = $request->input('date_of_birth', $user->date_of_birth);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile Saved',
+            'data' => []
+        ]);
+    }
+
+    public function userLastSeen()
+    {
+        $user = User::find($this->user->id);
+        $user->last_seen = Carbon::now();
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => '',
+            'data' => []
+        ]);
+
+
     }
 }

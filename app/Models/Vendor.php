@@ -36,4 +36,9 @@ class Vendor extends Model
     {
         return $this->morphMany(Resource::class, 'resourceable');
     }
+
+    public function staff()
+    {
+        $this->hasMany(Staff::class, 'vendor_id', 'id');
+    }
 }
