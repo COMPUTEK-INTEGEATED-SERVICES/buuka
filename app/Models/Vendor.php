@@ -41,4 +41,9 @@ class Vendor extends Model
     {
         $this->hasMany(Staff::class, 'vendor_id', 'id');
     }
+
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(Wallet::class, 'walletable');
+    }
 }

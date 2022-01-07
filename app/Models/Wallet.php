@@ -10,7 +10,7 @@ class Wallet extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'amount', 'status'
+        'walletable_id', 'amount', 'status', 'walletable_type'
     ];
 
     public function user()

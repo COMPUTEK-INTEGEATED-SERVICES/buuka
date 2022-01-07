@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEscrowsTable extends Migration
+class CreateGeneralSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateEscrowsTable extends Migration
      */
     public function up()
     {
-        Schema::create('escrows', function (Blueprint $table) {
+        Schema::create('general_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('balance')->default(0);
-            $table->integer('escrowable_id');
-            $table->string('escrowable_type');
-            //$table->integer('book_id')->nullable();
-            $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('sms_verify')->default(0);
+            $table->tinyInteger('email_verify')->default(0);
+            $table->tinyInteger('otp_login')->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateEscrowsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('escrows');
+        Schema::dropIfExists('general_settings');
     }
 }

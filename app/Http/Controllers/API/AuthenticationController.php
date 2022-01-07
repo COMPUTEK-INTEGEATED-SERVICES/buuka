@@ -6,9 +6,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
+use App\Models\RegistrationVerification;
 use App\Models\User;
 use App\Models\PasswordReset;
 use App\Models\Wallet;
+use App\Notifications\Auth\EmailVerificationNotification;
 use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
@@ -78,11 +80,34 @@ class AuthenticationController extends Controller
 
         //This will handle creating a wallet for the user
         Wallet::create([
-            'user_id'=>$user->id,
+            'walletable_id'=>$user->id,
+            'walletable_type'=>'App\Models\User'
         ]);
 
         try {
-            $this->user->notify(new RegistrationNotification());
+            $user->notify(new RegistrationNotification());
+
+            $verification = RegistrationVerification::create([
+                'user_id'=>$user->id
+            ]);
+            $verification = RegistrationVerification::find($verification->id);
+            if (general_settings()->sms_verify == 1)
+            {
+                //send verification code to sms
+                $otp = Str::random(5);
+                //send verification code to email
+                $verification->sms_otp = Hash::make($otp);
+                $message = "Welcome to ". getenv('APP_NAME'). "here is your OTP, $otp do not disclose it";
+                send_sms($request->phone, $message);
+            }
+            if (general_settings()->email_verify == 1)
+            {
+                $otp = Str::random(5);
+                //send verification code to email
+                $verification->email_otp = Hash::make($otp);
+                $user->notify(new EmailVerificationNotification($otp));
+            }
+            $verification->save();
         }catch (\Throwable $throwable)
         {
             report($throwable);

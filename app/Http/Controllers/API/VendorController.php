@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Escrow;
 use App\Models\Resource;
 use App\Models\Vendor;
 use App\Models\VendorImages;
+use App\Models\Wallet;
 use App\Notifications\Vendor\VendorCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -72,6 +74,17 @@ class VendorController extends Controller
                 ]);
             }
         }
+
+        //create vendor wallet and escrow account
+        Escrow::create([
+            'escrowable_id'=>$vendor->id,
+            'escrowable_type'=>'App\Models\Vendor',
+        ]);
+
+        Wallet::create([
+            'walletable_id'=>$vendor->id,
+            'walletable_type'=>'App\Models\Vendor'
+        ]);
 
         try {
             $user->notify( new VendorCreatedNotification());

@@ -51,19 +51,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function wallet(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->hasOne(Wallet::class, 'user_id', 'id');
+        return $this->morphOne(Wallet::class, 'walletable');
     }
 
     public function withdrawalRequest(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(WithdrawalRequest::class, 'user_id', 'id');
-    }
-
-    public function photo()
-    {
-
     }
 
     public function staff(): \Illuminate\Database\Eloquent\Relations\HasMany
