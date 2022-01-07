@@ -46,6 +46,28 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
+        if (app('general_settings')->email_verify == 1)
+        {
+            if (auth()->user()->email_verified == 0)
+            {
+                return response([
+                    'status'=>false,
+                    'message'=>'Please verify your email address',
+                    'data'=>[]
+                ], 403);
+            }
+        }
+        if (app('general_settings')->sms_verify == 1)
+        {
+            if (auth()->user()->sms_verified == 0)
+            {
+                return response([
+                    'status'=>false,
+                    'message'=>'Please verify your phone number',
+                    'data'=>[]
+                ], 403);
+            }
+        }
         $token = auth()->user()->createToken(Str::random(5))->accessToken;
         return response([
             'status'=>true,
@@ -91,7 +113,7 @@ class AuthenticationController extends Controller
                 'user_id'=>$user->id
             ]);
             $verification = RegistrationVerification::find($verification->id);
-            if (general_settings()->sms_verify == 1)
+            if (app('general_settings')->sms_verify == 1)
             {
                 //send verification code to sms
                 $otp = random_int(100000, 999999);
@@ -100,7 +122,7 @@ class AuthenticationController extends Controller
                 $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
                 send_sms($request->phone, $message);
             }
-            if (general_settings()->email_verify == 1)
+            if (app('general_settings')->email_verify == 1)
             {
                 $otp = random_int(100000, 999999);
                 //send verification code to email
