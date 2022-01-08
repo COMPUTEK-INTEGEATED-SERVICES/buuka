@@ -39,7 +39,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
     Route::get('payment_methods', [\App\Http\Controllers\API\PaymentController::class, 'payment_methods']);
-    Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+    //Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
 
     //auth routes
     Route::post('auth/verify_email_and_phone', [\App\Http\Controllers\API\AuthenticationController::class, 'verifyRegistrationEmailOrPhone']);
@@ -101,6 +101,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //order book routes
     Route::post('book/new/fixed', [\App\Http\Controllers\API\OrderController::class, 'fixedBook']);
     Route::post('book/custom/accept', [\App\Http\Controllers\API\OrderController::class, 'acceptOrderProposal']);
+    Route::post('book/mark_as_complete', [\App\Http\Controllers\API\OrderController::class, 'markOrderAsCompleted']);
 
     //credit card routes
     Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);
@@ -114,4 +115,8 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('user/upload_photo', [\App\Http\Controllers\API\UserController::class, 'uploadPhoto']);
     Route::post('user/edit_profile', [\App\Http\Controllers\API\UserController::class, 'editUserProfile']);
     Route::get('user/last_seen', [\App\Http\Controllers\API\UserController::class, 'userLastProfile']);
+
+    //payment routes
+    Route::post('payment/confirm/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
+    Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
 });

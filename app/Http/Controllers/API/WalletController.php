@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Escrow;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,17 +18,31 @@ class WalletController extends Controller
         $this->user = auth()->guard('api')->user();
     }
 
-    public function credit($amount)
+    public static function credit($id, $type, $amount)
     {
-        $wallet_balance = Wallet::where('user_id', $this->user->id)->first();
-        $wallet_balance->balance = $wallet_balance->balance + $amount;
-        return $wallet_balance->save();
+        if ($type == 'user') {
+            $type = 'App\Models\User';
+        } else {
+            $type = 'App\Models\Vendor';
+        }
+
+        $wallet = Wallet::where('walletable_id', $id)
+            ->where('walletable_type', $type)->first();
+        $wallet->balance = $wallet->balance + $amount;
+        return $wallet->save();
     }
 
-    public function debit($amount)
+    public static function debit($id, $type, $amount)
     {
-        $wallet_balance = Wallet::where('user_id', $this->user->id)->first();
-        $wallet_balance->balance = $wallet_balance->balance - $amount;
-        return $wallet_balance->save();
+        if ($type == 'user') {
+            $type = 'App\Models\User';
+        } else {
+            $type = 'App\Models\Vendor';
+        }
+
+        $wallet = Wallet::where('walletable_id', $id)
+            ->where('walletable_type', $type)->first();
+        $wallet->balance = $wallet->balance - $amount;
+        return $wallet->save();
     }
 }

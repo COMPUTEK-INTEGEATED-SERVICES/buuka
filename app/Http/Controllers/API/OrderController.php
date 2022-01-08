@@ -16,7 +16,9 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\Order\UserBookCompleteNotification;
 use App\Notifications\Order\UserBookSuccessfulNotification;
+use App\Notifications\Order\UserMarkedOrderAsCompletedNotification;
 use App\Notifications\Order\VendorBookCompleteNotification;
+use App\Notifications\Order\VendorMarkedOrderAsCompletedNotification;
 use App\Notifications\Order\VendorNewBookNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -220,5 +222,56 @@ class OrderController extends Controller
             'message'=>'Invalid request',
             'data'=>[]
         ], 422);
+    }
+
+    public function markOrderAsCompleted(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = Validator::make( $request->all(), [
+            'book_id' => 'required|int|exists:books,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $book = Book::find($request->book_id);
+
+        $vendor = Vendor::find($book->vendor_id);
+        if ($this->user->can('participate', $book, $vendor))
+        {
+            if ($book->status == 1)
+            {
+                //notify the vendor that a user marked order as paid or vise versa
+                try {
+                    User::find($book->user_id)->notify(new VendorMarkedOrderAsCompletedNotification($vendor, $book));
+                    User::find($book->vendor_id)->notify(new UserMarkedOrderAsCompletedNotification($book));
+                }catch (\Throwable $throwable)
+                {
+                    report($throwable);
+                }
+
+                //change book status to complete
+                $book->status = 2;
+
+                //we credit vendor from escrow
+                EscrowController::subtractFund($vendor->user_id, 'vendor', $book->amount);
+                WalletController::credit($vendor->user_id, 'vendor', $book->amount);
+
+                $book->save();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'This book as been marked as completed',
+                    'data' => []
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Access denied',
+            'data' => []
+        ], 403);
     }
 }
