@@ -8,6 +8,7 @@ use App\Events\Order\UserBookSuccessfulEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\Client;
+use App\Models\Escrow;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\TransactionReference;
@@ -158,6 +159,10 @@ class OrderController extends Controller
             'user_id'=>$book->user_id,
             'vendor_id'=>$book->vendor_id
         ]);
+
+        //move money to escrow account
+        EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
+
         //finally save the book
         return $book->save();
     }

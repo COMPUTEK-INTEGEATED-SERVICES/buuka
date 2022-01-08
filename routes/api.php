@@ -40,6 +40,13 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
     Route::get('payment_methods', [\App\Http\Controllers\API\PaymentController::class, 'payment_methods']);
     Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+
+    //auth routes
+    Route::post('auth/verify_email_and_phone', [\App\Http\Controllers\API\AuthenticationController::class, 'verifyRegistrationEmailOrPhone']);
+    Route::group(['middleware' =>'throttle:1,5'], function (){
+        Route::post('auth/resend_email_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendEmailVerification']);
+        Route::post('auth/resend_sms_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendSmsVerification']);
+    });
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 

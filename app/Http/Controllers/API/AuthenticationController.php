@@ -109,10 +109,9 @@ class AuthenticationController extends Controller
         try {
             $user->notify(new RegistrationNotification());
 
-            $verification = RegistrationVerification::create([
+            $verification = RegistrationVerification::firstOrNew([
                 'user_id'=>$user->id
             ]);
-            $verification = RegistrationVerification::find($verification->id);
             if (app('general_settings')->sms_verify == 1)
             {
                 //send verification code to sms
@@ -209,6 +208,138 @@ class AuthenticationController extends Controller
         return response([
             'status'=>false,
             'message'=>'An error occurred our engineers are working on it',
+            'data'=>[]
+        ]);
+    }
+
+    public function verifyRegistrationEmailOrPhone(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'email' => 'required|string|email|max:255|exists:users, email',
+            'email_otp' => 'string|max:6',
+            'sms_otp' => 'string|max:6',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid OTP supplied',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $otps = RegistrationVerification::where('user_id', $user->id)->first();
+        if (app('general_settings')->sms_verify == 1)
+        {
+            if (!Hash::check($request->sms_otp, $otps->sms_otp))
+            {
+                return response([
+                    'status'=>false,
+                    'message'=>'Invalid OTP supplied',
+                    'data'=>[]
+                ], 403);
+            }
+            $user->phone_verified = 1;
+        }
+
+        if (app('general_settings')->email_verify == 1)
+        {
+            if (!Hash::check($request->email_otp, $otps->email_otp))
+            {
+                return response([
+                    'status'=>false,
+                    'message'=>'Invalid OTP supplied',
+                    'data'=>[]
+                ], 403);
+            }
+            $user->email_verified = 1;
+        }
+
+        $user->save();
+        return response([
+            'status'=>true,
+            'message'=>'Verification complete',
+            'data'=>[]
+        ]);
+    }
+
+    public function resendSmsVerification(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'email' => 'required|string|email|max:255|exists:users, email',
+            'phone'=> "nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $verification = RegistrationVerification::firstOrNew([
+            'user_id'=>$user->id
+        ]);
+        if (app('general_settings')->sms_verify == 1)
+        {
+            //send verification code to sms
+            $otp = random_int(100000, 999999);
+            //send verification code to email
+            $verification->sms_otp = Hash::make($otp);
+            $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
+            send_sms($request->input('phone', $user->phone), $message);
+        }
+        if ($request->phone)
+        {
+            $user->phone = $request->phone;
+        }
+        $user->save();
+
+        return response([
+            'status'=>true,
+            'message'=>'OTP has been sent to '.$request->input('phone', $user->phone),
+            'data'=>[]
+        ]);
+    }
+
+    public function resendEmailVerification(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'email' => 'required|string|email|max:255|exists:users, email',
+            'new_email' => 'nullable|string|email|max:255|unique:users',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if ($request->new_email)
+        {
+            $user->email = $request->email;
+        }
+        $user->save();
+        $verification = RegistrationVerification::firstOrNew([
+            'user_id'=>$user->id
+        ]);
+        if (app('general_settings')->email_verify == 1)
+        {
+            $otp = random_int(100000, 999999);
+            //send verification code to email
+            $verification->email_otp = Hash::make($otp);
+            $user->notify(new EmailVerificationNotification($otp));
+        }
+
+        return response([
+            'status'=>true,
+            'message'=>'OTP has been sent to '.$user->email,
             'data'=>[]
         ]);
     }

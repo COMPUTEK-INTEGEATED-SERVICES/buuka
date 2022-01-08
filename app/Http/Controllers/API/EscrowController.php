@@ -17,7 +17,7 @@ class EscrowController extends Controller
         $this->user = auth()->guard('api')->user();
     }
 
-    public function addFund($id, $type, $amount)
+    public static function addFund($id, $type, $amount)
     {
         if ($type == 'user') {
             $type = 'App\Models\User';
@@ -31,7 +31,7 @@ class EscrowController extends Controller
         return $escrow->save();
     }
 
-    public function subtractFund($id, $type, $amount)
+    public static function subtractFund($id, $type, $amount)
     {
         if ($type == 'user') {
             $type = 'App\Models\User';
