@@ -115,9 +115,10 @@ class AuthenticationController extends Controller
         try {
             $user->notify(new RegistrationNotification());
 
-            $verification = RegistrationVerification::firstOrNew([
+            $verification = RegistrationVerification::firstOrCreate([
                 'user_id'=>$user->id
             ]);
+            $verification = RegistrationVerification::find($verification->id);
             if (app('general_settings')->sms_verify == 1)
             {
                 //send verification code to sms
@@ -306,6 +307,7 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
+        $verification = RegistrationVerification::find($verification->id);
         if (app('general_settings')->sms_verify == 1)
         {
             //send verification code to sms
@@ -360,6 +362,7 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
+        $verification = RegistrationVerification::find($verification->id);
         if (app('general_settings')->email_verify == 1)
         {
             $otp = random_int(100000, 999999);
