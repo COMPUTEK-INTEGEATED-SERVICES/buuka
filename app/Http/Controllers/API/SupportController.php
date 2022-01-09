@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Action\AddressAction;
+use App\Models\Admin\VendorPackage;
 use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
@@ -552,5 +553,16 @@ class SupportController
         $this->city = City::where('name', 'Like', '%' . $this->address->city . '%')->first()->id;
         $this->country = Country::where('name', 'Like', '%' . $this->address->country . '%')->first()->id;
         $this->state = Country::where('name', 'Like', '%' . $this->address->state . '%')->first()->id;
+    }
+
+    public function vendorPackages()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'banks'=>VendorPackage::where('status', 1)->get()
+            ]
+        ]);
     }
 }
