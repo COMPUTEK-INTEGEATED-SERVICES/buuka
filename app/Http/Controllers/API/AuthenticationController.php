@@ -60,7 +60,7 @@ class AuthenticationController extends Controller
             if (auth()->user()->sms_verified == 0)
             {
                 $require['sms']=true;
-                $msg = ($msg)?' and your phone number':'Please verify your phone number';
+                $msg = ($msg)?$msg.' and your phone number':'Please verify your phone number';
             }
         }
         if (!empty('require'))
