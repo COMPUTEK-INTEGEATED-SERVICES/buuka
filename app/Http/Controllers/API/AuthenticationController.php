@@ -303,7 +303,7 @@ class AuthenticationController extends Controller
                 'data' => []
             ], 403);
         }
-        $verification = RegistrationVerification::firstOrNew([
+        $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
         if (app('general_settings')->sms_verify == 1)
@@ -357,7 +357,7 @@ class AuthenticationController extends Controller
             $user->email = $request->email;
         }
         $user->save();
-        $verification = RegistrationVerification::firstOrNew([
+        $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
         if (app('general_settings')->email_verify == 1)
