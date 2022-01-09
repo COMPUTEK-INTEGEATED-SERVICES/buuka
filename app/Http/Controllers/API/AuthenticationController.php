@@ -374,7 +374,9 @@ class AuthenticationController extends Controller
         return response([
             'status'=>true,
             'message'=>'OTP has been sent to '.$user->email,
-            'data'=>[]
+            'data'=>[
+                $verification
+            ]
         ]);
     }
 }
