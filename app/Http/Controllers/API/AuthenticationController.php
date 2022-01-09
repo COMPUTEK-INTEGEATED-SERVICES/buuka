@@ -230,15 +230,12 @@ class AuthenticationController extends Controller
 
         $user = User::where('email', $request->email)->first();
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
+        $require = [];
         if (app('general_settings')->sms_verify == 1)
         {
             if (!Hash::check($request->sms_otp, $otps->sms_otp))
             {
-                return response([
-                    'status'=>false,
-                    'message'=>'Invalid OTP supplied',
-                    'data'=>[]
-                ], 403);
+                $require[] = ['sms'=>true];
             }
             $user->phone_verified = 1;
         }
@@ -247,13 +244,19 @@ class AuthenticationController extends Controller
         {
             if (!Hash::check($request->email_otp, $otps->email_otp))
             {
-                return response([
-                    'status'=>false,
-                    'message'=>'Invalid OTP supplied',
-                    'data'=>[]
-                ], 403);
+                $require[] = ['email'=>true];
             }
             $user->email_verified = 1;
+        }
+        if (!empty($require))
+        {
+            return response([
+                'status'=>false,
+                'message'=>'Invalid OTP supplied',
+                'data'=>[
+                    'require'=>$require
+                ]
+            ], 403);
         }
 
         $user->save();
