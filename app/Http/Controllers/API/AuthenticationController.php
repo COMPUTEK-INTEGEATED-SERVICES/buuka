@@ -221,7 +221,7 @@ class AuthenticationController extends Controller
     public function verifyRegistrationEmailOrPhone(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255|exists:users, email',
+            'email' => 'required|string|email|max:255',
             'email_otp' => 'string|max:6',
             'sms_otp' => 'string|max:6',
         ]);
@@ -235,6 +235,14 @@ class AuthenticationController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        if (!$user)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid email address',
+                'data' => []
+            ], 403);
+        }
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
         if (app('general_settings')->sms_verify == 1)
         {
