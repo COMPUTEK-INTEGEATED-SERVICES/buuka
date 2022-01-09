@@ -221,9 +221,9 @@ class AuthenticationController extends Controller
     public function verifyRegistrationEmailOrPhone(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|int|email|max:255',
-            'email_otp' => 'string|max:6',
-            'sms_otp' => 'string|max:6',
+            'email' => 'required|string|email|max:255',
+            'email_otp' => 'int|max:6',
+            'sms_otp' => 'int|max:6',
         ]);
 
         if($v->fails()){
