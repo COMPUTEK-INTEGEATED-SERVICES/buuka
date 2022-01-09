@@ -46,28 +46,34 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
+        $require = [];
         if (app('general_settings')->email_verify == 1)
         {
             if (auth()->user()->email_verified == 0)
             {
-                return response([
-                    'status'=>false,
-                    'message'=>'Please verify your email address',
-                    'data'=>[]
-                ], 403);
+                $require['email']=true;
+                $msg= 'Please verify your email';
             }
         }
         if (app('general_settings')->sms_verify == 1)
         {
             if (auth()->user()->sms_verified == 0)
             {
-                return response([
-                    'status'=>false,
-                    'message'=>'Please verify your phone number',
-                    'data'=>[]
-                ], 403);
+                $require['sms']=true;
+                $msg = ($msg)?' and your phone number':'Please verify your phone number';
             }
         }
+        if (!empty('require'))
+        {
+            return response([
+                'status'=>false,
+                'message'=>$msg,
+                'data'=>[
+                    $require
+                ]
+            ], 403);
+        }
+
         $token = auth()->user()->createToken(Str::random(5))->accessToken;
         return response([
             'status'=>true,
@@ -230,12 +236,16 @@ class AuthenticationController extends Controller
 
         $user = User::where('email', $request->email)->first();
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
-        $require = [];
         if (app('general_settings')->sms_verify == 1)
         {
             if (!Hash::check($request->sms_otp, $otps->sms_otp))
             {
-                $require[] = ['sms'=>true];
+                $require = ['sms'];
+                return response([
+                    'status'=>false,
+                    'message'=>'Invalid OTP supplied',
+                    'data'=>[]
+                ], 403);
             }
             $user->phone_verified = 1;
         }
@@ -244,19 +254,13 @@ class AuthenticationController extends Controller
         {
             if (!Hash::check($request->email_otp, $otps->email_otp))
             {
-                $require[] = ['email'=>true];
+                return response([
+                    'status'=>false,
+                    'message'=>'Invalid OTP supplied',
+                    'data'=>[]
+                ], 403);
             }
             $user->email_verified = 1;
-        }
-        if (!empty($require))
-        {
-            return response([
-                'status'=>false,
-                'message'=>'Invalid OTP supplied',
-                'data'=>[
-                    'require'=>$require
-                ]
-            ], 403);
         }
 
         $user->save();
