@@ -222,8 +222,8 @@ class AuthenticationController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'email' => 'required|string|email|max:255',
-            'email_otp' => 'int|max:6',
-            'sms_otp' => 'int|max:6',
+            'email_otp' => 'int|min:6',
+            'sms_otp' => 'int|min:6',
         ]);
 
         if($v->fails()){
