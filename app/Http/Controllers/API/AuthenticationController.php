@@ -275,7 +275,7 @@ class AuthenticationController extends Controller
     public function resendSmsVerification(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255|exists:users, email',
+            'email' => 'required|string|email|max:255|exists:App\Models\Users,email',
             'phone'=> "nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
         ]);
 
