@@ -322,6 +322,7 @@ class AuthenticationController extends Controller
             $user->phone = $request->phone;
         }
         $user->save();
+        $verification->save();
 
         return response([
             'status'=>true,
@@ -370,13 +371,11 @@ class AuthenticationController extends Controller
             $verification->email_otp = Hash::make($otp);
             $user->notify(new EmailVerificationNotification($otp));
         }
-
+        $verification->save();
         return response([
             'status'=>true,
             'message'=>'OTP has been sent to '.$user->email,
-            'data'=>[
-                $verification
-            ]
+            'data'=>[]
         ]);
     }
 }
