@@ -69,7 +69,7 @@ class AuthenticationController extends Controller
                 'message'=>$msg,
                 'data'=>[
                     'email'=>auth()->user()->email,
-                    $require
+                    'required'=>$require
                 ]
             ], 403);
         }
