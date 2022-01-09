@@ -43,7 +43,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
 
     //auth routes
     Route::post('auth/verify_email_and_phone', [\App\Http\Controllers\API\AuthenticationController::class, 'verifyRegistrationEmailOrPhone']);
-    Route::group([], function (){
+    Route::group(['middleware' =>'throttle:1,1'], function (){
         Route::post('auth/resend_email_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendEmailVerification']);
         Route::post('auth/resend_sms_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendSmsVerification']);
     });
