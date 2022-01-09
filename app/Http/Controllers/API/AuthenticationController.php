@@ -275,7 +275,7 @@ class AuthenticationController extends Controller
     public function resendSmsVerification(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255|exists:App\Models\Users,email',
+            'email' => 'required|string|email|max:255',
             'phone'=> "nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
         ]);
 
@@ -288,6 +288,14 @@ class AuthenticationController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        if (!$user)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid email address',
+                'data' => []
+            ], 403);
+        }
         $verification = RegistrationVerification::firstOrNew([
             'user_id'=>$user->id
         ]);
@@ -316,7 +324,7 @@ class AuthenticationController extends Controller
     public function resendEmailVerification(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255|exists:users, email',
+            'email' => 'required|string|email|max:255',
             'new_email' => 'nullable|string|email|max:255|unique:users',
         ]);
 
@@ -329,6 +337,14 @@ class AuthenticationController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        if (!$user)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid email address',
+                'data' => []
+            ], 403);
+        }
         if ($request->new_email)
         {
             $user->email = $request->email;
