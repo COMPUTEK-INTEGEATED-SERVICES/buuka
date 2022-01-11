@@ -169,7 +169,8 @@ class ChatController extends Controller
     public function getAllMessages()
     {
         $chat = Chat::where('user_2', $this->user->id)
-            ->orderByDesc('id')->get();
+            ->orderByDesc('id')
+            ->with(['user_1', 'user_2'])->distict('user_1')->get();
         /*$chat =  Chat::select(DB::raw('t.*'))
             ->from(DB::raw('(SELECT * FROM chats ORDER BY created_at DESC) t'))
             ->where('user_2', $this->user->id)
