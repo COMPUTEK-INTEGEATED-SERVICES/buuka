@@ -14,8 +14,8 @@ class BankSeeder extends Seeder
      */
     public function run()
     {
-        $banks = file_get_contents('./extras/banks.json');
-        foreach (json_decode($banks) as $bank)
+        $banks = json_decode(file_get_contents('./extras/banks.json'));
+        foreach ($banks as $bank)
         {
             Bank::create([
                 'name'=>$bank->name,

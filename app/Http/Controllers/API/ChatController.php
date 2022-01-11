@@ -122,7 +122,7 @@ class ChatController extends Controller
                     ->where('user_2', $this->user->id);
             })->latest()->paginate(10);
 
-            if ($this->user->can('participate', $chat))
+            if ($this->user->can('participate', $this->user, $chat))
             {
                 return response([
                     'status'=>true,
