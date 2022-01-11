@@ -168,7 +168,7 @@ class ChatController extends Controller
     public function getAllMessages()
     {
         $chat = Chat::with(['user_1', 'user_2'])->where('user_2', $this->user->id)
-            ->orderBy('chats.id')->groupBy('chats.user_1', 'chats.id')->paginate(10);
+            ->orderBy('chats.id', 'desc')->groupBy('chats.user_1', 'chats.id')->paginate(10);
 
         return response([
             'status'=>true,
