@@ -166,15 +166,15 @@ class ChatController extends Controller
         ]);
     }
 
-    public function getAllMessages()
+    public function getAllMessages(Request $request)
     {
         $chat = Chat::with(['user_1', 'user_2'])
             ->where('user_2', $this->user->id)
             ->paginate(10);
             /*->get()
             ->keyBy('user_1');*/
-        $chat = $chat->getCollection($chat)->keyBy('user_1');
-        $chat->setCollection();
+        $chatCollection = $chat->getCollection()->keyBy('user_1');
+        $chat->setCollection($chatCollection);
 
         return response([
             'status'=>true,
