@@ -170,8 +170,11 @@ class ChatController extends Controller
     {
         $chat = Chat::with(['user_1', 'user_2'])
             ->where('user_2', $this->user->id)
-            ->get()
-            ->keyBy('user_1');
+            ->paginate(10);
+            /*->get()
+            ->keyBy('user_1');*/
+        $chat = $chat->getCollection($chat)->keyBy('user_1');
+        $chat->setCollection();
 
         return response([
             'status'=>true,
