@@ -173,7 +173,7 @@ class ChatController extends Controller
         })->orWhere(function ($query){
             $query->where('user_1', '!=', $this->user->id)
                 ->where('user_2', $this->user->id);
-        })->groupBy('chats.user_1')->latest()->paginate(10);
+        })->latest()->groupBy('chats.user_1')->paginate(10);
 
         return response([
             'status'=>true,
