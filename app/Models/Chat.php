@@ -13,6 +13,10 @@ class Chat extends Model
         'message', 'type', 'user_1', 'user_2'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     public function user_1(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_1');
