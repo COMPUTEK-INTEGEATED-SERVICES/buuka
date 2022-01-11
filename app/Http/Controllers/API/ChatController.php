@@ -165,12 +165,12 @@ class ChatController extends Controller
         ]);
     }
 
-    public function getAllMessages(Request $request)
+    public function getAllMessages()
     {
-        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query) use ($request) {
+        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query){
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
-        })->orWhere(function ($query) use ($request) {
+        })->orWhere(function ($query){
             $query->where('user_1', '!=', $this->user->id)
                 ->where('user_2', $this->user->id);
         })->latest()->paginate(10);
