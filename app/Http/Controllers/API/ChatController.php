@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
@@ -168,7 +169,11 @@ class ChatController extends Controller
     public function getAllMessages()
     {
         $chat = Chat::with(['user_1', 'user_2'])->where('user_2', $this->user->id)
-            ->orderBy('chats.id')->distinct('chats.user_1')->paginate(10);
+            ->orderBy('chats.created_at')->groupBy('chats.user_1')->paginate(10);
+        /*$chat =  Chat::select(DB::raw('t.*'))
+            ->from(DB::raw('(SELECT * FROM chats ORDER BY created_at DESC) t'))
+            ->groupBy('t.from')
+            ->get();*/
 
         return response([
             'status'=>true,
