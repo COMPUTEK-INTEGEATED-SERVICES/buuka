@@ -170,7 +170,7 @@ class ChatController extends Controller
         $chat = Chat::with(['user_1', 'user_2'])->where(function ($query){
             $query->where('user_1', '!=', $this->user->id)
                 ->where('user_2', '=', $this->user->id);
-        })->groupBy('chats.user_1')->latest()->paginate(10);
+        })->groupBy('chats.user_1', 'chats*')->latest()->paginate(10);
 
         return response([
             'status'=>true,
