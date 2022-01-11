@@ -167,7 +167,7 @@ class ChatController extends Controller
 
     public function getAllMessages()
     {
-        $chat = Chat::with(['user_1', 'user_2'])->where(function ($query){
+        $chat = Chat::where(function ($query){
             $query->where('user_1', $this->user->id)
                 ->where('user_2', '!=', $this->user->id);
         })->orWhere(function ($query){
