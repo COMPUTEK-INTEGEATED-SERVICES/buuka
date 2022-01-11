@@ -15,7 +15,7 @@ class Chat extends Model
 
     public function user_1(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(User::class, 'id', 'user_1')->with();
+        return $this->hasOne(User::class, 'id', 'user_1');
     }
 
     public function user_2(): \Illuminate\Database\Eloquent\Relations\HasOne
