@@ -120,4 +120,17 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //payment routes
     Route::post('payment/confirm/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
     Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+
+    //vendor packages routes
+    Route::post('vendor_package/add_vendor_package', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'createVendorType']);
+    Route::post('vendor_package/edit_vendor_package', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'editVendorType']);
+    Route::get('vendor_package/enable', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'enable']);
+    Route::get('vendor_package/disable', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'disable']);
+
+    //client routes
+    Route::post('vendor/add_note', [\App\Http\Controllers\API\ClientController::class, 'vendorAddNote']);
+    Route::post('vendor/edit_note', [\App\Http\Controllers\API\ClientController::class, 'vendorEditNote']);
+    Route::post('vendor/delete_note', [\App\Http\Controllers\API\ClientController::class, 'vendorDeleteNote']);
+    Route::get('vendor/get_client_inf0', [\App\Http\Controllers\API\ClientController::class, 'getClientInfo']);
+    Route::get('vendor/get_all_client_info', [\App\Http\Controllers\API\ClientController::class, 'getAllClientInfo']);
 });

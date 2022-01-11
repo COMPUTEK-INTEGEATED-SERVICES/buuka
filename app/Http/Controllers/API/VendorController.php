@@ -20,7 +20,7 @@ class VendorController extends Controller
     {
         $user = auth()->guard('api')->user();
         $v = Validator::make( $request->all(), [
-            'vendor_package_id' => 'required|int|exists:vendor_packages, id',
+            'vendor_package_id' => 'required|int|exists:vendor_packages,id',
             'business_name' => 'required|string|unique:vendors',
             'description' => 'required|string',
             'country' => 'nullable|int|exists:countries,id',
