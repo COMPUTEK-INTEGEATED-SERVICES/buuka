@@ -35,6 +35,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
     Route::get('banks', [\App\Http\Controllers\API\SupportController::class, 'getBanks']);
+    Route::get('vendor_packages', [\App\Http\Controllers\API\SupportController::class, 'vendorPackages']);
 
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
