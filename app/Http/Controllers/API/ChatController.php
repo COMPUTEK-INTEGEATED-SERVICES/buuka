@@ -173,7 +173,7 @@ class ChatController extends Controller
         $chat =  Chat::with(['user_1', 'user_2'])->select(DB::raw('t.*'))
             ->from(DB::raw('(SELECT * FROM chats ORDER BY created_at DESC) t'))
             ->where('user_2', $this->user->id)
-            ->groupBy('t.user_1')
+            ->groupBy('t.user_2')
             ->get();
 
         return response([
