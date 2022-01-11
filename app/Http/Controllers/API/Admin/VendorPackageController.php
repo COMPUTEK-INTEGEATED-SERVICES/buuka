@@ -45,22 +45,17 @@ class VendorPackageController extends Controller
                 'commission' => $request->input('commission'),
                 'color' => $request->input('color')
             ]);
-
             return response([
                 'status'=>true,
                 'message'=>'Vendor Type Created',
                 'data'=>[]
             ]);
         }
-
         return response([
             'status'=>false,
             'message'=>'Access Denied',
             'data'=>[]
         ], 403);
-
-
-
     }
 
     public function editVendorType(Request $request)
