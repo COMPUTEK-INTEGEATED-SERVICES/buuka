@@ -17,12 +17,12 @@ class Chat extends Model
         'created_at' => 'datetime',
     ];
 
-    public function user_1(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function sender(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_1');
     }
 
-    public function user_2(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function receiver(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_2');
     }
