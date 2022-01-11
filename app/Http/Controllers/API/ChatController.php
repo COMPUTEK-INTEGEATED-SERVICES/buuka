@@ -172,8 +172,6 @@ class ChatController extends Controller
             ->where('user_2', $this->user->id)
             ->latest()
             ->paginate(10);
-            /*->get();*/
-            /*->keyBy('user_1');*/
         $chatCollection = $chat->getCollection()->keyBy('user_1');
         $chat->setCollection($chatCollection);
 
