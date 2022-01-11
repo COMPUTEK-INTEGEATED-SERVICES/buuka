@@ -15,12 +15,12 @@ class AddPhonecodeCapitalCurrencyCurrencynameCurrencysymbolRegionSubregionToCoun
     {
         Schema::table('countries', function (Blueprint $table) {
             $table->after('currency', function ($query){
-                $query->string('currency_name')->nullalble();
-                $query->string('currency_symbol')->nullalble();
-                $query->string('phone_code')->nullalble();
-                $query->string('capital')->nullalble();
-                $query->string('region')->nullalble();
-                $query->string('sub_region')->nullalble();
+                $query->string('currency_name')->nullable();
+                $query->string('currency_symbol')->nullable();
+                $query->string('phone_code')->nullable();
+                $query->string('capital')->nullable();
+                $query->string('region')->nullable();
+                $query->string('sub_region')->nullable();
             });
         });
     }
