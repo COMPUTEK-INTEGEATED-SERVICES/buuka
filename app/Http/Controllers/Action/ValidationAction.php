@@ -20,6 +20,6 @@ class ValidationAction
                 'data'=>$validator->errors()->all()
             ], 422);
         }
-        return true;
+        //return true;
     }
 }

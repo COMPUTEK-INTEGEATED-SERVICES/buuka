@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +19,17 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
+        'email_verified',
         'password',
+        'phone',
+        'phone_verified',
+        'photo',
+        'gender',
+        'date_of_birth',
+        'last_seen'
     ];
 
     /**
@@ -41,4 +50,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(Wallet::class, 'walletable');
+    }
+
+    public function withdrawalRequest(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WithdrawalRequest::class, 'user_id', 'id');
+    }
+
+    public function staff(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        $this->hasMany(Staff::class, 'user_id', 'id');
+    }
 }
