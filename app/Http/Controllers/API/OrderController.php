@@ -274,4 +274,10 @@ class OrderController extends Controller
             'data' => []
         ], 403);
     }
+
+    public function cancelBook(Request $request)
+    {
+        //apply buuka cancellation policy
+        //cancel the order
+    }
 }

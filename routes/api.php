@@ -40,7 +40,6 @@ Route::middleware(['cors', 'guest'])->group(function (){
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
     Route::get('payment_methods', [\App\Http\Controllers\API\PaymentController::class, 'payment_methods']);
-    //Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
 
     //auth routes
     Route::post('auth/verify_email_and_phone', [\App\Http\Controllers\API\AuthenticationController::class, 'verifyRegistrationEmailOrPhone']);
@@ -119,7 +118,9 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
 
     //payment routes
     Route::post('payment/confirm/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
+    Route::post('payment/confirm/with_gcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
     Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+    Route::post('payment/gcard/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
     //vendor packages routes
     Route::post('vendor_package/add_vendor_package', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'createVendorType']);
@@ -133,4 +134,9 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('vendor/delete_note', [\App\Http\Controllers\API\ClientController::class, 'vendorDeleteNote']);
     Route::get('vendor/get_client_inf0', [\App\Http\Controllers\API\ClientController::class, 'getClientInfo']);
     Route::get('vendor/get_all_client_info', [\App\Http\Controllers\API\ClientController::class, 'getAllClientInfo']);
+
+    //gift card routes
+    Route::get('gift_card/get_info', [\App\Http\Controllers\API\GiftCardController::class, 'getGiftCardInfo']);
+    Route::post('gift_card/redeem', [\App\Http\Controllers\API\GiftCardController::class, 'redeemGiftCard']);
+    Route::post('gift_card/purchase', [\App\Http\Controllers\API\GiftCardController::class, 'saveGiftCardInfo']);
 });

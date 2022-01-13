@@ -6,11 +6,14 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Book;
 use App\Models\CreditCard;
+use App\Models\GiftCard;
+use App\Models\GiftCardPurchase;
 use App\Models\PaymentChannel;
 use App\Models\PaymentMethod;
 use App\Models\TransactionReference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use function Composer\Autoload\includeFile;
 
 class PaymentController extends \App\Http\Controllers\Controller
@@ -55,7 +58,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
         $secret_key = PaymentChannel::find(1)->secret_key;
         $book = Book::find(TransactionReference::where('reference', $request->reference)
-            ->where('type', 'book')->first()->id);
+            ->where('referenceable_type', 'App\Models\Book')->first()->id);
 
         $result = [];
         //The parameter after verify/ is the transaction reference to be verified
@@ -119,6 +122,86 @@ class PaymentController extends \App\Http\Controllers\Controller
         ]);
     }
 
+    public function verifyGiftCardPurchase(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'reference' => 'required|string|exists:transaction_references, reference',
+            'currency'=>'required|string|exists:countries, currency'
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $secret_key = PaymentChannel::find(1)->secret_key;
+        $gcard = GiftCardPurchase::find(TransactionReference::where('reference', $request->reference)
+            ->where('referenceable_type', 'App\Models\GiftCardPurchase')->first()->id);
+
+        $result = [];
+        //The parameter after verify/ is the transaction reference to be verified
+        $url = 'https://api.paystack.co/transaction/verify/' . $request->reference;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $secret_key]);
+        $r = curl_exec($ch);
+        curl_close($ch);
+
+        if ($r) {
+            $result = json_decode($r, true);
+
+            if ($result) {
+                if ($result['data']) {
+                    if ($result['data']['status'] == 'success') {
+
+                        $am = $result['data']['amount'];
+                        $amount = $gcard->quantity * $gcard->unit_price;
+                        $sam = round($amount, 2) * 100;
+
+                        if ($am == $sam && $result['data']['currency'] == $request->currency  && $gcard->status == 0) {
+                            $gcard->status = 1;
+                            $gcard->save();
+                            for ($x = 0; $x <= $gcard->quantity; $x++)
+                            {
+                                GiftCard::create([
+                                    'purchase_id'=>$gcard->id,
+                                    'code'=>Str::upper(Str::random(12)),
+                                    'balance'=>$gcard->unit_price
+                                ]);
+                            }
+                            return response([
+                                'status'=>true,
+                                'message'=>'Order purchased confirmed',
+                                'data'=>[]
+                            ]);
+                        } else {
+                            $message = "Less Amount Paid. Please Contact With Admin";
+                        }
+                    } else {
+                        $message = $result['data']['gateway_response'];
+                    }
+                } else {
+                    $message = $result['message'];
+                }
+            } else {
+                $message = "Something went wrong while executing";
+            }
+        } else {
+            $message = "Something went wrong while executing";
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'data' => []
+        ]);
+    }
+
     public function processPaymentWithSavedCard(Request $request)
     {
         $v = Validator::make( $request->all(), [
@@ -138,7 +221,7 @@ class PaymentController extends \App\Http\Controllers\Controller
         $user = auth()->guard()->user();
         $secret_key = PaymentChannel::find(1)->secret_key;
         $book = Book::find(TransactionReference::where('reference', $request->reference)
-            ->where('type', 'book')->first()->id);
+            ->where('referenceable_type', 'App\Models\Book')->first()->id);
 
         $card = CreditCard::find($request->card_id);
         if ($card->user_id != $user->id)
@@ -215,5 +298,70 @@ class PaymentController extends \App\Http\Controllers\Controller
             'message' => $message,
             'data' => []
         ]);
+    }
+
+    public function processPaymentWithGiftCard(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = Validator::make( $request->all(), [
+            'reference' => 'required|string|exists:transaction_references, reference',
+            'code' => 'required|string|exists:gift_cards,code',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $book = Book::find(TransactionReference::where('reference', $request->reference)
+            ->where('referenceable_type', 'App\Models\Book')->first()->id);
+        $giftcard = GiftCard::find($request->code);
+        if ($giftcard->status == 1)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => "This Gift Card is empty",
+                'data' => []
+            ]);
+        }
+        switch ($giftcard->balance)
+        {
+            case $book->amount == $giftcard->balance:
+                //debit the giftcard
+                GiftCard::debit($giftcard->id, $book->amount);
+                $giftcard->status = 1;
+                $giftcard->save();
+                (new OrderController())->completeOrder($book->id);
+                break;
+            case $book->amount < $giftcard->balance:
+                //debit the giftcard
+                GiftCard::debit($giftcard->id, $book->amount);
+                (new OrderController())->completeOrder($book->id);
+                break;
+            case $book->amount > $giftcard->balance:
+                //we subtract the balance from the book amount
+                //before which we must have set the actual amount to book amount
+                //save the book amount and send a response
+                $actual_amount = $book->amount;
+                $book->amount = $book->amount - $giftcard->balance;
+                $book->actual_amount = $actual_amount;
+                //debit the giftcard
+                $giftcard->balance = 0;
+                $giftcard->status = 1;
+                $giftcard->save();
+                $book->save();
+                return response()->json([
+                    'status' => true,
+                    'message' => "GiftCard has been applied to the order",
+                    'data' => []
+                ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => "An error has occurred",
+            'data' => []
+        ], 422);
     }
 }
