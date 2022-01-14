@@ -43,7 +43,7 @@ class PaymentController extends \App\Http\Controllers\Controller
     public function verifyPayment(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references, reference',
+            'reference' => 'required|string|exists:transaction_references,reference',
             'save_card'=>'nullable|bool',
             'currency'=>'required|string|exists:countries, currency'
         ]);
@@ -205,7 +205,7 @@ class PaymentController extends \App\Http\Controllers\Controller
     public function processPaymentWithSavedCard(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references, reference',
+            'reference' => 'required|string|exists:transaction_references,reference',
             'card_id'=>'required|int|exists:credit_cards, id',
             'currency'=>'required|string|exists:countries, currency'
         ]);

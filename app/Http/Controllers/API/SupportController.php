@@ -10,6 +10,7 @@ use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Rating;
 use App\Models\Service;
 use App\Models\State;
 use App\Models\Weeks;
@@ -562,6 +563,58 @@ class SupportController
             'message'=>'',
             'data'=>[
                 'banks'=>VendorPackage::where('status', 1)->get()
+            ]
+        ]);
+    }
+
+    public function getVendorRating(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $ratings = Rating::where('rateable_id',$request->vendor_id)
+            ->where('rateable_type','App\Models\Vendor')->get();
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'ratings'=>$ratings,
+            ]
+        ]);
+    }
+
+    public function getServiceRating(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'service_id' => 'required|int|exists:services,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $ratings = Rating::where('rateable_id',$request->service_id)
+            ->where('rateable_type','App\Models\Service')->get();
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'ratings'=>$ratings,
             ]
         ]);
     }
