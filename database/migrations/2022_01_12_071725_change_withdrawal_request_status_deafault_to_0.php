@@ -26,7 +26,7 @@ class ChangeWithdrawalRequestStatusDeafaultTo0 extends Migration
     public function down()
     {
         Schema::table('withdrawal_requests', function (Blueprint $table) {
-            //
+            $table->dropColumn('withdrawal_requests');
         });
     }
 }

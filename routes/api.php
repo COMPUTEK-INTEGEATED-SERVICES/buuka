@@ -36,6 +36,8 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
     Route::get('banks', [\App\Http\Controllers\API\SupportController::class, 'getBanks']);
     Route::get('vendor_packages', [\App\Http\Controllers\API\SupportController::class, 'vendorPackages']);
+    Route::get('get_vendor_rating', [\App\Http\Controllers\API\SupportController::class, 'getVendorRating']);
+    Route::get('get_service_rating', [\App\Http\Controllers\API\SupportController::class, 'getServiceRating']);
 
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
@@ -139,4 +141,9 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::get('gift_card/get_info', [\App\Http\Controllers\API\GiftCardController::class, 'getGiftCardInfo']);
     Route::post('gift_card/redeem', [\App\Http\Controllers\API\GiftCardController::class, 'redeemGiftCard']);
     Route::post('gift_card/purchase', [\App\Http\Controllers\API\GiftCardController::class, 'saveGiftCardInfo']);
+
+    //rating routes
+    Route::post('rating/rate_vendor', [\App\Http\Controllers\API\RatingController::class, 'rateVendor']);
+    Route::post('vendor/rate_service', [\App\Http\Controllers\API\RatingController::class, 'rateService']);
+    Route::post('vendor/delete_rating', [\App\Http\Controllers\API\RatingController::class, 'deleteRating']);
 });
