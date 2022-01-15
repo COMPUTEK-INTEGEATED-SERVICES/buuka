@@ -51,6 +51,16 @@ class WithdrawalController extends Controller
             ]);
         }
 
+        $checkrequest = WithdrawalRequest::where('user_id', $this->user->id)
+            ->where('status',0)->first();
+        if($checkrequest) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You have a pending withdrawal request',
+                'data' => []
+            ]);
+        }
+
         (new WalletController())->debit($request->input('amount'));
 
         WithdrawalRequest::create([
