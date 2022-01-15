@@ -14,7 +14,7 @@ class ChangeWithdrawalRequestStatusDeafaultTo0 extends Migration
     public function up()
     {
         Schema::table('withdrawal_requests', function (Blueprint $table) {
-            $table->Integer('status')->default(0)->change();
+            $table->integer('status')->default(0)->change();
         });
     }
 
