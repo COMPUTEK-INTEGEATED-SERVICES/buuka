@@ -25,7 +25,7 @@ class CreateBooksTable extends Migration
             $table->integer('payment_method_id')->nullable();
             $table->string('proposed_by')->nullable();
             $table->tinyInteger('custom_book_accepted')->default(0);
-            $table->tinyInteger('status')->default(0)->comment('0 indicating that the order is pending');
+            $table->tinyInteger('status')->default(0)->comment('0 indicating that the order is pending, 1 that the order is paid for, 2 that the order is complete, 3 that the order is cancelled');
             $table->timestamps();
         });
     }

@@ -16,8 +16,10 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\Order\UserBookCompleteNotification;
 use App\Notifications\Order\UserBookSuccessfulNotification;
+use App\Notifications\Order\UserCanceledOrderNotification;
 use App\Notifications\Order\UserMarkedOrderAsCompletedNotification;
 use App\Notifications\Order\VendorBookCompleteNotification;
+use App\Notifications\Order\VendorCanceledOrderNotification;
 use App\Notifications\Order\VendorMarkedOrderAsCompletedNotification;
 use App\Notifications\Order\VendorNewBookNotification;
 use Illuminate\Http\Request;
@@ -279,5 +281,54 @@ class OrderController extends Controller
     {
         //apply buuka cancellation policy
         //cancel the order
+    }
+
+    public function markOrderAsCanceled(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'book_id' => 'required|int|exists:books,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $book = Book::find($request->book_id);
+        $vendor = Vendor::find($book->vendor_id);
+        if ($this->user->can('participate', $book, $vendor)){
+            //todo: implement order cancellation policy
+
+            $book->status = 3;
+            $book->save();
+
+            //todo: refund party
+            try {
+                if ($book->vendor_id == $this->user->id)
+                {
+                    $this->user->notify(new VendorCanceledOrderNotification($book, $vendor));
+                }else{
+                    $vendor->user->notify(new UserCanceledOrderNotification($book));
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Order has been cancelled',
+                    'data' => [
+                        'book'=>$book
+                    ]
+                ]);
+            }catch (\Throwable $throwable)
+            {
+                report($throwable);
+            }
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Access Denied',
+            'data' => []
+        ], 403);
     }
 }
