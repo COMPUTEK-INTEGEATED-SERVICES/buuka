@@ -16,12 +16,11 @@ use Illuminate\Support\Facades\Broadcast;
 /*Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });*/
-Broadcast::channel('chat-room-{chat}', function ($user, $chat) {
-    $chat = \App\Models\Chat::find($chat);
-    return $user->id == $chat->user_1 || $user->id == $chat->user_2;
-    // return true;
+Broadcast::channel('chat-room-{receiver}-{sender}', function ($user, $receiver, $sender) {
+    $chat = \App\Models\Chat::senderReceiver($sender, $receiver);
+    return !$chat->isEmpty() && ($user->id == $sender || $user->id == $receiver);
 });
 
 Broadcast::channel('user-notify-{userID}', function ($user, $userID) {
-    return true;
+    return $user->id == $userID;
 });

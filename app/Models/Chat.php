@@ -26,4 +26,15 @@ class Chat extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_2');
     }
+
+    public static function senderReceiver($sender, $receiver)
+    {
+        return self::where(function ($query) use ($sender, $receiver){
+            $query->where('user_1', $sender)
+                ->where('user_2', $receiver);
+        })->where(function ($query) use ($sender, $receiver){
+            $query->where('user_1', $receiver)
+                ->where('user_2', $sender);
+        })->get();
+    }
 }
