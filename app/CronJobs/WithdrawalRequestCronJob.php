@@ -29,6 +29,7 @@ class WithdrawalRequestCronJob
         {
             report($throwable);
         }
+        echo true;
     }
 
     private function createRecipientCode()
@@ -167,5 +168,3 @@ class WithdrawalRequestCronJob
         }
     }
 }
-
-(new WithdrawalRequestCronJob())->call();

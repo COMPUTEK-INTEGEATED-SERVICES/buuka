@@ -35,6 +35,8 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
     Route::get('banks', [\App\Http\Controllers\API\SupportController::class, 'getBanks']);
+
+    //vendor support routes
     Route::get('vendor_packages', [\App\Http\Controllers\API\SupportController::class, 'vendorPackages']);
     Route::get('get_vendor_rating', [\App\Http\Controllers\API\SupportController::class, 'getVendorRating']);
     Route::get('get_service_rating', [\App\Http\Controllers\API\SupportController::class, 'getServiceRating']);
@@ -134,7 +136,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('vendor/add_note', [\App\Http\Controllers\API\ClientController::class, 'vendorAddNote']);
     Route::post('vendor/edit_note', [\App\Http\Controllers\API\ClientController::class, 'vendorEditNote']);
     Route::post('vendor/delete_note', [\App\Http\Controllers\API\ClientController::class, 'vendorDeleteNote']);
-    Route::get('vendor/get_client_inf0', [\App\Http\Controllers\API\ClientController::class, 'getClientInfo']);
+    Route::get('vendor/get_client_info', [\App\Http\Controllers\API\ClientController::class, 'getClientInfo']);
     Route::get('vendor/get_all_client_info', [\App\Http\Controllers\API\ClientController::class, 'getAllClientInfo']);
 
     //gift card routes

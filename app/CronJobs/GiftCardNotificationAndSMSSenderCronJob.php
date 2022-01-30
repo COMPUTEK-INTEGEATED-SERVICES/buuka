@@ -56,7 +56,6 @@ class GiftCardNotificationAndSMSSenderCronJob
                 }
             }
         }
+        echo true;
     }
 }
-
-(new GiftCardNotificationAndSMSSenderCronJob())->call();
