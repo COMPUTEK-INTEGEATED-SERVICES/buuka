@@ -27,6 +27,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
 
     Route::get('service', [\App\Http\Controllers\API\SupportController::class, 'getService']);
     Route::get('services', [\App\Http\Controllers\API\SupportController::class, 'getServices']);
+    Route::get('vendor_services', [\App\Http\Controllers\API\SupportController::class, 'getVendorServices']);
 
     //support routes
     Route::get('countries', [\App\Http\Controllers\API\SupportController::class, 'getCountries']);
@@ -118,13 +119,13 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //user routes
     Route::post('user/upload_photo', [\App\Http\Controllers\API\UserController::class, 'uploadPhoto']);
     Route::post('user/edit_profile', [\App\Http\Controllers\API\UserController::class, 'editUserProfile']);
-    Route::get('user/last_seen', [\App\Http\Controllers\API\UserController::class, 'userLastProfile']);
+    Route::get('user/last_seen', [\App\Http\Controllers\API\UserController::class, 'userLastSeen']);
 
     //payment routes
-    Route::post('payment/confirm/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
-    Route::post('payment/confirm/with_gcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
-    Route::post('payment/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
-    Route::post('payment/gcard/confirm', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
+    Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
+    Route::post('payment/process/with_giftcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
+    Route::post('payment/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+    Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
     //vendor packages routes
     Route::post('vendor_package/add_vendor_package', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'createVendorType']);

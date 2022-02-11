@@ -502,6 +502,29 @@ class SupportController
         ]);
     }
 
+    public function getVendorServices(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $services = Service::where('vendor_id', $request->vendor_id)->get();
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'services'=>$services
+            ]
+        ]);
+    }
+
     public function getService(Request $request)
     {
         $v = Validator::make( $request->all(), [

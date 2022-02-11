@@ -6,6 +6,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductStaffRelationship;
+use App\Models\Resource;
 use App\Models\Service;
 use App\Notifications\Product\ProductCreatedNotification;
 use Illuminate\Http\Request;
@@ -26,11 +28,19 @@ class ProductController extends Controller
 
     public function createProduct(Request $request)
     {
+        $gender = ['male', 'female'];
+        $price_type = ['from'];
         $v = Validator::make( $request->all(), [
             'service_id' => 'required|integer|exists:services,id',
             'name'=>'required|string',
+            'description'=>'required|string',
+            'gender'=>'required|string|in:'.strtolower(implode(',',$gender)),
             'duration'=>'string|required',
-            'amount'=>'string|required',
+            'price'=>'string|required',
+            'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
+            'price_name'=>'nullable|string',
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'staff'=>'nullable|array'
         ]);
 
         if($v->fails()){
@@ -44,6 +54,30 @@ class ProductController extends Controller
         if ($this->user->can('interact', Service::find($request->service_id)))
         {
             $product = Product::create($request->toArray());
+            if($request->file){
+                //upload file
+                foreach ($request->file as $file)
+                {
+                    $message =  $file->store('public/attachments/products');
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$product->id,
+                        'resourceable_type'=>'App\Models\Product'
+                    ]);
+                }
+            }
+
+            if ($request->staff)
+            {
+                foreach ($request->staff as $staff)
+                {
+                    ProductStaffRelationship::create([
+                        'product_relation_id'=>$product->id,
+                        'product_relation_type'=>'App\Models\Product',
+                        'staff_id'=>$staff
+                    ]);
+                }
+            }
 
             try {
                 $this->user->notify(new ProductCreatedNotification($product));

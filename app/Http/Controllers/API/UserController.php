@@ -52,12 +52,13 @@ class UserController extends Controller
 
     public function editUserProfile(Request $request)
     {
+        $gender = ['male', 'female'];
         $v = Validator::make( $request->all(), [
             'first_name' => 'string',
             'last_name' => 'string',
             'email' => 'string|email',
             'phone' => 'string',
-            'gender' => 'string',
+            'gender' => 'string,in:'.strtolower(implode(',', $gender)),
             'date_of_birth' => 'string'
         ]);
 
