@@ -15,7 +15,7 @@ class UpdateProductTable extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->renameColumn('amount', 'price');
-            $table->after('price', function ($table){
+            $table->after('amount', function ($table){
                 $table->string('price_type')->nullable();
                 $table->string('price_name')->nullable();
                 $table->text('description')->nullable();
