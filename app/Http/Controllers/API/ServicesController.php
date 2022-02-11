@@ -54,7 +54,7 @@ class ServicesController extends Controller
         {
             //store the service
             $service = Service::create([
-                'vendor_id'=>$this->user->id,
+                'vendor_id'=>Vendor::where('user_id', $this->user->id)->first()->id,
                 'name'=>$request->input('name'),
                 'description'=>$request->input('description'),
             ]);
