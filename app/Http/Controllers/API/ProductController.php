@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductStaffRelationship;
 use App\Models\Resource;
 use App\Models\Service;
+use App\Models\Vendor;
 use App\Notifications\Product\ProductCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -51,7 +52,7 @@ class ProductController extends Controller
             ], 422);
         }
 
-        if ($this->user->can('interact', Service::find($request->service_id)))
+        if ($this->user->can('interact', Vendor::find(Service::find($request->service_id)->vendor_id)))
         {
             $product = Product::create($request->toArray());
             if($request->file){
