@@ -20,18 +20,22 @@ class CountryStateSeeder extends Seeder
         $countries = json_decode(file_get_contents('./extras/countries.json'));
         foreach ($countries as $country)
         {
-            $c = Country::create([
-                'name'=>$country->name,
-                'initial'=>$country->code3,
-                'currency'=>''
-            ]);
+            $c = Country::where('name', $country->name)->firstOr(function () use ($country) {
+                return Country::create([
+                    'name'=>$country->name,
+                    'initial'=>$country->code3,
+                    'currency'=>''
+                ]);
+            });
 
             foreach ($country->states as $state)
             {
-                State::create([
-                    'country_id'=>$c->id,
-                    'name'=>$state->name
-                ]);
+                State::where('country_id', $c->id)->firstOr(function () use ($c, $state) {
+                    return State::create([
+                        'country_id'=>$c->id,
+                        'name'=>$state->name
+                    ]);
+                });
             }
         }
     }
