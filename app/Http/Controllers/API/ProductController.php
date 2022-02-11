@@ -42,7 +42,8 @@ class ProductController extends Controller
             'price_name'=>'nullable|string',
             'file.*' => 'required|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
-            'staff.*'=>'required_with:staff|int'
+            'staff.*'=>'required_with:staff|int',
+            'tax'=>'nullable|int'
         ]);
 
         if($v->fails()){
@@ -105,12 +106,18 @@ class ProductController extends Controller
 
     public function editProduct(Request $request)
     {
+        $gender = ['male', 'female'];
+        $price_type = ['from'];
         $v = Validator::make( $request->all(), [
             'product_id' => 'required|integer|exists:products,id',
             'service_id' => 'required|integer|exists:services,id',
             'name'=>'nullable|string',
+            'description'=>'required|string',
+            'gender'=>'nullable|string|in:'.strtolower(implode(',',$gender)),
             'duration'=>'string|nullable',
-            'amount'=>'string|nullable',
+            'price'=>'string|nullable',
+            'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
+            'price_name'=>'nullable|string',
         ]);
 
         if($v->fails()){
@@ -177,5 +184,78 @@ class ProductController extends Controller
             'message'=>'Access denied',
             'data'=>[]
         ]);
+    }
+
+    public function addProductImage(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'product_id' => 'required|integer|exists:products,id',
+            'file' => 'required|mimes:jpeg,jpg,png'
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        if ($this->user->can('interact', Vendor::find(Service::find($request->service_id)->vendor_id)))
+        {
+            if($request->file){
+                //upload file
+                $file =  $request->file('file')->store('public/attachments');
+
+                $type = $request->file('file')->getMimeType();
+
+                Resource::create([
+                    'path'=>$file,
+                    'resourceable_id'=>$request->input('product_id'),
+                    'resourceable_type'=>'App\Models\Product'
+                ]);
+
+                return response([
+                    'status'=>true,
+                    'message'=>'Product image added',
+                    'data'=>[]
+                ]);
+            }
+        }
+        return response([
+            'status'=>false,
+            'message'=>'Access denied',
+            'data'=>[]
+        ], 403);
+    }
+
+    public function deleteProductImage(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'product_id' => 'required|integer|exists:products,id',
+            'image_id' => 'required|integer|exists:service_images,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        if ($this->user->can('interact', Vendor::find(Service::find($request->service_id)->vendor_id)))
+        {
+            Resource::destroy($request->input('image_id'));
+
+            return response([
+                'status'=>true,
+                'message'=>'Product image deleted',
+                'data'=>[]
+            ]);
+        }
+        return response([
+            'status'=>false,
+            'message'=>'Access denied',
+            'data'=>[]
+        ], 403);
     }
 }

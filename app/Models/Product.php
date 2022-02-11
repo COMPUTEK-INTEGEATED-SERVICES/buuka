@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id','name', 'price', 'duration', 'price_type', 'price_name', 'description', 'gender'
+        'service_id','name', 'price', 'duration', 'price_type', 'price_name', 'description', 'gender', 'tax'
     ];
 
     public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
