@@ -41,7 +41,8 @@ class ProductController extends Controller
             'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
-            'staff'=>'nullable|array'
+            'staff'=>'nullable|array',
+            'staff.*'=>'required_with:staff|int'
         ]);
 
         if($v->fails()){
