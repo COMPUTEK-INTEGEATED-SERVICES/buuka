@@ -40,7 +40,7 @@ class ProductController extends Controller
             'price'=>'string|required',
             'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
-            'file' => 'required|mimes:jpeg,jpg,png',
+            'file.*' => 'required|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
             'staff.*'=>'required_with:staff|int'
         ]);
@@ -49,7 +49,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Validation Failed',
-                'data' => [$v->errors(), $request->all()]
+                'data' => $v->errors()
             ], 422);
         }
 
