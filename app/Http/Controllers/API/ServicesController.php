@@ -39,7 +39,7 @@ class ServicesController extends Controller
         $v = Validator::make( $request->all(), [
             'name'=>'required|string',
             'description'=>'string|required',
-            'category_id'=>'required|array',
+            'category_id'=>'nullable|array',
         ]);
 
         if($v->fails()){
@@ -60,13 +60,13 @@ class ServicesController extends Controller
             ]);
 
             //store service categories
-            foreach ($request->input('category_id') as $category)
+            /*foreach ($request->input('category_id') as $category)
             {
                 ServiceCategory::create([
                     'service_id'=>$service->id,
                     'category_id'=>$category
                 ]);
-            }
+            }*/
 
             //store the images
             if($request->file){
