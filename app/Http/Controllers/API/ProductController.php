@@ -68,7 +68,7 @@ class ProductController extends Controller
                 }
             }
 
-            if ($request->staff)
+            if ($request->staff && !empty($request->staff))
             {
                 foreach ($request->staff as $staff)
                 {
