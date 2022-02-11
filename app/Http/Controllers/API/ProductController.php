@@ -49,7 +49,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Validation Failed',
-                'data' => $v->errors()
+                'data' => [$v->errors(), $request->all()]
             ], 422);
         }
 
