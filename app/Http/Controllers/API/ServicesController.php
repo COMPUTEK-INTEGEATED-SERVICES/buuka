@@ -69,7 +69,7 @@ class ServicesController extends Controller
             }*/
 
             //store the images
-            if($request->file){
+            /*if($request->file){
                 //upload file
                 foreach ($request->file('file') as $file)
                 {
@@ -82,7 +82,7 @@ class ServicesController extends Controller
                         'resourceable_type'=>'App\Models\Service'
                     ]);
                 }
-            }
+            }*/
 
             return response([
                 'status'=>true,
