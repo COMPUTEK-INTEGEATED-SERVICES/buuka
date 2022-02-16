@@ -40,7 +40,8 @@ class ProductController extends Controller
             'price'=>'string|required',
             'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
-            'file.*' => 'nullable|mimes:jpeg,jpg,png',
+            'file'=>'nullable|array',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
             'staff.*'=>'required_with:staff|int',
             'tax'=>'nullable|int'
@@ -118,6 +119,7 @@ class ProductController extends Controller
             'price'=>'string|nullable',
             'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
+            'tax'=>'nullable|int'
         ]);
 
         if($v->fails()){
@@ -133,7 +135,12 @@ class ProductController extends Controller
         {
             $product->name = $request->input('name', $product->name);
             $product->duration = $request->input('duration', $product->duration);
-            $product->amount = $request->input('amount', $product->amount);
+            $product->price = $request->input('price', $product->price);
+            $product->description = $request->input('description', $product->description);
+            $product->gender = $request->input('gender', $product->gender);
+            $product->price_type = $request->input('price_type', $product->pice_type);
+            $product->price_name = $request->input('price_name', $product->pice_name);
+            $product->tax = $request->input('tax', $product->tax);
 
             $product->save();
 
