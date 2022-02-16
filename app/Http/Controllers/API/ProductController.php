@@ -40,7 +40,7 @@ class ProductController extends Controller
             'price'=>'string|required',
             'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
-            'file.*' => 'required|mimes:jpeg,jpg,png',
+            'file.*' => 'nullable|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
             'staff.*'=>'required_with:staff|int',
             'tax'=>'nullable|int'

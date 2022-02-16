@@ -91,6 +91,8 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('product/create', [\App\Http\Controllers\API\ProductController::class, 'createProduct']);
     Route::post('product/edit', [\App\Http\Controllers\API\ProductController::class, 'editProduct']);
     Route::post('product/delete', [\App\Http\Controllers\API\ProductController::class, 'deleteProduct']);
+    Route::post('product/delete_image', [\App\Http\Controllers\API\ProductController::class, 'deleteProductImage']);
+    Route::post('product/add_image', [\App\Http\Controllers\API\ProductController::class, 'addProductImage']);
 
     //support routes
     Route::post('country/add', [\App\Http\Controllers\API\SupportController::class, 'addCountry']);
