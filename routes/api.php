@@ -29,6 +29,9 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('services', [\App\Http\Controllers\API\SupportController::class, 'getServices']);
     Route::get('vendor_services', [\App\Http\Controllers\API\SupportController::class, 'getVendorServices']);
 
+    //product routes
+    Route::get('product/{product_id}', [\App\Http\Controllers\API\SupportController::class, 'getSingleProduct']);
+
     //support routes
     Route::get('countries', [\App\Http\Controllers\API\SupportController::class, 'getCountries']);
     Route::get('states', [\App\Http\Controllers\API\SupportController::class, 'getStates']);

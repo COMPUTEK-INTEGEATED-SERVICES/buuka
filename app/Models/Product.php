@@ -17,4 +17,9 @@ class Product extends Model
     {
         return $this->belongsTo(Service::class, 'service_id', 'id');
     }
+
+    public function resources()
+    {
+        return $this->morphMany(Resource::class, 'resourceable');
+    }
 }

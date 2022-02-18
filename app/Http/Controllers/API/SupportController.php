@@ -10,6 +10,7 @@ use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Product;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\State;
@@ -639,6 +640,27 @@ class SupportController
             'data'=>[
                 'ratings'=>$ratings,
             ]
+        ]);
+    }
+
+    public function getSingleProduct(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = Validator::make( $request->all(), [
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => '',
+            'data' => Product::with(['service', 'resources'])->find($request->product_id)
         ]);
     }
 }
