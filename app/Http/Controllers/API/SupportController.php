@@ -645,22 +645,19 @@ class SupportController
 
     public function getSingleProduct(Request $request): \Illuminate\Http\JsonResponse
     {
-        $v = Validator::make( $request->all(), [
-            'product_id' => 'required|integer|exists:products,id',
-        ]);
-
-        if($v->fails()){
+        $product = Product::with(['service', 'resources'])->find($request->product_id);
+        if(!$product){
             return response()->json([
                 'status' => false,
                 'message' => 'Validation Failed',
-                'data' => $v->errors()
+                'data' => ['Invalid Product']
             ], 422);
         }
 
         return response()->json([
             'status' => true,
             'message' => '',
-            'data' => Product::with(['service', 'resources'])->find($request->product_id)
+            'data' => $product
         ]);
     }
 }
