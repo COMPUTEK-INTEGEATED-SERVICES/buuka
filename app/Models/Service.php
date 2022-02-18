@@ -13,7 +13,7 @@ class Service extends Model
         'name', 'description', 'vendor_id'
     ];
 
-    public function images(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function resources(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Resource::class, 'resourceable');
     }
@@ -25,7 +25,7 @@ class Service extends Model
 
     public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Product::class, 'service_id', 'id');
+        return $this->hasMany(Product::class, 'service_id', 'id')->with(['resources']);
     }
 
     public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
