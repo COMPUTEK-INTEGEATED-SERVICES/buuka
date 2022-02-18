@@ -20,7 +20,7 @@ class Service extends Model
 
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Vendor::class, 'vendor_id', 'user_id');
+        return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
     }
 
     public function products(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -516,7 +516,7 @@ class SupportController
                 'data' => $v->errors()
             ], 422);
         }
-        $services = Service::where('vendor_id', $request->vendor_id)->get();
+        $services = Service::with(['vendor', 'products', 'categories'])->where('vendor_id', $request->vendor_id)->get();
         return response([
             'status'=>true,
             'message'=>'',
