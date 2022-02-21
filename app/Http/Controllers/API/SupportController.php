@@ -466,7 +466,7 @@ class SupportController
 
     public function getServices(Request $request)
     {
-        $services = Service::with(['images', 'products', 'categories', 'vendor'])
+        $services = Service::with(['resources', 'products', 'categories', 'vendor'])
             ->where('status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
