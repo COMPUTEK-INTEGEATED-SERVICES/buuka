@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoryRelation;
 use App\Models\Escrow;
 use App\Models\Resource;
 use App\Models\Vendor;
@@ -33,6 +34,8 @@ class VendorController extends Controller
             'facebook'=>'nullable|string|url',
             'instagram'=>'nullable|string|url',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'category'=>'required|array',
+            'category.*'=>'int|exists:categories:id'
         ]);
 
         if($v->fails()){
@@ -60,6 +63,15 @@ class VendorController extends Controller
                 'instagram'=>$request->input('instagram'),
             ]),
         ]);
+
+        foreach ($request->category as $c)
+        {
+            CategoryRelation::create([
+                'relateable_id'=>$vendor->id,
+                'relateable_type'=>'App\Models\Vendor',
+                'category_id'=>$c
+            ]);
+        }
 
         //store the images
         if($request->file){
