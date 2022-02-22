@@ -47,4 +47,9 @@ class Vendor extends Model
     {
         return $this->morphOne(Wallet::class, 'walletable');
     }
+
+    public function categories(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(CategoryRelation::class, 'relateable');
+    }
 }
