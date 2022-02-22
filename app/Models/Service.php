@@ -28,8 +28,8 @@ class Service extends Model
         return $this->hasMany(Product::class, 'service_id', 'id')->with(['resources']);
     }
 
-    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function categories(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->belongsToMany(Category::class, 'service_categories', 'service_id', 'category_id');
+        return $this->morphMany(CategoryRelation::class, 'relateable');
     }
 }
