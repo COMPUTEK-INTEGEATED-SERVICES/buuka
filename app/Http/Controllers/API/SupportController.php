@@ -473,22 +473,27 @@ class SupportController
                 {
                     $query->where('name', 'Like', '%' . $request->input('query') . '%');
                 }
-                /*if ($request->input('city') != null)
+                if ($request->input('category_id') != null)
+                {
+                    $query->leftJoin('category_relations', 'category_relations.category_id', '=', $request->input('category_id'))
+                        ->where('vendors.id', 'category_relations.relateable_id');
+                }
+                if ($request->input('city') != null)
                 {
                     $query->leftJoin('vendors', 'vendors.city_id', '=', $request->input('city'));
-                }else{
+                }/*else{
                     $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
-                }
+                }*/
                 if ($request->input('state') != null)
                 {
                     $query->leftJoin('vendors', 'vendors.state_id', '=', $request->input('state'));
-                }else{
+                }/*else{
                     $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
-                }
+                }*/
                 if ($request->input('country') != null)
                 {
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $request->input('country'));
-                }else{
+                }/*else{
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
                 }*/
             })
