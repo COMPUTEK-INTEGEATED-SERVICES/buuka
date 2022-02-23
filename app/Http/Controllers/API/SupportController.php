@@ -470,11 +470,11 @@ class SupportController
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
             ->leftJoin('products', 'products.service_id', '=', 'services.id')->with(['resources'])
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
-            ->where('status', 1)
+            ->where('services.status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
                 {
-                    $query->where('name', 'Like', '%' . $request->input('query') . '%');
+                    $query->where('services.name', 'Like', '%' . $request->input('query') . '%');
                 }
                 if ($request->input('category_id') != null)
                 {
@@ -482,19 +482,19 @@ class SupportController
                 }
                 if ($request->input('city') != null)
                 {
-                    $query->leftJoin('vendors', 'vendors.city_id', '=', $request->input('city'));
+                    $query->where('vendors.city_id', $request->input('city'));
                 }/*else{
                     $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
                 }*/
                 if ($request->input('state') != null)
                 {
-                    $query->leftJoin('vendors', 'vendors.state_id', '=', $request->input('state'));
+                    $query->where('vendors.state_id', $request->input('state'));
                 }/*else{
                     $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
                 }*/
                 if ($request->input('country') != null)
                 {
-                    $query->leftJoin('vendors', 'vendors.country_id', '=', $request->input('country'));
+                    $query->where('vendors.country_id', $request->input('country'));
                 }/*else{
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
                 }*/
