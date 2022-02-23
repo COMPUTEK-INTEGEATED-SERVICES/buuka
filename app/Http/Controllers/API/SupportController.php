@@ -499,7 +499,7 @@ class SupportController
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
                 }*/
             })
-            ->latest()->paginate(10);
+            ->latest('services.created_at')->paginate(10);
 
         return response([
             'status'=>true,
