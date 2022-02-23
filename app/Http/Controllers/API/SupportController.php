@@ -468,7 +468,7 @@ class SupportController
     {
         $services = Service::with(['vendor', 'products'])
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
-            ->leftJoin('products', 'products.service_id', '=', 'services.id')->with(['resources'])
+            ->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
             ->where('services.status', 1)
             ->where(function($query) use ($request) {
