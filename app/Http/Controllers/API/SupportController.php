@@ -466,7 +466,10 @@ class SupportController
 
     public function getServices(Request $request)
     {
-        $services = Service::with(['resources', 'products', 'categories', 'vendor'])
+        $services = Service::with(['resources',])
+            ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
+            ->leftJoin('products', 'products.service_id', '=', 'services.id')->with(['resources'])
+            ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
             ->where('status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
@@ -475,8 +478,7 @@ class SupportController
                 }
                 if ($request->input('category_id') != null)
                 {
-                    $query->leftJoin('category_relations', 'category_relations.category_id', '=', $request->input('category_id'));
-                        $query->leftJoin('vendors', 'category_relations.relateable_id', '=', 'vendors.id');
+                    $query->where('category_relations.category_id', $request->input('category_id'));
                 }
                 if ($request->input('city') != null)
                 {
