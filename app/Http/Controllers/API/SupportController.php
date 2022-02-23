@@ -475,8 +475,8 @@ class SupportController
                 }
                 if ($request->input('category_id') != null)
                 {
-                    $query->leftJoin('category_relations', 'category_relations.category_id', '=', $request->input('category_id'))
-                        ->where('vendors.id', 'category_relations.relateable_id');
+                    $query->leftJoin('category_relations', 'category_relations.category_id', '=', $request->input('category_id'));
+                        $query->leftJoin('vendors', 'category_relations.relateable_id', '=', 'vendors.id');
                 }
                 if ($request->input('city') != null)
                 {
