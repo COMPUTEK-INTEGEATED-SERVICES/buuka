@@ -466,7 +466,7 @@ class SupportController
 
     public function getServices(Request $request)
     {
-        $services = Service::with([])
+        $services = Service::with(['vendor', 'products'])
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
             ->leftJoin('products', 'products.service_id', '=', 'services.id')->with(['resources'])
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
