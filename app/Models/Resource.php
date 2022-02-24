@@ -14,7 +14,7 @@ class Resource extends Model
     ];
 
     protected $hidden = [
-        'id', 'resourceable_id', 'resourceable_type'
+        'resourceable_id', 'resourceable_type', 'created_at', 'updated_at'
     ];
     public function resourceable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
