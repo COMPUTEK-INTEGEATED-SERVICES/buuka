@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\State;
+use App\Models\Vendor;
 use App\Models\Weeks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -669,6 +670,31 @@ class SupportController
             'status' => true,
             'message' => '',
             'data' => $product
+        ]);
+    }
+
+    public function getAVendor(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $vendor = Vendor::with(['reviews', 'services', 'staff', 'images'])->find($request->vendor_id);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                $vendor
+            ]
         ]);
     }
 }

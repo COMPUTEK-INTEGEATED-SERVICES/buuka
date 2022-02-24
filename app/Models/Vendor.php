@@ -25,7 +25,7 @@ class Vendor extends Model
 
     public function services(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Service::class, 'vendor_id', 'id');
+        return $this->hasMany(Service::class, 'vendor_id', 'id')->with(['products']);
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
