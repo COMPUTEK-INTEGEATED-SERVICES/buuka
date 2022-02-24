@@ -468,7 +468,7 @@ class SupportController
     {
         $services = Service::with(['vendor', 'products'])
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
-            ->leftJoin('products', 'products.service_id', '=', 'services.id')
+            //->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
             ->where('services.status', 1)
             ->where(function($query) use ($request) {
@@ -499,6 +499,7 @@ class SupportController
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
                 }*/
             })
+            //->select('')
             ->latest('services.created_at')->paginate(10);
 
         return response([
