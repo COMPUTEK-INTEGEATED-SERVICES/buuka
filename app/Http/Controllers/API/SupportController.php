@@ -467,12 +467,11 @@ class SupportController
     public function getServices(Request $request)
     {
         $services = Service::with(['products'])
+            ->where('services.status', 1)
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
+            ->where('vendors.status', 1)
             ->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
-            //->leftJoin('products', 'products.service_id', '=', 'services.id')
-            ->where('services.status', 1)
-            ->where('vendors.status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
                 {
