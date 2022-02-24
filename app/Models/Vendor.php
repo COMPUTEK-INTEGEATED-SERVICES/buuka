@@ -52,4 +52,9 @@ class Vendor extends Model
     {
         return $this->morphMany(CategoryRelation::class, 'relateable');
     }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Review::class, 'reviewable');
+    }
 }
