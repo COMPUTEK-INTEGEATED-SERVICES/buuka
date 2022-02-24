@@ -25,7 +25,7 @@ class Service extends Model
 
     public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Product::class, 'service_id', 'id')->with(['resources']);
+        return $this->hasMany(Product::class, 'service_id', 'id')/*->with(['resources'])*/;
     }
 
     public function categories(): \Illuminate\Database\Eloquent\Relations\MorphMany
