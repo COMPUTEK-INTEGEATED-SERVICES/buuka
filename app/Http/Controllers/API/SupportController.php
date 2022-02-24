@@ -472,6 +472,7 @@ class SupportController
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
             ->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->where('services.status', 1)
+            ->where('vendors.status', 1)
             ->where(function($query) use ($request) {
                 if ($request->input('query') != null)
                 {
