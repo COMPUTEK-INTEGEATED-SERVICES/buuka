@@ -40,7 +40,7 @@ class Vendor extends Model
 
     public function staff()
     {
-        $this->hasMany(Staff::class, 'vendor_id', 'id');
+        return $this->hasMany(Staff::class, 'vendor_id', 'id');
     }
 
     public function wallet(): \Illuminate\Database\Eloquent\Relations\MorphOne
