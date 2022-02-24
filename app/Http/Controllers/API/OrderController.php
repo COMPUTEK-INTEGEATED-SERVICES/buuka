@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 
 use App\Events\Order\UserBookSuccessfulEvent;
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Book;
 use App\Models\Client;
 use App\Models\Escrow;
@@ -84,6 +85,13 @@ class OrderController extends Controller
             'type'=>'book'
         ]);
 
+        Appointment::create([
+            'user_id'=>$this->user->id,
+            'vendor_id'=>$request->vendor_id,
+            'scheduled'=>Carbon::parse($request->input('scheduled')),
+            'book_id'=>$book->id
+        ]);
+
         try {
             $this->user->notify(new UserBookSuccessfulNotification($book));
             broadcast( new UserBookSuccessfulEvent($book, $this->user));
@@ -111,6 +119,13 @@ class OrderController extends Controller
             'note'=>$book->extras,
             'type'=>'custom',
             'proposed_by'=>($book->vendor_id == $book->user_id)?'vendor':'client'
+        ]);
+
+        Appointment::create([
+            'user_id'=>$book->user_id,
+            'vendor_id'=>$book->vendor_id,
+            'scheduled'=>Carbon::parse($book->scheduled),
+            'book_id'=>$book->id
         ]);
 
         TransactionReference::create([
