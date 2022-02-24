@@ -500,9 +500,9 @@ class SupportController
                     $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
                 }*/
             })
-            ->select('services.*', 'services.id as service_id', 'services.status as service_status', 'services.created_at as service_created', 'services.updated_at as service_updated', 'category_relations.category_id')
-            ->orderBy('services.created_at', 'asc')
-            ->orderBy('services.id', 'asc')
+            ->select('services.*', 'category_relations.category_id')
+            ->orderBy('services.created_at', 'desc')
+            ->orderBy('services.id', 'desc')
             ->paginate(10);
 
         return response([
