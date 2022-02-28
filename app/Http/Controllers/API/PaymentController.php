@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Events\PaymentEvent;
 use App\Models\Book;
 use App\Models\CreditCard;
 use App\Models\GiftCard;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use function Composer\Autoload\includeFile;
+use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
 class PaymentController extends \App\Http\Controllers\Controller
 {
@@ -363,5 +365,139 @@ class PaymentController extends \App\Http\Controllers\Controller
             'message' => "An error has occurred",
             'data' => []
         ], 422);
+    }
+
+    public function initiateFlutterwave(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $v = Validator::make( $request->all(), [
+            'reference' => 'required|string|exists:transaction_references,reference',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $user = auth()->guard()->user();
+        $book = Book::find(TransactionReference::where('reference', $request->reference)
+            ->where('referenceable_type', 'App\Models\Book')->first()->id);
+
+        $data = [
+            'payment_options' => 'card,banktransfer',
+            'amount' => $book->amount,
+            'email' => $user->email,
+            'tx_ref' => $request->reference,
+            'currency' => "NGN",
+            'redirect_url' => route('callback'),
+            'customer' => [
+                'email' => $user->email,
+                "phone_number" => $user->phone??'',
+                "name" => $user->first_name.' '.$user->last_name
+            ],
+
+            "customizations" => [
+                "title" => 'Movie Ticket',
+                "description" => "20th October"
+            ]
+        ];
+
+        $payment = Flutterwave::initializePayment($data);
+
+
+        if ($payment['status'] !== 'success') {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred',
+                'data' => []
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => '',
+            'data' => [
+                'link'=>$payment['data']['link']
+            ]
+        ]);
+    }
+
+    public function flutterwaveConfirmPayment()
+    {
+        $status = request()->status;
+
+        //if payment is successful
+        if ($status ==  'successful') {
+
+            $transactionID = Flutterwave::getTransactionIDFromCallback();
+            $data = Flutterwave::verifyTransaction($transactionID);
+
+            //send payment received event
+            $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
+                ->where('referenceable_type', 'App\Models\Book')->first()->id);
+
+            if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
+            {
+                return response([
+                    'status'=>true,
+                    'message'=>'Payment received with thanks',
+                    'data'=>[
+                        'book'=>$book,
+                    ]
+                ]);
+            }
+
+        }
+        if ($status ==  'cancelled'){
+            return response([
+                'status'=>false,
+                'message'=>'You cancelled this transaction',
+            ]);
+        }
+        return response([
+            'status'=>false,
+            'message'=>'An error occurred please try again',
+        ]);
+    }
+
+    public function flutterwaveWebhook(Request $request)
+    {
+        //This verifies the webhook is sent from Flutterwave
+        $verified = Flutterwave::verifyWebhook();
+
+        // if it is a charge event, verify and confirm it is a successful transaction
+        if ($verified && $request->event == 'charge.completed' && $request->data->status == 'successful') {
+            $verificationData = Flutterwave::verifyPayment($request->data['id']);
+            if ($verificationData['status'] === 'success') {
+                // process for successful charge
+
+                //send payment received event
+                broadcast(new PaymentEvent($request->data->tx_ref, $status = 'success'));
+
+                $book = Book::find(TransactionReference::where('reference', $request->data->tx_ref)
+                    ->where('referenceable_type', 'App\Models\Book')->first()->id);
+                (new OrderController())->completeOrder($book->id);
+            }
+            broadcast(new PaymentEvent($request->data->tx_ref, $verificationData['status']));
+        }
+
+        // if it is a transfer event, verify and confirm it is a successful transfer
+        if ($verified && $request->event == 'transfer.completed') {
+
+            $transfer = Flutterwave::transfers()->fetch($request->data['id']);
+
+            if($transfer['data']['status'] === 'SUCCESSFUL') {
+                // update transfer status to successful in your db
+            } else if ($transfer['data']['status'] === 'FAILED') {
+                // update transfer status to failed in your db
+                // revert customer balance back
+            } else if ($transfer['data']['status'] === 'PENDING') {
+                // update transfer status to pending in your db
+            }
+
+        }
+
     }
 }

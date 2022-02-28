@@ -162,6 +162,10 @@ class OrderController extends Controller
     public function completeOrder($book_id)
     {
         $book = Book::find($book_id);
+        if($book->status == 1)
+        {
+            return true;
+        }
         //mark the bok as done
         $book->status = 1;
         //get the vendor and alert them

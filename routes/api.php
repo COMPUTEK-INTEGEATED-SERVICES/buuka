@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
+Route::post('payment/webhook/callback/flutter', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveWebhook'])->name('callback');
+
 Route::middleware(['cors', 'guest'])->group(function (){
     Route::post('register', [\App\Http\Controllers\API\AuthenticationController::class, 'register'])->name('register');
     Route::post('login', [\App\Http\Controllers\API\AuthenticationController::class, 'login'])->name('login');
@@ -128,9 +130,11 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::get('user/last_seen', [\App\Http\Controllers\API\UserController::class, 'userLastSeen']);
 
     //payment routes
-    Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
+    //Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
     Route::post('payment/process/with_giftcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
-    Route::post('payment/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+    Route::post('payment/verify/paystack', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
+    Route::post('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment']);
+    Route::post('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwave']);
     Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
     //vendor packages routes
