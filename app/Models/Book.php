@@ -23,8 +23,8 @@ class Book extends Model
         'status',
     ];
 
-    public function reference(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function reference()
     {
-        return $this->hasOne(TransactionReference::class, 'book_id', 'id');
+        return $this->morphOne(TransactionReference::class, 'referenceable');
     }
 }
