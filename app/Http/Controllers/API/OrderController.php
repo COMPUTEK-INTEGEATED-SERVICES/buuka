@@ -80,9 +80,10 @@ class OrderController extends Controller
         ]);
 
         TransactionReference::create([
-            'book_id'=>$book->id,
+            'referenceable_id'=>$book->id,
+            'store_card_id'=>0,
             'reference'=>Str::random(),
-            'type'=>'book'
+            'referenceable_type'=>'App\Models\Book'
         ]);
 
         Appointment::create([
@@ -129,8 +130,10 @@ class OrderController extends Controller
         ]);
 
         TransactionReference::create([
-            'book_id'=>$book->id,
-            'reference'=>Str::random()
+            'referenceable_id'=>$book->id,
+            'store_card_id'=>0,
+            'reference'=>Str::random(),
+            'referenceable_type'=>'App\Models\Book'
         ]);
 
         return Book::with('reference')->find($book->id);
