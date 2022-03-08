@@ -49,7 +49,7 @@ class OrderController extends Controller
             'product_id' => 'required|array',
             'product_id.*' => 'exists:products,id',
             'note'=>'nullable|string',
-            'scheduled'=>'string|required',
+            'scheduled'=>'date_format:Y-m-d H:i|required',
         ]);
 
         if($v->fails()){
@@ -103,7 +103,7 @@ class OrderController extends Controller
             'status'=>true,
             'message'=>'Product(s) booked proceed to make payment',
             'data'=>[
-                'book'=>$book,
+                'book'=>Book::with('reference')->find($book->id),
             ]
         ]);
     }
@@ -133,7 +133,7 @@ class OrderController extends Controller
             'reference'=>Str::random()
         ]);
 
-        return $book;
+        return Book::with('reference')->find($book->id);
     }
 
     public function getSingleOrder(Request $request)
