@@ -10,7 +10,7 @@ class TransactionReference extends Model
     use HasFactory;
 
     protected $fillable = [
-        'book_id', 'store_card_id', 'reference', 'type'
+        'referenceable_id', 'store_card_id', 'reference', 'referenceable_type'
     ];
 
     public function store_card(): \Illuminate\Database\Eloquent\Relations\BelongsTo
