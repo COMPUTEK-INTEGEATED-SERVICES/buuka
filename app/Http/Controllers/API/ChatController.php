@@ -176,7 +176,10 @@ class ChatController extends Controller
     public function getAllMessages(Request $request)
     {
         $chat = Chat::with(['sender', 'receiver'])
-            ->where('user_2', $this->user->id)
+            ->where(function($q){
+                $q->where('user_2', $this->user->id)
+                    ->orWhere('user_1', $this->user->id);
+            })
             ->paginate(10);
         $chatCollection = $chat->getCollection()->keyBy('user_1');
         $chat->setCollection($chatCollection);
