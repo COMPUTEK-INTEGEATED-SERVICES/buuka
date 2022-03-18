@@ -440,6 +440,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
         //$transactionID = Flutterwave::getTransactionIDFromCallback();
         $data = Flutterwave::verifyTransaction($request->reference);
+        $data = (object)$data;
         $status = $data->status;
 
         //if payment is successful
