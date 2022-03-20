@@ -399,7 +399,7 @@ class PaymentController extends \App\Http\Controllers\Controller
             $payment = Flutterwave::initializePayment($data);
 
 
-            if ($payment['status'] == 'success') {
+            if ($payment && $payment['status'] == 'success') {
                 return $payment['data']['link'];
             }
         }
