@@ -52,7 +52,7 @@ class ChatController extends Controller
             ], 422);
         }
 
-        if ($this->canInteract())
+        if ($this->canSendMessage($request->user_id, $request->vendor_id, strtoupper($request->from)))
         {
             if($request->file){
                 //upload file
@@ -105,6 +105,17 @@ class ChatController extends Controller
             'message'=>'Not authorized',
             'data'=>[]
         ], 401);
+    }
+
+    private function canSendMessage($user_id, $vendor_id, $from)
+    {
+        if ($from == 'USER')
+        {
+            return $this->user->id == $user_id;
+        }else{
+            $vendor = Vendor::find($vendor_id);
+            return $this->user->id == $vendor->user_id;
+        }
     }
 
     private function canInteract():bool
