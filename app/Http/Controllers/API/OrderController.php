@@ -67,7 +67,7 @@ class OrderController extends Controller
         $total_amount = 0;
         foreach ($request->input('product_id') as $p)
         {
-            $total_amount = $total_amount + Product::find($p)->amount;
+            $total_amount = $total_amount + Product::find($p)->price;
         }
 
         $book = Book::create([
@@ -80,14 +80,15 @@ class OrderController extends Controller
             'type'=>'fixed'
         ]);
 
-        $ref = TransactionReference::create([
+        $ref = Str::random();
+        TransactionReference::create([
             'referenceable_id'=>$book->id,
             'store_card_id'=>0,
-            'reference'=>Str::random(),
+            'reference'=>$ref,
             'referenceable_type'=>'App\Models\Book'
         ]);
 
-        $link = (new PaymentController())->initiateFlutterwave($ref->reference);
+        $link = (new PaymentController())->initiateFlutterwave($ref);
 
         if ($link)
         {

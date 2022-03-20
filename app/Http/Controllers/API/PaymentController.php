@@ -376,7 +376,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
         $data = [
             'payment_options' => 'card,banktransfer',
-            'amount' => $book->amount,
+            'amount' => $book->amount * 100,
             'email' => $user->email,
             'tx_ref' => $reference,
             'currency' => "NGN",
@@ -388,8 +388,8 @@ class PaymentController extends \App\Http\Controllers\Controller
             ],
 
             "customizations" => [
-                "title" => 'Movie Ticket',
-                "description" => "20th October"
+                "title" => 'Order Book',
+                "description" => ""
             ]
         ];
 
