@@ -227,7 +227,7 @@ class ChatController extends Controller
             })
             ->latest()->paginate(10);
 
-        $key_by = ($request->as == 'USER')? 'user_id': 'vendor_id';
+        $key_by = ($request->as == 'USER')? 'vendor_id': 'user_id';
         $chatCollection = $chat->getCollection()->keyBy($key_by);
         $chat->setCollection($chatCollection);
 
