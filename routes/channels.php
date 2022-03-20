@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Broadcast;
 /*Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });*/
-Broadcast::channel('chat-room-{user}-{vendor}', function ($user, $user_id) {
-    return ($user->id == $user_id);
+Broadcast::channel('chat-room-{user}-{vendor}', function ($user, $user_id, $vendor_id) {
+    return ($user->id == $user_id || $user->id == \App\Models\Vendor::find($vendor_id)->user_id);
 });
 
 Broadcast::channel('user-notify-{userID}', function ($user, $userID) {
