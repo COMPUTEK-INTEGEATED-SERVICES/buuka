@@ -379,7 +379,7 @@ class PaymentController extends \App\Http\Controllers\Controller
         {
             $data = [
                 'payment_options' => 'card,banktransfer',
-                'amount' => $book->amount * 100,
+                'amount' => $book->amount,
                 'email' => $user->email,
                 'tx_ref' => $reference,
                 'currency' => "NGN",
