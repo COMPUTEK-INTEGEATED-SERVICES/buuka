@@ -21,6 +21,6 @@ Route::get('/', function () {
 Route::get('test/{reference}' ,function (\Illuminate\Http\Request $request){
     //$transactionID = Flutterwave::getTransactionIDFromCallback();
     $data = Flutterwave::verifyTransaction($request->reference);
-    $data = (object)$data;
+    //$data = (object)$data;
     var_dump($data);
 });

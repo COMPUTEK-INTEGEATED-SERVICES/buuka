@@ -28,6 +28,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
 class OrderController extends Controller
 {
@@ -79,33 +80,44 @@ class OrderController extends Controller
             'type'=>'fixed'
         ]);
 
-        TransactionReference::create([
+        $ref = TransactionReference::create([
             'referenceable_id'=>$book->id,
             'store_card_id'=>0,
             'reference'=>Str::random(),
             'referenceable_type'=>'App\Models\Book'
         ]);
 
-        Appointment::create([
-            'user_id'=>$this->user->id,
-            'vendor_id'=>$request->vendor_id,
-            'scheduled'=>Carbon::parse($request->input('scheduled')),
-            'book_id'=>$book->id
-        ]);
+        $link = (new PaymentController())->initiateFlutterwave($ref->reference);
 
-        try {
-            $this->user->notify(new UserBookSuccessfulNotification($book));
-            broadcast( new UserBookSuccessfulEvent($book, $this->user));
-        }catch (\Throwable $throwable){
-            report($throwable);
+        if ($link)
+        {
+            Appointment::create([
+                'user_id'=>$this->user->id,
+                'vendor_id'=>$request->vendor_id,
+                'scheduled'=>Carbon::parse($request->input('scheduled')),
+                'book_id'=>$book->id
+            ]);
+
+            try {
+                $this->user->notify(new UserBookSuccessfulNotification($book));
+                broadcast( new UserBookSuccessfulEvent($book, $this->user));
+            }catch (\Throwable $throwable){
+                report($throwable);
+            }
+
+            return response([
+                'status'=>true,
+                'message'=>'Product(s) booked proceed to make payment',
+                'data'=>[
+                    'book'=>Book::with('reference')->find($book->id),
+                    'link'=>$link
+                ]
+            ]);
         }
-
         return response([
-            'status'=>true,
-            'message'=>'Product(s) booked proceed to make payment',
-            'data'=>[
-                'book'=>Book::with('reference')->find($book->id),
-            ]
+            'status'=>false,
+            'message'=>'An error has occurred please try again',
+            'data'=>[]
         ]);
     }
 
@@ -352,5 +364,29 @@ class OrderController extends Controller
             'message' => 'Access Denied',
             'data' => []
         ], 403);
+    }
+
+    private function associate_flutter_reference($user, $book)
+    {
+        $data = [
+            'payment_options' => 'card,banktransfer',
+            'amount' => $book->amount,
+            'email' => $user->email,
+            'tx_ref' => $book->reference->reference,
+            'currency' => "NGN",
+            'redirect_url' => route('callback'),
+            'customer' => [
+                'email' => $user->email,
+                "phone_number" => $user->phone??'',
+                "name" => $user->first_name.' '.$user->last_name
+            ],
+
+            "customizations" => [
+                "title" => 'Movie Ticket',
+                "description" => "20th October"
+            ]
+        ];
+
+        return Flutterwave::initializePayment($data);
     }
 }

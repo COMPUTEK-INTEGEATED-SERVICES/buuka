@@ -15,6 +15,7 @@ use App\Models\TransactionReference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\Types\False_;
 use function Composer\Autoload\includeFile;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
@@ -367,29 +368,17 @@ class PaymentController extends \App\Http\Controllers\Controller
         ], 422);
     }
 
-    public function initiateFlutterwave(Request $request): \Illuminate\Http\JsonResponse
+    public function initiateFlutterwave($reference)
     {
-        $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references,reference',
-        ]);
-
-        if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation Failed',
-                'data' => $v->errors()
-            ], 422);
-        }
-
         $user = auth()->guard()->user();
-        $book = Book::find(TransactionReference::where('reference', $request->reference)
+        $book = Book::find(TransactionReference::where('reference', $reference)
             ->where('referenceable_type', 'App\Models\Book')->first()->id);
 
         $data = [
             'payment_options' => 'card,banktransfer',
             'amount' => $book->amount,
             'email' => $user->email,
-            'tx_ref' => $request->reference,
+            'tx_ref' => $reference,
             'currency' => "NGN",
             'redirect_url' => route('callback'),
             'customer' => [
@@ -408,20 +397,10 @@ class PaymentController extends \App\Http\Controllers\Controller
 
 
         if ($payment['status'] !== 'success') {
-            return response()->json([
-                'status' => false,
-                'message' => 'An error occurred',
-                'data' => []
-            ]);
+            return false;
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => '',
-            'data' => [
-                'link'=>$payment['data']['link']
-            ]
-        ]);
+        return $payment['data']['link'];
     }
 
     public function flutterwaveConfirmPayment(Request $request)
