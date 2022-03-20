@@ -8,6 +8,7 @@ use App\Events\Chat\NewChatMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -28,9 +29,12 @@ class ChatController extends Controller
     public function sendMessage(Request $request)
     {
         $allowed_image = ['jpeg', 'png', 'jpg', 'gif'];
+        $allowed_from = ['USER', 'VENDOR'];
         $v = Validator::make( $request->all(), [
             'message' => 'required_without:file|string',
-            'to_user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'required|integer|exists:users,id',
+            'vendor_id' => 'required|integer|exists:vendors,id',
+            'from' => 'required|string|in:'.strtoupper(implode(',',$allowed_from)),
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
             'book'=>'nullable|array',
             'book.product'=>'integer|exists:products,id',
@@ -48,7 +52,7 @@ class ChatController extends Controller
             ], 422);
         }
 
-        if ($this->senderIsNotReceiver($this->user->id, $request->input('to_user_id')))
+        if ($this->canInteract())
         {
             if($request->file){
                 //upload file
@@ -73,15 +77,18 @@ class ChatController extends Controller
                 $type = 'book';
             }
 
+            $vendor = Vendor::find($request->vendor_id);
             $chat = Chat::create([
-                'user_1'=>$this->user->id,
-                'user_2'=>$request->input('to_user_id'),
+                'vendor_id'=>$request->input('vendor_id'),
+                'user_id'=>$request->input('user_id'),
                 'type'=>$type??'text',
-                'message'=>$message
+                'message'=>$message,
+                'from'=>strtoupper($request->from),
+                'staff_id'=> $vendor->user_id
             ]);
 
             try {
-                broadcast( new NewChatMessage($chat, $this->user, User::find($request->input('to_user_id'))));
+                broadcast( new NewChatMessage($chat, $this->user, $vendor));
             }catch (\Throwable $throwable){
                 report($throwable);
             }
@@ -100,15 +107,16 @@ class ChatController extends Controller
         ], 401);
     }
 
-    private function senderIsNotReceiver($user_id, $to_user_id):bool
+    private function canInteract():bool
     {
-        return $user_id != $to_user_id;
+        return true;
     }
 
     public function getMessages(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'to_user_id' => 'required|integer|exists:users,id',
+            'vendor_id' => 'required|integer|exists:vendors,id',
+            'user_id' => 'required|integer|exists:users,id',
         ]);
 
         if($v->fails()){
@@ -119,14 +127,11 @@ class ChatController extends Controller
             ], 422);
         }
 
-        if($this->senderIsNotReceiver($this->user->id, $request->input('to_user_id')))
+        if($this->canInteract())
         {
-            $chat = Chat::with(['sender', 'receiver'])->where(function ($query) use ($request) {
-                $query->where('user_1', $this->user->id)
-                    ->where('user_2', $request->input('to_user_id'));
-            })->orWhere(function ($query) use ($request) {
-                $query->where('user_1', $request->input('to_user_id'))
-                    ->where('user_2', $this->user->id);
+            $chat = Chat::with(['user', 'vendor'])->where(function ($query) use ($request) {
+                $query->where('vendor_id', $request->input('vendor_id'))
+                    ->where('user_id', $request->input('user_id'));
             })->latest()->paginate(10);
 
             if ($chat)
@@ -141,7 +146,7 @@ class ChatController extends Controller
             }
             return response([
                 'status'=>false,
-                'message'=>'Access denied',
+                'message'=>'No messages',
                 'data'=>[]
             ]);
         }
@@ -155,12 +160,25 @@ class ChatController extends Controller
 
     public function getStarredMessages(Request $request)
     {
-        $chat = Chat::with(['sender', 'receiver'])->where(function ($query) use ($request) {
-            $query->where('user_1', $this->user->id)
-                ->where('user_2', '!=', $this->user->id);
-        })->orWhere(function ($query) use ($request) {
-            $query->where('user_1', '!=', $this->user->id)
-                ->where('user_2', $this->user->id);
+        $allowed_as = ['USER', 'VENDOR'];
+        $v = Validator::make( $request->all(), [
+            'as' => 'required|string|in:'.strtoupper(implode(',', $allowed_as)),
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $chat = Chat::with(['user', 'vendor'])->where(function ($query) use ($request) {
+            if ($request->input('as') == 'USER'){
+                $query->where('user_id', $this->user->id);
+            }else{
+                $query->where('staff_id', $this->user->id);
+            }
         })->where('starred', 1)
             ->latest()->paginate(10);
 
@@ -175,14 +193,32 @@ class ChatController extends Controller
 
     public function getAllMessages(Request $request)
     {
-        $chat = Chat::with(['sender', 'receiver'])
-            ->where(function($q){
-                $q->where('user_2', $this->user->id)
-                    ->orWhere('user_1', $this->user->id);
+        $allowed_as = ['USER', 'VENDOR'];
+        $v = Validator::make( $request->all(), [
+            'as' => 'required|string|in:'.strtoupper(implode(',', $allowed_as)),
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $chat = Chat::with(['user', 'vendor'])
+            ->where(function($query, $request){
+                if ($request->input('as') == 'USER'){
+                    $query->where('user_id', $this->user->id);
+                }else{
+                    $query->where('staff_id', $this->user->id);
+                }
             })
             ->latest()->paginate(10);
-        /*$chatCollection = $chat->getCollection()->keyBy('user_1');
-        $chat->setCollection($chatCollection);*/
+
+        $key_by = ($request->as == 'USER')? 'user_id': 'vendor_id';
+        $chatCollection = $chat->getCollection()->keyBy($key_by);
+        $chat->setCollection($chatCollection);
 
         return response([
             'status'=>true,
@@ -195,12 +231,25 @@ class ChatController extends Controller
 
     public function getDeletedMessages(Request $request)
     {
-        $chat = Chat::with(['sender', 'receiver'])->where(function ($query) use ($request) {
-            $query->where('user_1', $this->user->id)
-                ->where('user_2', '!=', $this->user->id);
-        })->orWhere(function ($query) use ($request) {
-            $query->where('user_1', '!=', $this->user->id)
-                ->where('user_2', $this->user->id);
+        $allowed_as = ['USER', 'VENDOR'];
+        $v = Validator::make( $request->all(), [
+            'as' => 'required|string|in:'.strtoupper(implode(',', $allowed_as)),
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $chat = Chat::with(['user', 'vendor'])->where(function ($query) use ($request) {
+            if ($request->input('as') == 'USER'){
+                $query->where('user_id', $this->user->id);
+            }else{
+                $query->where('staff_id', $this->user->id);
+            }
         })->where('deleted', 1)
             ->latest()->paginate(10);
 
@@ -215,12 +264,25 @@ class ChatController extends Controller
 
     public function getNewMessages(Request $request)
     {
+        $allowed_as = ['USER', 'VENDOR'];
+        $v = Validator::make( $request->all(), [
+            'as' => 'required|string|in:'.strtoupper(implode(',', $allowed_as)),
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $v->errors()
+            ], 422);
+        }
+
         $chat = Chat::with(['sender', 'receiver'])->where(function ($query) use ($request) {
-            $query->where('user_1', $this->user->id)
-                ->where('user_2', '!=', $this->user->id);
-        })->orWhere(function ($query) use ($request) {
-            $query->where('user_1', '!=', $this->user->id)
-                ->where('user_2', $this->user->id);
+            if ($request->input('as') == 'USER'){
+                $query->where('user_id', $this->user->id);
+            }else{
+                $query->where('staff_id', $this->user->id);
+            }
         })->where('read', 1)
             ->latest()->paginate(10);
 

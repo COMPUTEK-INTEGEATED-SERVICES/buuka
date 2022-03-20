@@ -10,21 +10,21 @@ class Chat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'message', 'type', 'user_1', 'user_2'
+        'message', 'type', 'user_id', 'vendor_id', 'from', 'staff_id'
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
     ];
 
-    public function sender(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function user(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(User::class, 'id', 'user_1');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function receiver(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function vendor(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(User::class, 'id', 'user_2');
+        return $this->hasOne(Vendor::class, 'id', 'vendor_id');
     }
 
     public static function senderReceiver($sender, $receiver)

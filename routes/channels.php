@@ -16,9 +16,8 @@ use Illuminate\Support\Facades\Broadcast;
 /*Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });*/
-Broadcast::channel('chat-room-{receiver}-{sender}', function ($user, $receiver, $sender) {
-    //$chat = \App\Models\Chat::senderReceiver($sender, $receiver);
-    return /*!$chat->isEmpty() && */($user->id == $sender || $user->id == $receiver);
+Broadcast::channel('chat-room-{user}-{vendor}', function ($user, $user_id) {
+    return ($user->id == $user_id);
 });
 
 Broadcast::channel('user-notify-{userID}', function ($user, $userID) {
