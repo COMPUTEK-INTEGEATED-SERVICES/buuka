@@ -207,7 +207,7 @@ class ChatController extends Controller
         }
 
         $chat = Chat::with(['user', 'vendor'])
-            ->where(function($query, $request){
+            ->where(function($query) use ($request) {
                 if ($request->input('as') == 'USER'){
                     $query->where('user_id', $this->user->id);
                 }else{
