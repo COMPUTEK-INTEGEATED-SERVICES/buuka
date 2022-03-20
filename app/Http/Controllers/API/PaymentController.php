@@ -370,37 +370,41 @@ class PaymentController extends \App\Http\Controllers\Controller
 
     public function initiateFlutterwave($reference)
     {
+        $book_id = TransactionReference::where('reference', $reference)
+            ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id;
         $user = auth()->guard()->user();
-        $book = Book::find(TransactionReference::where('reference', $reference)
-            ->where('referenceable_type', 'App\Models\Book')->first()->id);
+        $book = Book::find($book_id);
 
-        $data = [
-            'payment_options' => 'card,banktransfer',
-            'amount' => $book->amount * 100,
-            'email' => $user->email,
-            'tx_ref' => $reference,
-            'currency' => "NGN",
-            'redirect_url' => route('callback'),
-            'customer' => [
+        if ($book)
+        {
+            $data = [
+                'payment_options' => 'card,banktransfer',
+                'amount' => $book->amount * 100,
                 'email' => $user->email,
-                "phone_number" => $user->phone??'',
-                "name" => $user->first_name.' '.$user->last_name
-            ],
+                'tx_ref' => $reference,
+                'currency' => "NGN",
+                'redirect_url' => route('callback'),
+                'customer' => [
+                    'email' => $user->email,
+                    "phone_number" => $user->phone??'',
+                    "name" => $user->first_name.' '.$user->last_name
+                ],
 
-            "customizations" => [
-                "title" => 'Order Book',
-                "description" => ""
-            ]
-        ];
+                "customizations" => [
+                    "title" => 'Order Book',
+                    "description" => ""
+                ]
+            ];
 
-        $payment = Flutterwave::initializePayment($data);
+            $payment = Flutterwave::initializePayment($data);
 
 
-        if ($payment['status'] !== 'success') {
-            return false;
+            if ($payment['status'] == 'success') {
+                return $payment['data']['link'];
+            }
         }
 
-        return $payment['data']['link'];
+        return false;
     }
 
     public function flutterwaveConfirmPayment(Request $request)
