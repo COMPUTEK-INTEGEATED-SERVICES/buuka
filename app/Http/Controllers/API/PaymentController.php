@@ -409,8 +409,10 @@ class PaymentController extends \App\Http\Controllers\Controller
 
     public function flutterwaveConfirmPayment(Request $request)
     {
-        /*$v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references,reference',
+        $v = Validator::make( $request->all(), [
+            'tx_ref' => 'required|string|exists:transaction_references,reference',
+            'status'=>'required|string',
+            'transaction_id'=>'required|string'
         ]);
 
         if($v->fails()){
@@ -419,16 +421,16 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
-        }*/
+        }
 
         $transactionID = Flutterwave::getTransactionIDFromCallback();
         $data = Flutterwave::verifyTransaction($transactionID);
-        $data = (object)$data;
-        $data = (object)$data->data;
+        $d = (object)$data;
+        $data = (object)$d->data;
         $status = $data->status;
 
         //if payment is successful
-        if ($status ==  'successful') {
+        if ($d && $status ==  'successful') {
 
             //send payment received event
             $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
