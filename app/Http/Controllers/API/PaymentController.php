@@ -436,7 +436,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
                     ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
 
-                var_dump($data->amount == $book->amount);exit();
+                var_dump($data->currency == 'NGN');exit();
                 if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
                 {
                     return response([
