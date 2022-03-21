@@ -396,7 +396,7 @@ class OrderController extends Controller
     {
         $allowed_flags = ['PAID', 'UN_PAID', 'COMPLETED', 'CANCELLED'];
         $v = Validator::make($request->all(), [
-            'FLAG'=>'required|string|in:'.strtoupper(implode(',', $allowed_flags))
+            'FLAG'=>'nullable|string|in:'.strtoupper(implode(',', $allowed_flags))
         ]);
 
         if ($v->fails()){
