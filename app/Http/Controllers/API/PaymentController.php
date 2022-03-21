@@ -426,33 +426,36 @@ class PaymentController extends \App\Http\Controllers\Controller
         $transactionID = Flutterwave::getTransactionIDFromCallback();
         $data = Flutterwave::verifyTransaction($transactionID);
         $d = (object)$data;
-        $data = (object)$d->data;
-        $status = $data->status;
+        var_dump($d);exit();
 
-        //if payment is successful
-        if ($d && $status ==  'successful') {
+        if ($d){
+            $data = (object)$d->data;
+            $status = $data->status;
+            //if payment is successful
+            if ($status ==  'successful') {
 
-            //send payment received event
-            $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
-                ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
+                //send payment received event
+                $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
+                    ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
 
-            if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
-            {
+                if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
+                {
+                    return response([
+                        'status'=>true,
+                        'message'=>'Payment received with thanks',
+                        'data'=>[
+                            'book'=>$book,
+                        ]
+                    ]);
+                }
+
+            }
+            if ($status ==  'cancelled'){
                 return response([
-                    'status'=>true,
-                    'message'=>'Payment received with thanks',
-                    'data'=>[
-                        'book'=>$book,
-                    ]
+                    'status'=>false,
+                    'message'=>'You cancelled this transaction',
                 ]);
             }
-
-        }
-        if ($status ==  'cancelled'){
-            return response([
-                'status'=>false,
-                'message'=>'You cancelled this transaction',
-            ]);
         }
         return response([
             'status'=>false,
