@@ -32,4 +32,14 @@ class Book extends Model
     {
         return $this->hasOne(Vendor::class, 'id', 'vendor_id');
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function products()
+    {
+        //return $this->where
+    }
 }
