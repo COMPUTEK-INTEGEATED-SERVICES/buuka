@@ -407,7 +407,7 @@ class OrderController extends Controller
             ]);
         }
 
-        $books = Book::with(['reference', 'vendor'])
+        $books = Book::with(['reference', 'vendor', 'user'])
             ->where('user_id', $this->user->id)
             ->where(function ($query) use ($request) {
                 $flag = NULL;
