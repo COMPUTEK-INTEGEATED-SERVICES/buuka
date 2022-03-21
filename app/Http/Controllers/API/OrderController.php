@@ -111,7 +111,7 @@ class OrderController extends Controller
                 'message'=>'Product(s) booked proceed to make payment',
                 'data'=>[
                     'book'=>Book::with('reference')->find($book->id),
-                    'link'=>''
+                    'link'=>$link
                 ]
             ]);
         }
