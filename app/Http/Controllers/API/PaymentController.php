@@ -429,10 +429,8 @@ class PaymentController extends \App\Http\Controllers\Controller
 
         if ($d->status != 'error'){
             $data = (object)$d->data;
-            var_dump($data->status);exit();
-            $status = $data->status;
             //if payment is successful
-            if ($status ==  'successful') {
+            if ($data->status ==  'successful') {
 
                 //send payment received event
                 $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
