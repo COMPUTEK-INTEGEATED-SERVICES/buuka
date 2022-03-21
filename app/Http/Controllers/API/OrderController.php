@@ -187,8 +187,8 @@ class OrderController extends Controller
         //get the vendor and alert them
         try {
             $vendor = Vendor::find($book->vendor_id);
-            Notification::send(User::find($book->user_id), new UserBookCompleteNotification($book, $vendor));
-            Notification::send(User::find($vendor->user_id), new VendorBookCompleteNotification($book, $vendor));
+            User::find($book->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
+            User::find($vendor->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
 
             //before returning result, save the vendor's client
             Client::firstOrNew([
