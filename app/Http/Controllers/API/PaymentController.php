@@ -436,16 +436,27 @@ class PaymentController extends \App\Http\Controllers\Controller
                 $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
                     ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
 
-                //var_dump((new OrderController())->completeOrder($book->id));exit();
-                if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
+                if($data->amount == $book->amount && $data->currency == 'NGN')
                 {
-                    return response([
-                        'status'=>true,
-                        'message'=>'Payment received with thanks',
-                        'data'=>[
-                            'book'=>$book,
-                        ]
-                    ]);
+                    try {
+                        (new OrderController())->completeOrder($book->id);
+                        return response([
+                            'status'=>true,
+                            'message'=>'Payment received with thanks',
+                            'data'=>[
+                                'book'=>$book,
+                            ]
+                        ]);
+                    }catch (\Throwable $throwable){
+                        report($throwable);
+                        return response([
+                            'status'=>false,
+                            'message'=>'An error occurred please retry confirmation',
+                            'data'=>[
+                                'book'=>$book,
+                            ]
+                        ]);
+                    }
                 }
 
             }
