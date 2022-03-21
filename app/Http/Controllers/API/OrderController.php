@@ -391,4 +391,48 @@ class OrderController extends Controller
 
         return Flutterwave::initializePayment($data);
     }
+
+    public function getBooks(Request $request)
+    {
+        $allowed_flags = ['PAID', 'UN_PAID', 'COMPLETED', 'CANCELLED'];
+        $v = Validator::make($request->all(), [
+            'FLAG'=>'required|string|in:'.strtoupper(implode(',', $allowed_flags))
+        ]);
+
+        if ($v->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Validation error',
+                'data'=>$v->errors()
+            ]);
+        }
+
+        $books = Book::with(['reference'])->where(function ($query) use ($request) {
+            if (strtoupper($request->flag) == 'PAID')
+            {
+                $flag = 1;
+            }
+            elseif (strtoupper($request->flag) == 'UN_PAID')
+            {
+                $flag = 0;
+            }
+            elseif (strtoupper($request->flag) == 'COMPLETED')
+            {
+                $flag = 2;
+            }
+            else
+            {
+                //cancelled =3
+                $flag = 3;
+            }
+            $query->where('user_id', $this->user->id)
+                ->where('status', $flag);
+        })->latest()->paginate(10);
+
+        return response()->json([
+            'status'=>true,
+            'message'=>'',
+            'data'=>$books
+        ]);
+    }
 }

@@ -117,6 +117,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('book/new/fixed', [\App\Http\Controllers\API\OrderController::class, 'fixedBook']);
     Route::post('book/custom/accept', [\App\Http\Controllers\API\OrderController::class, 'acceptOrderProposal']);
     Route::post('book/mark_as_complete', [\App\Http\Controllers\API\OrderController::class, 'markOrderAsCompleted']);
+    Route::get('book/history', [\App\Http\Controllers\API\OrderController::class, 'getBooks']);
 
     //credit card routes
     Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);
