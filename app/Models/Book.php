@@ -27,4 +27,9 @@ class Book extends Model
     {
         return $this->morphOne(TransactionReference::class, 'referenceable');
     }
+
+    public function vendor()
+    {
+        return $this->hasOne(Vendor::class, 'id', 'vendor_id');
+    }
 }
