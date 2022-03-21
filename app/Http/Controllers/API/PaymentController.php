@@ -429,6 +429,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
         if ($d->status != 'error'){
             $data = (object)$d->data;
+            var_dump($data);exit();
             $status = $data->status;
             //if payment is successful
             if ($status ==  'successful') {
