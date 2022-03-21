@@ -188,19 +188,20 @@ class OrderController extends Controller
         try {
             $vendor = Vendor::find($book->vendor_id);
             Notification::send(User::find($book->user_id), new UserBookCompleteNotification($book, $vendor));
-            Notification::send(User::find($book->vendor_id), new VendorBookCompleteNotification($book, $vendor));
+            Notification::send(User::find($vendor->user_id), new VendorBookCompleteNotification($book, $vendor));
+
+            //before returning result, save the vendor's client
+            Client::firstOrNew([
+                'user_id'=>$book->user_id,
+                'vendor_id'=>$book->vendor_id
+            ]);
+
+            //move money to escrow account
+            EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
         }catch (\Throwable $throwable)
         {
             report($throwable);
         }
-        //before returning result, save the vendor's client
-        Client::firstOrNew([
-            'user_id'=>$book->user_id,
-            'vendor_id'=>$book->vendor_id
-        ]);
-
-        //move money to escrow account
-        EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
 
         //finally save the book
         return $book->save();
