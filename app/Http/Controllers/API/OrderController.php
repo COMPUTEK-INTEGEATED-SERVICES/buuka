@@ -407,7 +407,9 @@ class OrderController extends Controller
             ]);
         }
 
-        $books = Book::with(['reference'])->where(function ($query) use ($request) {
+        $books = Book::with(['reference'])
+            ->where('user_id', $this->user->id)
+            ->where(function ($query) use ($request) {
             if (strtoupper($request->flag) == 'PAID')
             {
                 $flag = 1;
@@ -425,7 +427,7 @@ class OrderController extends Controller
                 //cancelled =3
                 $flag = 3;
             }
-            $query->where('user_id', $this->user->id)
+            $query
                 ->where('status', $flag);
         })->latest()->paginate(10);
 
