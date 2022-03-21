@@ -410,6 +410,7 @@ class OrderController extends Controller
         $books = Book::with(['reference'])
             ->where('user_id', $this->user->id)
             ->where(function ($query) use ($request) {
+                $flag = NULL;
                 if (strtoupper($request->flag) == 'PAID')
                 {
                     $flag = 1;
