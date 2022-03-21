@@ -425,6 +425,7 @@ class PaymentController extends \App\Http\Controllers\Controller
         $data = Flutterwave::verifyTransaction($transactionID);
         $data = (object)$data;
         $status = $data->status;
+        var_dump($data);
 
         //if payment is successful
         if ($status ==  'successful') {
@@ -454,7 +455,6 @@ class PaymentController extends \App\Http\Controllers\Controller
         return response([
             'status'=>false,
             'message'=>'An error occurred please try again',
-            'data'=>$data
         ]);
     }
 
