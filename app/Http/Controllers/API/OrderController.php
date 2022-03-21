@@ -411,19 +411,19 @@ class OrderController extends Controller
             ->where('user_id', $this->user->id)
             ->where(function ($query) use ($request) {
                 $flag = NULL;
-                if (strtoupper($request->flag) == 'PAID')
+                if (strtoupper($request->FLAG) == 'PAID')
                 {
                     $flag = 1;
                 }
-                if (strtoupper($request->flag) == 'UN_PAID')
+                if (strtoupper($request->FLAG) == 'UN_PAID')
                 {
                     $flag = 0;
                 }
-                if (strtoupper($request->flag) == 'COMPLETED')
+                if (strtoupper($request->FLAG) == 'COMPLETED')
                 {
                     $flag = 2;
                 }
-                if (strtoupper($request->flag) == 'CANCELLED')
+                if (strtoupper($request->FLAG) == 'CANCELLED')
                 {
                     //cancelled =3
                     $flag = 3;
