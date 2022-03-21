@@ -409,7 +409,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
     public function flutterwaveConfirmPayment(Request $request)
     {
-        $v = Validator::make( $request->all(), [
+        /*$v = Validator::make( $request->all(), [
             'reference' => 'required|string|exists:transaction_references,reference',
         ]);
 
@@ -419,7 +419,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
-        }
+        }*/
 
         $transactionID = Flutterwave::getTransactionIDFromCallback();
         $data = Flutterwave::verifyTransaction($transactionID);
