@@ -448,7 +448,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 }
 
             }
-            if ($status ==  'cancelled'){
+            if ($data->status ==  'cancelled'){
                 return response([
                     'status'=>false,
                     'message'=>'You cancelled this transaction',
