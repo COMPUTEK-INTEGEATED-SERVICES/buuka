@@ -454,6 +454,7 @@ class PaymentController extends \App\Http\Controllers\Controller
         return response([
             'status'=>false,
             'message'=>'An error occurred please try again',
+            'data'=>$data
         ]);
     }
 
