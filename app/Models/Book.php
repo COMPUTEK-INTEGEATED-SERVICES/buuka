@@ -40,6 +40,6 @@ class Book extends Model
 
     public function products()
     {
-        return Product::whereIn('id', json_decode($this->product_id, true))->get();
+        return $this->product_id;
     }
 }
