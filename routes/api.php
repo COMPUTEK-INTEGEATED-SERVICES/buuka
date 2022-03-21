@@ -58,6 +58,8 @@ Route::middleware(['cors', 'guest'])->group(function (){
         Route::post('auth/resend_email_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendEmailVerification']);
         Route::post('auth/resend_sms_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendSmsVerification']);
     });
+
+    Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 
@@ -133,7 +135,6 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
     Route::post('payment/process/with_giftcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
     Route::post('payment/verify/paystack', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
-    Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
     Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwave']);
     Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
