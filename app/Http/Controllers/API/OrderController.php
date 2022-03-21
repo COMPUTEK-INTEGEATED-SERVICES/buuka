@@ -428,7 +428,7 @@ class OrderController extends Controller
                     //cancelled =3
                     $flag = 3;
                 }
-                if ($flag){
+                if (!is_null($flag)){
                     $query
                         ->where('status', $flag);
                 }
