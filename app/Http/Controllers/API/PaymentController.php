@@ -473,7 +473,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 broadcast(new PaymentEvent($request->data->tx_ref, $status = 'success'));
 
                 $book = Book::find(TransactionReference::where('reference', $request->data->tx_ref)
-                    ->where('referenceable_type', 'App\Models\Book')->first()->id);
+                    ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
                 (new OrderController())->completeOrder($book->id);
             }
             broadcast(new PaymentEvent($request->data->tx_ref, $verificationData['status']));
