@@ -410,25 +410,27 @@ class OrderController extends Controller
         $books = Book::with(['reference'])
             ->where('user_id', $this->user->id)
             ->where(function ($query) use ($request) {
-            if (strtoupper($request->flag) == 'PAID')
-            {
-                $flag = 1;
-            }
-            elseif (strtoupper($request->flag) == 'UN_PAID')
-            {
-                $flag = 0;
-            }
-            elseif (strtoupper($request->flag) == 'COMPLETED')
-            {
-                $flag = 2;
-            }
-            else
-            {
-                //cancelled =3
-                $flag = 3;
-            }
-            $query
-                ->where('status', $flag);
+                if (strtoupper($request->flag) == 'PAID')
+                {
+                    $flag = 1;
+                }
+                if (strtoupper($request->flag) == 'UN_PAID')
+                {
+                    $flag = 0;
+                }
+                if (strtoupper($request->flag) == 'COMPLETED')
+                {
+                    $flag = 2;
+                }
+                if (strtoupper($request->flag) == 'CANCELLED')
+                {
+                    //cancelled =3
+                    $flag = 3;
+                }
+                if ($flag){
+                    $query
+                        ->where('status', $flag);
+                }
         })->latest()->paginate(10);
 
         return response()->json([
