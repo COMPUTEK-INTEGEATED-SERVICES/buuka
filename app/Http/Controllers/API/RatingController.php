@@ -27,9 +27,9 @@ class RatingController extends Controller
     public function rateVendor(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'vendor_id' => 'required|int|exists:vendors,id',
+            'rateable_id' => 'required|int|exists:vendors,id',
             'comment'=>'string',
-            'star'=>'required|string',
+            'rating'=>'required|string',
         ]);
 
         if($v->fails()){
@@ -62,9 +62,9 @@ class RatingController extends Controller
     public function rateService(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'service_id' => 'required|int|exists:services,id',
+            'rateable_id' => 'required|int|exists:services,id',
             'comment'=>'string',
-            'star'=>'required|string',
+            'rating'=>'required|string',
         ]);
 
         if($v->fails()){
