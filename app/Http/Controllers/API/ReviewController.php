@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\Review;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,8 +28,11 @@ class ReviewController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
+        $service = Service::find($request->service_id);
         Review::create([
             'service_id'=>$request->input('service_id'),
+            'reviewable_id'=>$service->vendor_id,
+            'reviewable_type'=>'App\Models\Vendor',
             'user_id'=> $user->id,
             'comment'=>$request->input('comment'),
             'star'=>$request->input('star')
