@@ -31,7 +31,7 @@ class UserMarkedOrderAsCompletedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -58,6 +58,15 @@ class UserMarkedOrderAsCompletedNotification extends Notification
     {
         return [
             //
+        ];
+    }
+
+    public function toDatabase($notifiable):array
+    {
+        return [
+            'subject'=>'Order completed',
+            'message'=>"User marked order as completed",
+            'action'=>''
         ];
     }
 }

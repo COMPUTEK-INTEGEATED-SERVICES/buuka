@@ -33,7 +33,7 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -60,6 +60,15 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
     {
         return [
             //
+        ];
+    }
+
+    public function toDatabase($notifiable):array
+    {
+        return [
+            'subject'=>'Order Completed',
+            'message'=>"Vendor has marked this order as completed",
+            'action'=>''
         ];
     }
 }

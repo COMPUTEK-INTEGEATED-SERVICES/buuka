@@ -63,10 +63,12 @@ class VendorCanceledOrderNotification extends Notification
         ];
     }
 
-    public function toDatabase($notifiable): array
+    public function toDatabase($notifiable):array
     {
         return [
-            //
+            'subject'=>'Order cancelled',
+            'message'=>"Order cancelled",
+            'action'=>''
         ];
     }
 }
