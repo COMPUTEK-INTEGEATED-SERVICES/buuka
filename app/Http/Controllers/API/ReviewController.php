@@ -17,7 +17,7 @@ class ReviewController extends \App\Http\Controllers\Controller
         $v = Validator::make( $request->all(), [
             'vendor_id' => 'required|integer|exists:vendors,id',
             'comment' => 'required|string',
-            'star' => 'required|string',
+            'star' => 'required|numeric|min:1|max:5',
         ]);
 
         if($v->fails()){
