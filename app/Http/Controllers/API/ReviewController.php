@@ -15,7 +15,7 @@ class ReviewController extends \App\Http\Controllers\Controller
     {
         $user = auth()->guard('api')->user();
         $v = Validator::make( $request->all(), [
-            'service_id' => 'required|integer|exists:services,id',
+            'vendor_id' => 'required|integer|exists:vendors,id',
             'comment' => 'required|string',
             'star' => 'required|string',
         ]);
@@ -28,10 +28,8 @@ class ReviewController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
-        $service = Service::find($request->service_id);
         Review::create([
-            'service_id'=>$request->input('service_id'),
-            'reviewable_id'=>$service->vendor_id,
+            'reviewable_id'=>$request->vendor_id,
             'reviewable_type'=>'App\Models\Vendor',
             'user_id'=> $user->id,
             'comment'=>$request->input('comment'),
