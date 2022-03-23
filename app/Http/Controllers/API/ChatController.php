@@ -96,7 +96,9 @@ class ChatController extends Controller
             return response([
                 'status'=>true,
                 'message'=>'Chat sent',
-                'data'=>[]
+                'data'=>[
+                    $request->file('file')->getClientMimeType()
+                ]
             ]);
         }
 
