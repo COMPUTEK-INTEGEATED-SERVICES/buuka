@@ -687,7 +687,13 @@ class SupportController
             ], 422);
         }
 
-        $vendor = Vendor::with(['reviews', 'services', 'staff', 'images'])->find($request->vendor_id);
+        $vendor = Vendor::with(['reviews', 'services', 'staff', 'images'])
+            ->where('id', $request->vendor_id)
+            ->leftJoin('vendors as related_vendors', function ($query){
+                $query->on('vendors.state', '=', 'related_vendors.state');
+                $query->where('vendors.city', '=', 'related_vendors.city');
+                //$query->where('vendors.state', '=', 'related_vendors.state')
+            })->first();
 
         return response([
             'status'=>true,
