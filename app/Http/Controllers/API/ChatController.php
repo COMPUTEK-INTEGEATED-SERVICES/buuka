@@ -28,7 +28,7 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request)
     {
-        $allowed_image = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        $allowed_image = ['image/jpeg', 'image/png', 'image/gif'];
         $allowed_from = ['USER', 'VENDOR'];
         $v = Validator::make( $request->all(), [
             'message' => 'required_without:file|string',
