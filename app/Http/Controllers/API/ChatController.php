@@ -28,7 +28,7 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request)
     {
-        $allowed_image = ['jpeg', 'png', 'jpg', 'gif'];
+        $allowed_image = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
         $allowed_from = ['USER', 'VENDOR'];
         $v = Validator::make( $request->all(), [
             'message' => 'required_without:file|string',
@@ -58,7 +58,7 @@ class ChatController extends Controller
                 //upload file
                 $message =  $request->file('file')->store('public/attachments');
 
-                if (in_array(strtolower($request->file('file')->getMimeType()), $allowed_image))
+                if (in_array(strtolower($request->file('file')->getClientMimeType()), $allowed_image))
                 {
                     $type = 'image';
                 }else{
