@@ -58,7 +58,7 @@ class Vendor extends Model
         return $this->morphMany(Review::class, 'reviewable')->with(['user']);
     }
 
-    public function related_vendors($vendor_id)
+    public static function related_vendors($vendor_id)
     {
         $vendor = Vendor::find($vendor_id);
         return Vendor::where(function ($query) use ($vendor) {
