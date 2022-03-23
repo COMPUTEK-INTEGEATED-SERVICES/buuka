@@ -65,6 +65,6 @@ class Vendor extends Model
             $query->where('state_id', '=', $vendor->state_id)
                 ->where('city_id', '=', $vendor->city_id)
                 ->where('id', '!=', $vendor_id);
-        })->get();
+        })->inRandomOrder()->take(10)->get();
     }
 }
