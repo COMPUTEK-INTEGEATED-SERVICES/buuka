@@ -58,11 +58,11 @@ class ChatController extends Controller
                 //upload file
                 $message =  $request->file('file')->store('public/attachments');
 
-                if (in_array($request->file('file')->getMimeType(), $allowed_image))
+                if (in_array(strtolower($request->file('file')->getMimeType()), $allowed_image))
                 {
                     $type = 'image';
                 }else{
-                    $type = 'file';
+                    $type = 'document';
                 }
                 //$type = $request->file('file')->getMimeType();
             }else{
