@@ -693,8 +693,30 @@ class SupportController
             'status'=>true,
             'message'=>'',
             'data'=>[
-                'vendor'=>$vendor,
-                'related'=>Vendor::related_vendors($request->vendor_id)
+                $vendor
+            ]
+        ]);
+    }
+
+    public function getVendorsNearVendor(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                Vendor::related_vendors($request->vendor_id)
             ]
         ]);
     }

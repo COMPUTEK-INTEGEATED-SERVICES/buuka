@@ -47,6 +47,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('get_vendor_rating', [\App\Http\Controllers\API\SupportController::class, 'getVendorRating']);
     Route::get('get_service_rating', [\App\Http\Controllers\API\SupportController::class, 'getServiceRating']);
     Route::get('vendor', [\App\Http\Controllers\API\SupportController::class, 'getAVendor']);
+    Route::get('vendors_near_vendor', [\App\Http\Controllers\API\SupportController::class, 'getVendorsNearVendor']);
 
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
