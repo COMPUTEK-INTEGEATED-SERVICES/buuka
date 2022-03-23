@@ -695,7 +695,7 @@ class SupportController
                 //$query->where('vendors.state', '=', 'related_vendors.state')
             })
             ->select('related_vendors.id as related_vendor_id', 'related_vendors.*', 'vendors.*')
-            ->first();
+            ->get();
 
         return response([
             'status'=>true,
