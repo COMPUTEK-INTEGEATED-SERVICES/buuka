@@ -715,9 +715,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                Vendor::related_vendors($request->vendor_id)
-            ]
+            'data'=>Vendor::related_vendors($request->vendor_id)
         ]);
     }
 }
