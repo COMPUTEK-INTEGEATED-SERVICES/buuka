@@ -46,7 +46,8 @@ class VendorController extends Controller
             ], 422);
         }
 
-        if (Vendor::where('user_id', $user->id)->first()){
+        $vendor = Vendor::where('user_id', $user->id)->first();
+        if ($vendor){
             return response()->json([
                 'status' => false,
                 'message' => 'You have a business account already!',
