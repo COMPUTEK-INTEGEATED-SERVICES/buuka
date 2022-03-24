@@ -18,9 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test/{reference}' ,function (\Illuminate\Http\Request $request){
-    $transactionID = Flutterwave::getTransactionIDFromCallback();
-    $data = Flutterwave::verifyTransaction($transactionID);
-    //$data = (object)$data;
-    var_dump($data);
+Route::get('test' ,function (){
+
 });
