@@ -35,7 +35,7 @@ class VendorController extends Controller
             'instagram'=>'nullable|string|url',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
             'category'=>'required|array',
-            'category.*'=>'int|exists:categories:id'
+            'category.*'=>'int|exists:categories,id'
         ]);
 
         if($v->fails()){
