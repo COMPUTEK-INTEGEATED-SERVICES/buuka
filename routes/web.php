@@ -19,7 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('test' ,function (){
-    $cities = json_decode(file_get_contents('../extras/cities_in_nigeria.json'));
+    $cities = json_decode(file_get_contents('./extras/cities_in_nigeria.json'));
     $country = \App\Models\Country::where('name', 'Nigeria')->where('initial', 'NGA')->first();
     foreach ($cities as $items)
     {
