@@ -598,7 +598,7 @@ class SupportController
             'status'=>true,
             'message'=>'',
             'data'=>[
-                'banks'=>VendorPackage::where('status', 1)->get()
+                VendorPackage::where('status', 1)->get()
             ]
         ]);
     }
