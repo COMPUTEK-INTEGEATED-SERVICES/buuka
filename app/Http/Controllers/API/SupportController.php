@@ -597,9 +597,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                VendorPackage::where('status', 1)->get()
-            ]
+            'data'=>VendorPackage::where('status', 1)->get()
         ]);
     }
 
