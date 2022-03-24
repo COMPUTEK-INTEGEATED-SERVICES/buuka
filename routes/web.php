@@ -28,10 +28,10 @@ Route::get('test' ,function (){
         {
             $citiez = $items->cities;
             foreach ($citiez as $city){
-                \App\Models\City::updateORCreate(
-                    ['state_id'=>$state->id],
-                    ['name'=>$city]
-                );
+                \App\Models\City::create([
+                    'state_id'=>$state->id,
+                    'name'=>$city
+                ]);
             }
         }
     }
