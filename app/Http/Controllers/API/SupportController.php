@@ -568,9 +568,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                'category'=>Weeks::all()
-            ]
+            'data'=>Weeks::all()
         ]);
     }
 
