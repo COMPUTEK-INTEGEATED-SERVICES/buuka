@@ -26,7 +26,7 @@ class UserController extends Controller
     public function uploadPhoto(Request $request): \Illuminate\Http\JsonResponse
     {
         $v = Validator::make( $request->all(), [
-            'file' => 'required|mimes:jpeg,jpg,png,gif,pdf',
+            'file' => 'required|mimes:jpeg,jpg,png',
         ]);
 
         if($v->fails()){

@@ -39,7 +39,7 @@ class ChatController extends Controller
             'book'=>'nullable|array',
             'book.product'=>'integer|exists:products,id',
             'book.amount'=>'string',
-            'book.scheduled'=>'string',
+            'book.scheduled'=>'date_format:Y-m-d H:i|required',
             'book.extras'=>'string',
             'book.vendor_id'=>'int',
         ]);
