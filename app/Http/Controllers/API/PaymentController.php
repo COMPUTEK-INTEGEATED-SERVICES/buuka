@@ -484,7 +484,7 @@ class PaymentController extends \App\Http\Controllers\Controller
             //if payment is successful
             if ($data->status ==  'successful') {
                 //get what the payment is for
-                Log::error($data);
+                //Log::error(json_encode($data));
                 $ref = TransactionReference::where('reference', $data->tx_ref)->first();
                 switch ($ref->referenceable_type){
                     case "App\Models\Book":
