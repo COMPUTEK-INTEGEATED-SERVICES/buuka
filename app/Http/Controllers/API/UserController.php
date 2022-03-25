@@ -54,12 +54,12 @@ class UserController extends Controller
     {
         $gender = ['male', 'female'];
         $v = Validator::make( $request->all(), [
-            'first_name' => 'string',
-            'last_name' => 'string',
-            'email' => 'string|email',
-            'phone' => 'string',
-            'gender' => 'string,in:'.strtolower(implode(',', $gender)),
-            'date_of_birth' => 'string'
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'gender' => 'nullable|string,in:'.strtolower(implode(',', $gender)),
+            'date_of_birth' => 'nullable|string'
         ]);
 
         if($v->fails()){
