@@ -74,10 +74,10 @@ class UserController extends Controller
             $user = User::find($this->user->id);
             $user->first_name = $request->input('first_name', $user->first_name);
             $user->last_name = $request->input('last_name', $user->last_name);
-            $user->email = $request->input('email', $user->email);
-            $user->email_verified = (!empty($request->email) && $user->email != $request->email)?0:$user->email_verified;
-            $user->phone = $request->input('phone', $user->phone);
-            $user->phone_verified = (!empty($request->phone) && $user->phone != $request->phone)?0:$user->phone_verified;
+            //$user->email = $request->input('email', $user->email);
+            //$user->email_verified = (!empty($request->email) && $user->email != $request->email)?0:$user->email_verified;
+            //$user->phone = $request->input('phone', $user->phone);
+            //$user->phone_verified = (!empty($request->phone) && $user->phone != $request->phone)?0:$user->phone_verified;
             $user->gender = $request->input('gender', $user->gender);
             $user->date_of_birth = $request->input('date_of_birth', $user->date_of_birth);
             $user->save();
