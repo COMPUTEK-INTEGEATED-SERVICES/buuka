@@ -59,7 +59,7 @@ class UserController extends Controller
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'gender' => 'nullable|string|in:'.strtolower(implode(',', $gender)),
-            'date_of_birth' => 'nullable|string'
+            'date_of_birth' => 'nullable|date_format:Y-m-d|before:today'
         ]);
 
         if($v->fails()){
