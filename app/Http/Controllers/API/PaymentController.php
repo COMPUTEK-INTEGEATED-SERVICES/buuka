@@ -16,6 +16,7 @@ use App\Models\TransactionReference;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Types\False_;
@@ -483,7 +484,8 @@ class PaymentController extends \App\Http\Controllers\Controller
             //if payment is successful
             if ($data->status ==  'successful') {
                 //get what the payment is for
-                $ref = TransactionReference::where('reference', $data->tx-ref)->first();
+                Log::error($data);
+                $ref = TransactionReference::where('reference', $data->tx_ref)->first();
                 switch ($ref->referenceable_type){
                     case "App\Models\Book":
                         $book = Book::find($ref->referenceable_id);
