@@ -58,7 +58,7 @@ class UserController extends Controller
             'last_name' => 'nullable|string',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
-            'gender' => 'nullable|string,in:'.strtolower(implode(',', $gender)),
+            'gender' => 'nullable|string|in:'.strtolower(implode(',', $gender)),
             'date_of_birth' => 'nullable|string'
         ]);
 
