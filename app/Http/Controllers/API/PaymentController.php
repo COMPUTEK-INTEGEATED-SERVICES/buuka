@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Events\PaymentEvent;
+use App\Http\Controllers\Action\PaymentAction;
 use App\Models\Book;
 use App\Models\CreditCard;
 use App\Models\GiftCard;
@@ -12,9 +13,12 @@ use App\Models\GiftCardPurchase;
 use App\Models\PaymentChannel;
 use App\Models\PaymentMethod;
 use App\Models\TransactionReference;
+use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\Types\False_;
 use function Composer\Autoload\includeFile;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
@@ -367,10 +371,10 @@ class PaymentController extends \App\Http\Controllers\Controller
         ], 422);
     }
 
-    public function initiateFlutterwave(Request $request): \Illuminate\Http\JsonResponse
+    public function initiateFlutterwaveForWallet(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references,reference',
+            'amount' => 'required|int',
         ]);
 
         if($v->fails()){
@@ -380,16 +384,20 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'data' => $v->errors()
             ], 422);
         }
-
         $user = auth()->guard()->user();
-        $book = Book::find(TransactionReference::where('reference', $request->reference)
-            ->where('referenceable_type', 'App\Models\Book')->first()->id);
+
+        $reference = TransactionReference::create([
+            'referenceable_id'=>$user->wallet->id,
+            'store_card_id'=>0,
+            'reference'=>Str::random(),
+            'referenceable_type'=>'App\Models\Wallet'
+        ]);
 
         $data = [
             'payment_options' => 'card,banktransfer',
-            'amount' => $book->amount,
+            'amount' => $request->amount,
             'email' => $user->email,
-            'tx_ref' => $request->reference,
+            'tx_ref' => $reference->reference,
             'currency' => "NGN",
             'redirect_url' => route('callback'),
             'customer' => [
@@ -399,35 +407,54 @@ class PaymentController extends \App\Http\Controllers\Controller
             ],
 
             "customizations" => [
-                "title" => 'Movie Ticket',
-                "description" => "20th October"
+                "title" => 'Wallet Top-up',
+                "description" => ""
             ]
         ];
 
-        $payment = Flutterwave::initializePayment($data);
+        return $payment = PaymentAction::initiateFlutter($data);
+    }
 
+    public function initiateFlutterwaveForBook($reference)
+    {
+        $book_id = TransactionReference::where('reference', $reference)
+            ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id;
+        $user = auth()->guard()->user();
+        $book = Book::find($book_id);
 
-        if ($payment['status'] !== 'success') {
-            return response()->json([
-                'status' => false,
-                'message' => 'An error occurred',
-                'data' => []
-            ]);
+        if ($book)
+        {
+            $data = [
+                'payment_options' => 'card,banktransfer',
+                'amount' => $book->amount,
+                'email' => $user->email,
+                'tx_ref' => $reference,
+                'currency' => "NGN",
+                'redirect_url' => route('callback'),
+                'customer' => [
+                    'email' => $user->email,
+                    "phone_number" => $user->phone??'',
+                    "name" => $user->first_name.' '.$user->last_name
+                ],
+
+                "customizations" => [
+                    "title" => 'Order Book',
+                    "description" => ""
+                ]
+            ];
+
+            $payment = PaymentAction::initiateFlutter($data);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => '',
-            'data' => [
-                'link'=>$payment['data']['link']
-            ]
-        ]);
+        return $payment??false;
     }
 
     public function flutterwaveConfirmPayment(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references,reference',
+            'tx_ref' => 'required|string|exists:transaction_references,reference',
+            'status'=>'required|string',
+            'transaction_id'=>'required|string'
         ]);
 
         if($v->fails()){
@@ -438,35 +465,76 @@ class PaymentController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
-        //$transactionID = Flutterwave::getTransactionIDFromCallback();
-        $data = Flutterwave::verifyTransaction($request->reference);
-        $data = (object)$data;
-        $status = $data->status;
+        $transactionID = Flutterwave::getTransactionIDFromCallback();
+        $data = Flutterwave::verifyTransaction($transactionID);
+        $d = (object)$data;
 
-        //if payment is successful
-        if ($status ==  'successful') {
+        if ($d->status != 'error'){
+            $data = (object)$d->data;
+            //if payment is successful
+            if ($data->status ==  'successful') {
+                //get what the payment is for
+                $ref = TransactionReference::where('reference', $data->tx-ref)->first();
+                switch ($ref->referenceable_type){
+                    case "App\Models\Book":
+                        $book = Book::find($ref->referenceable_id);
 
-            //send payment received event
-            $book = Book::find(TransactionReference::where('reference', $data->tx_ref)
-                ->where('referenceable_type', 'App\Models\Book')->first()->id);
-
-            if($data->amount == $book->amount && $data->currency == 'NGN' && (new OrderController())->completeOrder($book->id))
-            {
+                        if($data->amount == $book->amount && $data->currency == 'NGN')
+                        {
+                            try {
+                                (new OrderController())->completeOrder($book->id);
+                                return response([
+                                    'status'=>true,
+                                    'message'=>'Payment received with thanks',
+                                    'data'=>[
+                                        'book'=>$book,
+                                    ]
+                                ]);
+                            }catch (\Throwable $throwable){
+                                report($throwable);
+                                return response([
+                                    'status'=>false,
+                                    'message'=>'An error occurred please retry confirmation',
+                                    'data'=>[
+                                        'book'=>$book,
+                                    ]
+                                ]);
+                            }
+                        }
+                        break;
+                    case "App\Models\Wallet":
+                        $wallet = Wallet::find($ref->referenceable_id);
+                        if($data->amount && $data->currency == 'NGN')
+                        {
+                            try {
+                                WalletController::credit($wallet->walletable_id, 'user', $data->amount);
+                                return response([
+                                    'status'=>true,
+                                    'message'=>'Wallet has been funded with '. $data->amount,
+                                    'data'=>[
+                                        'wallet'=>$wallet,
+                                    ]
+                                ]);
+                            }catch (\Throwable $throwable){
+                                report($throwable);
+                                return response([
+                                    'status'=>false,
+                                    'message'=>'An error occurred please retry confirmation',
+                                    'data'=>[
+                                        'wallet'=>$wallet,
+                                    ]
+                                ]);
+                            }
+                        }
+                        break;
+                }
+            }
+            if ($data->status ==  'cancelled'){
                 return response([
-                    'status'=>true,
-                    'message'=>'Payment received with thanks',
-                    'data'=>[
-                        'book'=>$book,
-                    ]
+                    'status'=>false,
+                    'message'=>'You cancelled this transaction',
                 ]);
             }
-
-        }
-        if ($status ==  'cancelled'){
-            return response([
-                'status'=>false,
-                'message'=>'You cancelled this transaction',
-            ]);
         }
         return response([
             'status'=>false,
@@ -489,7 +557,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 broadcast(new PaymentEvent($request->data->tx_ref, $status = 'success'));
 
                 $book = Book::find(TransactionReference::where('reference', $request->data->tx_ref)
-                    ->where('referenceable_type', 'App\Models\Book')->first()->id);
+                    ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
                 (new OrderController())->completeOrder($book->id);
             }
             broadcast(new PaymentEvent($request->data->tx_ref, $verificationData['status']));

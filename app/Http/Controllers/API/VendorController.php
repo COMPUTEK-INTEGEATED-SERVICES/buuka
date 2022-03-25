@@ -35,7 +35,7 @@ class VendorController extends Controller
             'instagram'=>'nullable|string|url',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
             'category'=>'required|array',
-            'category.*'=>'int|exists:categories:id'
+            'category.*'=>'int|exists:categories,id'
         ]);
 
         if($v->fails()){
@@ -44,6 +44,15 @@ class VendorController extends Controller
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
+        }
+
+        $vendor = Vendor::where('user_id', $user->id)->first();
+        if ($vendor){
+            return response()->json([
+                'status' => false,
+                'message' => 'You have a business account already!',
+                'data' => []
+            ]);
         }
 
         $vendor = Vendor::create([

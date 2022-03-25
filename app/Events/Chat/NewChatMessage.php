@@ -4,6 +4,7 @@ namespace App\Events\Chat;
 
 use App\Models\Chat;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -25,20 +26,20 @@ class NewChatMessage implements ShouldBroadcast
      */
     private $user;
     /**
-     * @var User
+     * @var Vendor
      */
-    private $to_user;
+    private $vendor;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Chat $chat, User $user, User $to_user)
+    public function __construct(Chat $chat, User $user, Vendor $vendor)
     {
         $this->chat = $chat;
         $this->user = $user;
-        $this->to_user = $to_user;
+        $this->vendor = $vendor;
     }
 
     /**
@@ -48,11 +49,11 @@ class NewChatMessage implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel("chat-room-{$this->user->id}-{$this->to_user->id}");
+        return new PrivateChannel("chat-room-{$this->user->id}-{$this->vendor->id}");
     }
 
     public function broadcastWith()
     {
-        return ['message' => $this->chat, 'user' => $this->user];
+        return ['message' => $this->chat];
     }
 }

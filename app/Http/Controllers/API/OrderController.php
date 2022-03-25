@@ -28,6 +28,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
 class OrderController extends Controller
 {
@@ -66,7 +67,7 @@ class OrderController extends Controller
         $total_amount = 0;
         foreach ($request->input('product_id') as $p)
         {
-            $total_amount = $total_amount + Product::find($p)->amount;
+            $total_amount = $total_amount + Product::find($p)->price;
         }
 
         $book = Book::create([
@@ -79,33 +80,45 @@ class OrderController extends Controller
             'type'=>'fixed'
         ]);
 
+        $ref = Str::random();
         TransactionReference::create([
             'referenceable_id'=>$book->id,
             'store_card_id'=>0,
-            'reference'=>Str::random(),
+            'reference'=>$ref,
             'referenceable_type'=>'App\Models\Book'
         ]);
 
-        Appointment::create([
-            'user_id'=>$this->user->id,
-            'vendor_id'=>$request->vendor_id,
-            'scheduled'=>Carbon::parse($request->input('scheduled')),
-            'book_id'=>$book->id
-        ]);
+        $link = (new PaymentController())->initiateFlutterwave($ref);
 
-        try {
-            $this->user->notify(new UserBookSuccessfulNotification($book));
-            broadcast( new UserBookSuccessfulEvent($book, $this->user));
-        }catch (\Throwable $throwable){
-            report($throwable);
+        if ($link)
+        {
+            Appointment::create([
+                'user_id'=>$this->user->id,
+                'vendor_id'=>$request->vendor_id,
+                'scheduled'=>Carbon::parse($request->input('scheduled')),
+                'book_id'=>$book->id
+            ]);
+
+            try {
+                $this->user->notify(new UserBookSuccessfulNotification($book));
+                broadcast( new UserBookSuccessfulEvent($book, $this->user));
+            }catch (\Throwable $throwable){
+                report($throwable);
+            }
+
+            return response([
+                'status'=>true,
+                'message'=>'Product(s) booked proceed to make payment',
+                'data'=>[
+                    'book'=>Book::with('reference')->find($book->id),
+                    'link'=>$link
+                ]
+            ]);
         }
-
         return response([
-            'status'=>true,
-            'message'=>'Product(s) booked proceed to make payment',
-            'data'=>[
-                'book'=>Book::with('reference')->find($book->id),
-            ]
+            'status'=>false,
+            'message'=>'An error has occurred please try again',
+            'data'=>[]
         ]);
     }
 
@@ -174,20 +187,21 @@ class OrderController extends Controller
         //get the vendor and alert them
         try {
             $vendor = Vendor::find($book->vendor_id);
-            Notification::send(User::find($book->user_id), new UserBookCompleteNotification($book, $vendor));
-            Notification::send(User::find($book->vendor_id), new VendorBookCompleteNotification($book, $vendor));
+            User::find($book->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
+            User::find($vendor->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
+
+            //before returning result, save the vendor's client
+            Client::firstOrNew([
+                'user_id'=>$book->user_id,
+                'vendor_id'=>$book->vendor_id
+            ]);
+
+            //move money to escrow account
+            EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
         }catch (\Throwable $throwable)
         {
             report($throwable);
         }
-        //before returning result, save the vendor's client
-        Client::firstOrNew([
-            'user_id'=>$book->user_id,
-            'vendor_id'=>$book->vendor_id
-        ]);
-
-        //move money to escrow account
-        EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
 
         //finally save the book
         return $book->save();
@@ -352,5 +366,78 @@ class OrderController extends Controller
             'message' => 'Access Denied',
             'data' => []
         ], 403);
+    }
+
+    private function associate_flutter_reference($user, $book)
+    {
+        $data = [
+            'payment_options' => 'card,banktransfer',
+            'amount' => $book->amount,
+            'email' => $user->email,
+            'tx_ref' => $book->reference->reference,
+            'currency' => "NGN",
+            'redirect_url' => route('callback'),
+            'customer' => [
+                'email' => $user->email,
+                "phone_number" => $user->phone??'',
+                "name" => $user->first_name.' '.$user->last_name
+            ],
+
+            "customizations" => [
+                "title" => 'Movie Ticket',
+                "description" => "20th October"
+            ]
+        ];
+
+        return Flutterwave::initializePayment($data);
+    }
+
+    public function getBooks(Request $request)
+    {
+        $allowed_flags = ['PAID', 'UN_PAID', 'COMPLETED', 'CANCELLED'];
+        $v = Validator::make($request->all(), [
+            'FLAG'=>'nullable|string|in:'.strtoupper(implode(',', $allowed_flags))
+        ]);
+
+        if ($v->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Validation error',
+                'data'=>$v->errors()
+            ]);
+        }
+
+        $books = Book::with(['reference', 'vendor', 'user'])
+            ->where('user_id', $this->user->id)
+            ->where(function ($query) use ($request) {
+                $flag = NULL;
+                if (strtoupper($request->FLAG) == 'PAID')
+                {
+                    $flag = 1;
+                }
+                if (strtoupper($request->FLAG) == 'UN_PAID')
+                {
+                    $flag = 0;
+                }
+                if (strtoupper($request->FLAG) == 'COMPLETED')
+                {
+                    $flag = 2;
+                }
+                if (strtoupper($request->FLAG) == 'CANCELLED')
+                {
+                    //cancelled =3
+                    $flag = 3;
+                }
+                if (!is_null($flag)){
+                    $query
+                        ->where('status', $flag);
+                }
+        })->latest()->paginate(10);
+
+        return response()->json([
+            'status'=>true,
+            'message'=>'',
+            'data'=>$books
+        ]);
     }
 }

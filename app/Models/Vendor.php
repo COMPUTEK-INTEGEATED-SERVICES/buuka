@@ -55,6 +55,16 @@ class Vendor extends Model
 
     public function reviews(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->morphMany(Review::class, 'reviewable');
+        return $this->morphMany(Review::class, 'reviewable')->with(['user']);
+    }
+
+    public static function related_vendors($vendor_id)
+    {
+        $vendor = Vendor::find($vendor_id);
+        return Vendor::where(function ($query) use ($vendor_id, $vendor) {
+            $query->where('state_id', '=', $vendor->state_id)
+                ->where('city_id', '=', $vendor->city_id)
+                ->where('id', '!=', $vendor_id);
+        })->inRandomOrder()->take(10)->get();
     }
 }

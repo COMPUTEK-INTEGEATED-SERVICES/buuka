@@ -568,9 +568,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                'category'=>Weeks::all()
-            ]
+            'data'=>Weeks::all()
         ]);
     }
 
@@ -597,9 +595,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                'banks'=>VendorPackage::where('status', 1)->get()
-            ]
+            'data'=>VendorPackage::where('status', 1)->get()
         ]);
     }
 
@@ -695,6 +691,27 @@ class SupportController
             'data'=>[
                 $vendor
             ]
+        ]);
+    }
+
+    public function getVendorsNearVendor(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>Vendor::related_vendors($request->vendor_id)
         ]);
     }
 }

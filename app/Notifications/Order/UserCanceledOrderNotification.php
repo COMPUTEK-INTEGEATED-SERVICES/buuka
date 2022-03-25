@@ -61,10 +61,12 @@ class UserCanceledOrderNotification extends Notification
         ];
     }
 
-    public function toDatabase($notifiable): array
+    public function toDatabase($notifiable):array
     {
         return [
-            //
+            'subject'=>'Cancelled Book',
+            'message'=>"User cancelled book",
+            'action'=>''
         ];
     }
 }

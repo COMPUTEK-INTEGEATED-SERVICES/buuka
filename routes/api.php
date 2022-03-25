@@ -47,6 +47,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('get_vendor_rating', [\App\Http\Controllers\API\SupportController::class, 'getVendorRating']);
     Route::get('get_service_rating', [\App\Http\Controllers\API\SupportController::class, 'getServiceRating']);
     Route::get('vendor', [\App\Http\Controllers\API\SupportController::class, 'getAVendor']);
+    Route::get('vendors_near_vendor', [\App\Http\Controllers\API\SupportController::class, 'getVendorsNearVendor']);
 
     //payment routes
     Route::get('payment_settings', [\App\Http\Controllers\API\PaymentController::class, 'payment_settings']);
@@ -58,6 +59,8 @@ Route::middleware(['cors', 'guest'])->group(function (){
         Route::post('auth/resend_email_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendEmailVerification']);
         Route::post('auth/resend_sms_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendSmsVerification']);
     });
+
+    Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 
@@ -115,6 +118,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('book/new/fixed', [\App\Http\Controllers\API\OrderController::class, 'fixedBook']);
     Route::post('book/custom/accept', [\App\Http\Controllers\API\OrderController::class, 'acceptOrderProposal']);
     Route::post('book/mark_as_complete', [\App\Http\Controllers\API\OrderController::class, 'markOrderAsCompleted']);
+    Route::get('book/history', [\App\Http\Controllers\API\OrderController::class, 'getBooks']);
 
     //credit card routes
     Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);
@@ -133,8 +137,8 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
     Route::post('payment/process/with_giftcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
     Route::post('payment/verify/paystack', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
-    Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
-    Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwave']);
+    Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForBook']);
+    Route::get('deposit/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForWallet']);
     Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
     //vendor packages routes

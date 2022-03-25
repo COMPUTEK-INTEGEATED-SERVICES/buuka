@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\Review;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,9 +15,9 @@ class ReviewController extends \App\Http\Controllers\Controller
     {
         $user = auth()->guard('api')->user();
         $v = Validator::make( $request->all(), [
-            'service_id' => 'required|integer|exists:services,id',
+            'vendor_id' => 'required|integer|exists:vendors,id',
             'comment' => 'required|string',
-            'star' => 'required|string',
+            'star' => 'required|numeric|min:1|max:5',
         ]);
 
         if($v->fails()){
@@ -28,7 +29,8 @@ class ReviewController extends \App\Http\Controllers\Controller
         }
 
         Review::create([
-            'service_id'=>$request->input('service_id'),
+            'reviewable_id'=>$request->vendor_id,
+            'reviewable_type'=>'App\Models\Vendor',
             'user_id'=> $user->id,
             'comment'=>$request->input('comment'),
             'star'=>$request->input('star')

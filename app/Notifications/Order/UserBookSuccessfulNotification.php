@@ -58,4 +58,13 @@ class UserBookSuccessfulNotification extends Notification
             //
         ];
     }
+
+    public function toDatabase($notifiable):array
+    {
+        return [
+            'subject'=>'Book Successful',
+            'message'=>"Book Successful",
+            'action'=>''
+        ];
+    }
 }

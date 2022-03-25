@@ -12,4 +12,9 @@ class Review extends Model
     protected $fillable = [
         'service_id', 'user_id', 'comment', 'star', 'reviewable_id', 'reviewable_type'
     ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }
