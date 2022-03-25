@@ -412,7 +412,16 @@ class PaymentController extends \App\Http\Controllers\Controller
             ]
         ];
 
-        return $payment = PaymentAction::initiateFlutter($data);
+        $payment = PaymentAction::initiateFlutter($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Link generated',
+            'data' => [
+                'link'=>$payment,
+                'reference'=>$reference->reference
+            ]
+        ]);
     }
 
     public function initiateFlutterwaveForBook($reference)
