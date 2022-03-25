@@ -88,6 +88,7 @@ class UserController extends Controller
                 'data' => []
             ]);
         }catch (\Throwable $throwable){
+            report($throwable);
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred',
