@@ -137,7 +137,8 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //Route::post('payment/process/with_saved_card', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithSavedCard']);
     Route::post('payment/process/with_giftcard', [\App\Http\Controllers\API\PaymentController::class, 'processPaymentWithGiftCard']);
     Route::post('payment/verify/paystack', [\App\Http\Controllers\API\PaymentController::class, 'verifyPayment']);
-    Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwave']);
+    Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForBook']);
+    Route::get('deposit/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForWallet']);
     Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
 
     //vendor packages routes
