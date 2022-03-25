@@ -41,7 +41,7 @@ class UserController extends Controller
 
         $user = User::find($this->user->id);
         $user->photo = $file;
-        $file->save();
+        $user->save();
 
         return response()->json([
             'status' => true,
