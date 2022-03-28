@@ -86,12 +86,15 @@ class AuthenticationController extends Controller
     }
 
     public function register (Request $request) {
+        $gender = ['male', 'female'];
         $v = Validator::make( $request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
+            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users",
+            'date_of_birth' => 'required|date_format:Y-m-d|before:'.now()->subYears(12)->toDateString(),
+            'gender' => 'required|string|in:'.strtolower(implode(',', $gender)),
         ]);
 
         if($v->fails()){
