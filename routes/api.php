@@ -60,6 +60,9 @@ Route::middleware(['cors', 'guest'])->group(function (){
         Route::post('auth/resend_sms_otp', [\App\Http\Controllers\API\AuthenticationController::class, 'resendSmsVerification']);
     });
 
+    //search route
+    Route::get('search', [\App\Http\Controllers\API\SearchController::class, 'searchServices']);
+
     Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
