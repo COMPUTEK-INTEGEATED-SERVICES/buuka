@@ -56,7 +56,7 @@ class AuthenticationController extends Controller
         }
         if (app('general_settings')->sms_verify == 1)
         {
-            if (auth()->user()->sms_verified == 0)
+            if (auth()->user()->phone_verified == 0)
             {
                 $require['sms']=true;
                 $msg = (!empty($msg))?$msg.' and your phone number':'Please verify your phone number';
@@ -225,7 +225,7 @@ class AuthenticationController extends Controller
     public function verifyRegistrationEmailOrPhone(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|exists:users,email',
             'email_otp' => 'required_without:sms_otp|int|min:6',
             'sms_otp' => 'required_without:email_otp|int|min:6',
         ]);
@@ -286,7 +286,7 @@ class AuthenticationController extends Controller
     public function resendSmsVerification(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|exists:users',
             'phone'=> "nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
         ]);
 
