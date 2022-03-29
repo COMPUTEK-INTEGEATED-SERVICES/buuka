@@ -226,8 +226,8 @@ class AuthenticationController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'email' => 'required|string|email|max:255',
-            'email_otp' => 'int|min:6',
-            'sms_otp' => 'int|min:6',
+            'email_otp' => 'required_without:sms_otp|int|min:6',
+            'sms_otp' => 'required_without:email_otp|int|min:6',
         ]);
 
         if($v->fails()){
@@ -248,7 +248,7 @@ class AuthenticationController extends Controller
             ], 403);
         }
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
-        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0)
+        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0 && $request->sms_otp)
         {
             if (!Hash::check($request->sms_otp, $otps->sms_otp))
             {
@@ -262,7 +262,7 @@ class AuthenticationController extends Controller
             $user->phone_verified = 1;
         }
 
-        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0)
+        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0 && $request->email_otp)
         {
             if (!Hash::check($request->email_otp, $otps->email_otp))
             {
