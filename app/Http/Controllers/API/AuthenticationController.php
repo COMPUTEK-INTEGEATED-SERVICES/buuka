@@ -51,7 +51,7 @@ class AuthenticationController extends Controller
             if (auth()->user()->email_verified == 0)
             {
                 $require['email']=true;
-                $msg= 'Please verify your email';
+                $msg = 'Please verify your email';
             }
         }
         if (app('general_settings')->sms_verify == 1)
@@ -59,7 +59,7 @@ class AuthenticationController extends Controller
             if (auth()->user()->sms_verified == 0)
             {
                 $require['sms']=true;
-                $msg = ($msg)?$msg.' and your phone number':'Please verify your phone number';
+                $msg = (!empty($msg))?$msg.' and your phone number':'Please verify your phone number';
             }
         }
         if (!empty($require))
