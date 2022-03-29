@@ -248,7 +248,7 @@ class AuthenticationController extends Controller
             ], 403);
         }
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
-        if (app('general_settings')->sms_verify == 1)
+        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0)
         {
             if (!Hash::check($request->sms_otp, $otps->sms_otp))
             {
@@ -262,7 +262,7 @@ class AuthenticationController extends Controller
             $user->phone_verified = 1;
         }
 
-        if (app('general_settings')->email_verify == 1)
+        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0)
         {
             if (!Hash::check($request->email_otp, $otps->email_otp))
             {
