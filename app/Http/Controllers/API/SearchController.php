@@ -24,23 +24,23 @@ class SearchController extends Controller
                     $query->where('services.name', 'Like', '%' . $request->input('q') . '%')
                         ->orWhere('services.description', 'Like', '%' . $request->input('q') . '%');
                 }
-                if ($request->input('category_id') != null)
+                if ($request->input('category_id') != null && $request->input('category_id') != '')
                 {
                     $query->where('category_relations.category_id', $request->input('category_id'));
                 }
-                if ($request->input('city') != null)
+                if ($request->input('city_id') != null && $request->input('city_id') != '')
                 {
                     $query->where('vendors.city_id', $request->input('city_id'));
                 }/*else{
                     $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
                 }*/
-                if ($request->input('state') != null)
+                if ($request->input('state_id') != null && $request->input('state_id') != '')
                 {
                     $query->where('vendors.state_id', $request->input('state_id'));
                 }/*else{
                     $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
                 }*/
-                if ($request->input('country') != null)
+                if ($request->input('country_id') != null && $request->input('country_id') != '')
                 {
                     $query->where('vendors.country_id', $request->input('country_id'));
                 }/*else{
