@@ -346,12 +346,9 @@ class OrderController extends Controller
 
                 //todo: refund party
                 try {
-                    if ($book->vendor_id == $this->user->id)
-                    {
-                        $this->user->notify(new VendorCanceledOrderNotification($book, $vendor));
-                    }else{
-                        User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
-                    }
+                    User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
+                    User::find($book->user_id)->notify(new VendorCanceledOrderNotification($book, $vendor));
+
                     return response()->json([
                         'status' => true,
                         'message' => 'Order has been cancelled',
