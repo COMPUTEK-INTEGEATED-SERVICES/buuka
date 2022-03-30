@@ -339,28 +339,36 @@ class OrderController extends Controller
             //todo: implement order cancellation policy
 
             //todo: store cancellation reason
-            $book->status = 3;
-            $book->save();
 
-            //todo: refund party
-            try {
-                if ($book->vendor_id == $this->user->id)
+            if ($book->status != 3){
+                $book->status = 3;
+                $book->save();
+
+                //todo: refund party
+                try {
+                    if ($book->vendor_id == $this->user->id)
+                    {
+                        $this->user->notify(new VendorCanceledOrderNotification($book, $vendor));
+                    }else{
+                        User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Order has been cancelled',
+                        'data' => [
+                            'book'=>$book
+                        ]
+                    ]);
+                }catch (\Throwable $throwable)
                 {
-                    $this->user->notify(new VendorCanceledOrderNotification($book, $vendor));
-                }else{
-                    User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
+                    report($throwable);
                 }
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Order has been cancelled',
-                    'data' => [
-                        'book'=>$book
-                    ]
-                ]);
-            }catch (\Throwable $throwable)
-            {
-                report($throwable);
             }
+            return response()->json([
+                'status' => false,
+                'message' => 'Order is already cancelled',
+                'data' => []
+            ], 403);
         }
 
         return response()->json([
