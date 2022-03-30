@@ -351,10 +351,10 @@ class OrderController extends Controller
                     {
                         //it is the user
                         $this->user->notify(new OrderCancellationNotification($book));
-                        User::find($book->user_id)->notify(new VendorCanceledOrderNotification($book, $vendor));
+                        User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
                     }else{
                         $this->user->notify(new OrderCancellationNotification($book));
-                        User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
+                        User::find($book->user_id)->notify(new VendorCanceledOrderNotification($book, $vendor));
                     }
 
                     return response()->json([
