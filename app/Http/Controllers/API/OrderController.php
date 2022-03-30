@@ -323,7 +323,7 @@ class OrderController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'book_id' => 'required|int|exists:books,id',
-            'reason' => 'required|string'
+            'reason' => 'nullable|string'
         ]);
 
         if($v->fails()){
