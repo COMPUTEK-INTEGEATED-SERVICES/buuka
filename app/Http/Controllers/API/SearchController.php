@@ -19,7 +19,7 @@ class SearchController extends Controller
             ->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
             ->where(function($query) use ($request) {
-                if ($request->input('q') != null)
+                if ($request->input('q') != null && $request->input('q') != '')
                 {
                     $query->where('services.name', 'Like', '%' . $request->input('q') . '%');
                 }
