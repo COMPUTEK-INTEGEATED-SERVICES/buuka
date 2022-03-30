@@ -21,7 +21,8 @@ class SearchController extends Controller
             ->where(function($query) use ($request) {
                 if ($request->input('q') != null && $request->input('q') != '')
                 {
-                    $query->where('services.name', 'Like', '%' . $request->input('q') . '%');
+                    $query->where('services.name', 'Like', '%' . $request->input('q') . '%')
+                        ->orWhere('services.description', 'Like', '%' . $request->input('q') . '%');
                 }
                 if ($request->input('category_id') != null)
                 {
