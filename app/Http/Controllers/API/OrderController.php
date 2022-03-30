@@ -323,6 +323,7 @@ class OrderController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'book_id' => 'required|int|exists:books,id',
+            'reason' => 'required|string'
         ]);
 
         if($v->fails()){
@@ -337,6 +338,7 @@ class OrderController extends Controller
         if ($this->user->can('participate', [$book, $vendor])){
             //todo: implement order cancellation policy
 
+            //todo: store cancellation reason
             $book->status = 3;
             $book->save();
 
