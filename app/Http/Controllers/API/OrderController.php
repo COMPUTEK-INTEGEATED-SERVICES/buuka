@@ -334,7 +334,7 @@ class OrderController extends Controller
         }
         $book = Book::find($request->book_id);
         $vendor = Vendor::find($book->vendor_id);
-        if ($this->user->can('participate', $book, $vendor)){
+        if ($this->user->can('participate', [$book, $vendor])){
             //todo: implement order cancellation policy
 
             $book->status = 3;
