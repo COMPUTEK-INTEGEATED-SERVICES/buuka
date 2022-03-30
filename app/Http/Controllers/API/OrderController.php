@@ -15,6 +15,7 @@ use App\Models\Service;
 use App\Models\TransactionReference;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\Order\OrderCancellationNotification;
 use App\Notifications\Order\UserBookCompleteNotification;
 use App\Notifications\Order\UserBookSuccessfulNotification;
 use App\Notifications\Order\UserCanceledOrderNotification;
@@ -346,8 +347,15 @@ class OrderController extends Controller
 
                 //todo: refund party
                 try {
-                    User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
-                    User::find($book->user_id)->notify(new VendorCanceledOrderNotification($book, $vendor));
+                    if ($this->user->id == $book->user_id)
+                    {
+                        //it is the user
+                        $this->user->notify(new OrderCancellationNotification($book));
+                        User::find($book->user_id)->notify(new VendorCanceledOrderNotification($book, $vendor));
+                    }else{
+                        $this->user->notify(new OrderCancellationNotification($book));
+                        User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
+                    }
 
                     return response()->json([
                         'status' => true,
