@@ -348,7 +348,7 @@ class OrderController extends Controller
                 {
                     $this->user->notify(new VendorCanceledOrderNotification($book, $vendor));
                 }else{
-                    $vendor->user->notify(new UserCanceledOrderNotification($book));
+                    User::find($vendor->user_id)->notify(new UserCanceledOrderNotification($book));
                 }
                 return response()->json([
                     'status' => true,
