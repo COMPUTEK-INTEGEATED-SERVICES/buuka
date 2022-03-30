@@ -363,12 +363,13 @@ class OrderController extends Controller
                 {
                     report($throwable);
                 }
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Order is already cancelled',
+                    'data' => []
+                ], 403);
             }
-            return response()->json([
-                'status' => false,
-                'message' => 'Order is already cancelled',
-                'data' => []
-            ], 403);
         }
 
         return response()->json([
