@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30767fd7fb32d5b51aa15287aa05e224",
+    "content-hash": "72fefb8320b8660c6d6f7b6ea8d9866d",
     "packages": [
+        {
+            "name": "africastalking/africastalking",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AfricasTalkingLtd/africastalking-php.git",
+                "reference": "94e17a13eaaf782cf7697bfc7da020398a2b6f13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AfricasTalkingLtd/africastalking-php/zipball/94e17a13eaaf782cf7697bfc7da020398a2b6f13",
+                "reference": "94e17a13eaaf782cf7697bfc7da020398a2b6f13",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AfricasTalking\\SDK\\": "src/",
+                    "AfricasTalking\\SDK\\Tests\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Africas's Talking",
+                    "email": "support@africastalking.com",
+                    "homepage": "https://www.africastalking.com"
+                }
+            ],
+            "description": "Official Africa's Talking PHP SDK",
+            "homepage": "http://github.com/AfricasTalkingLtd/africastalking-php",
+            "keywords": [
+                "Africastalking",
+                "airtime",
+                "api",
+                "sms",
+                "text message",
+                "ussd",
+                "voice"
+            ],
+            "support": {
+                "issues": "https://github.com/AfricasTalkingLtd/africastalking-php/issues",
+                "source": "https://github.com/AfricasTalkingLtd/africastalking-php/tree/v3.0.0"
+            },
+            "time": "2020-10-11T00:52:15+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.3",
@@ -1639,6 +1695,71 @@
                 "source": "https://github.com/kingflamez/laravelrave/tree/v4.2.0"
             },
             "time": "2021-03-29T06:08:53+00:00"
+        },
+        {
+            "name": "laravel-notification-channels/africastalking",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-notification-channels/africastalking.git",
+                "reference": "2b91ed59820c2ccdde623345f719003a2ffcb4c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-notification-channels/africastalking/zipball/2b91ed59820c2ccdde623345f719003a2ffcb4c6",
+                "reference": "2b91ed59820c2ccdde623345f719003a2ffcb4c6",
+                "shasum": ""
+            },
+            "require": {
+                "africastalking/africastalking": "^3.0",
+                "guzzlehttp/guzzle": "^6.2 || ^7.0",
+                "illuminate/notifications": "5.5 - 9",
+                "illuminate/support": "5.5 - 9",
+                "php": ">=7.2.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3",
+                "orchestra/testbench": "~5.0 || ^6.0",
+                "phpunit/phpunit": "^7.5 || ^8.5.21 || ^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NotificationChannels\\AfricasTalking\\AfricasTalkingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NotificationChannels\\AfricasTalking\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Osaigbovo Emmanuel",
+                    "email": "osaigbovoemmanuel1@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This package makes it easy to send notifications via AfricasTalking with Laravel",
+            "homepage": "https://github.com/laravel-notification-channels/africastalking",
+            "keywords": [
+                "Africastalking",
+                "laravel",
+                "laravel-notification-channel",
+                "notification",
+                "notification-channel"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-notification-channels/africastalking/issues",
+                "source": "https://github.com/laravel-notification-channels/africastalking/tree/3.2.0"
+            },
+            "time": "2022-02-10T22:21:46+00:00"
         },
         {
             "name": "laravel/framework",

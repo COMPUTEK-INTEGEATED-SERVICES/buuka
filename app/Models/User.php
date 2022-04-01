@@ -63,6 +63,11 @@ class User extends Authenticatable
 
     public function staff(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        $this->hasMany(Staff::class, 'user_id', 'id');
+        return $this->hasMany(Staff::class, 'user_id', 'id');
+    }
+
+    public function routeNotificationForAfricasTalking($notification)
+    {
+        return $this->phone;
     }
 }

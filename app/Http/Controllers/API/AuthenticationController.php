@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\PasswordReset;
 use App\Models\Wallet;
 use App\Notifications\Auth\EmailVerificationNotification;
+use App\Notifications\Auth\PhoneVerificationNotification;
 use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
@@ -128,8 +129,9 @@ class AuthenticationController extends Controller
                 $otp = random_int(100000, 999999);
                 //send verification code to email
                 $verification->sms_otp = Hash::make($otp);
-                $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
-                send_sms($request->phone, $message);
+                /*$message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
+                send_sms($request->phone, $message);*/
+                $user->notify(new PhoneVerificationNotification($otp));
             }
             if (app('general_settings')->email_verify == 1)
             {
