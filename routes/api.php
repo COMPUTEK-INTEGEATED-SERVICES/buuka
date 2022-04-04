@@ -167,4 +167,8 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('rating/rate_vendor', [\App\Http\Controllers\API\RatingController::class, 'rateVendor']);
     Route::post('vendor/rate_service', [\App\Http\Controllers\API\RatingController::class, 'rateService']);
     Route::post('vendor/delete_rating', [\App\Http\Controllers\API\RatingController::class, 'deleteRating']);
+
+    //appointment routes
+    Route::get('appointments/today', [\App\Http\Controllers\API\AppointmentController::class, 'get_vendor_appointments_today']);
+    Route::get('appointments', [\App\Http\Controllers\API\AppointmentController::class, 'get_vendor_appointments']);
 });

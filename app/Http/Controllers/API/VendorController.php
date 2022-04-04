@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryRelation;
 use App\Models\Escrow;
 use App\Models\Resource;
+use App\Models\Staff;
+use App\Models\State;
 use App\Models\Vendor;
 use App\Models\VendorImages;
 use App\Models\Wallet;
@@ -107,6 +109,13 @@ class VendorController extends Controller
         Wallet::create([
             'walletable_id'=>$vendor->id,
             'walletable_type'=>'App\Models\Vendor'
+        ]);
+
+        //you are your number one staff
+        Staff::create([
+            'vendor_id'=>$vendor->id,
+            'user_id'=>$this->user_id,
+            'confirm_staff_request'=>1,
         ]);
 
         try {
