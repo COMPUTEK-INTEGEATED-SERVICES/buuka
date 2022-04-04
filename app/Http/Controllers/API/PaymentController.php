@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Events\PaymentEvent;
+use App\Http\Controllers\Action\BookActions;
 use App\Http\Controllers\Action\PaymentAction;
 use App\Models\Book;
 use App\Models\CreditCard;
@@ -100,7 +101,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                                     ($save)?$m = 'Order booked, card saved':$m = 'Order booked, card not saved';
                                 }
                             }
-                            (new OrderController)->completeOrder($book);
+                            (new BookActions())->markBookAsPaid($book->id);
                             return response([
                                 'status'=>true,
                                 'message'=>$m??'Order book completed',
@@ -278,7 +279,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                         $sam = round($book->amount, 2) * 100;
 
                         if ($am == $sam && $result['data']['currency'] == $request->currency  && $book->status == '0') {
-                            (new OrderController)->completeOrder($book);
+                            (new BookActions())->markBookAsPaid($book->id);
                             return response([
                                 'status'=>true,
                                 'message'=>'Order book completed',
@@ -340,12 +341,12 @@ class PaymentController extends \App\Http\Controllers\Controller
                 GiftCard::debit($giftcard->id, $book->amount);
                 $giftcard->status = 1;
                 $giftcard->save();
-                (new OrderController())->completeOrder($book->id);
+                (new BookActions())->markBookAsPaid($book->id);
                 break;
             case $book->amount < $giftcard->balance:
                 //debit the giftcard
                 GiftCard::debit($giftcard->id, $book->amount);
-                (new OrderController())->completeOrder($book->id);
+                (new BookActions())->markBookAsPaid($book->id);
                 break;
             case $book->amount > $giftcard->balance:
                 //we subtract the balance from the book amount
@@ -493,7 +494,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                         if($data->amount == $book->amount && $data->currency == 'NGN')
                         {
                             try {
-                                (new OrderController())->completeOrder($book->id);
+                                (new BookActions())->markBookAsPaid($book->id);
                                 return response([
                                     'status'=>true,
                                     'message'=>'Payment received with thanks',
@@ -569,7 +570,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
                 $book = Book::find(TransactionReference::where('reference', $request->data->tx_ref)
                     ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id);
-                (new OrderController())->completeOrder($book->id);
+                (new BookActions())->markBookAsPaid($book->id);
             }
             broadcast(new PaymentEvent($request->data->tx_ref, $verificationData['status']));
         }

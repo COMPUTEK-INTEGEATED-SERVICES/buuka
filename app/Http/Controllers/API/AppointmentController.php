@@ -61,7 +61,7 @@ class AppointmentController extends Controller
         return response()->json([
             'status'=>true,
             'message'=>'',
-            'data'=>Appointment::where('vendor_id', $request->vendor_id)->latest()->paginate(20)
+            'data'=>Appointment::with('book')->where('vendor_id', $request->vendor_id)->latest()->paginate(20)
         ]);
     }
 }

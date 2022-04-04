@@ -37,4 +37,9 @@ class Book extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
+
+    public function products()
+    {
+        return $this->hasMany(ProductBookRelation::class, 'book_id', 'id')->with('product');
+    }
 }

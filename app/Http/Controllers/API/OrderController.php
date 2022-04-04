@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API;
 
 
 use App\Events\Order\UserBookSuccessfulEvent;
+use App\Http\Controllers\Action\BookActions;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Book;
 use App\Models\Client;
 use App\Models\Escrow;
 use App\Models\Product;
+use App\Models\ProductBookRelation;
 use App\Models\Service;
 use App\Models\TransactionReference;
 use App\Models\User;
@@ -61,59 +63,15 @@ class OrderController extends Controller
                 'data' => $v->errors()
             ], 422);
         }
-        /**
-         * here i will take the product_id and book it against amount and other details
-         */
-        //here i will want to get the total amount
-        $total_amount = 0;
-        foreach ($request->input('product_id') as $p)
+
+        $book = (new BookActions())->createFixedBook($request, $this->user);
+
+        if ($book)
         {
-            $total_amount = $total_amount + Product::find($p)->price;
-        }
-
-        $book = Book::create([
-            'user_id'=>$this->user->id,
-            'vendor_id'=>$request->vendor_id,
-            'product_id'=>json_encode($request->input('product_id')),
-            'schedule'=>Carbon::make($request->input('scheduled')),
-            'amount'=>$total_amount,
-            'note'=>$request->input('note'),
-            'type'=>'fixed'
-        ]);
-
-        $ref = Str::random();
-        TransactionReference::create([
-            'referenceable_id'=>$book->id,
-            'store_card_id'=>0,
-            'reference'=>$ref,
-            'referenceable_type'=>'App\Models\Book'
-        ]);
-
-        $link = (new PaymentController())->initiateFlutterwave($ref);
-
-        if ($link)
-        {
-            Appointment::create([
-                'user_id'=>$this->user->id,
-                'vendor_id'=>$request->vendor_id,
-                'scheduled'=>Carbon::parse($request->input('scheduled')),
-                'book_id'=>$book->id
-            ]);
-
-            try {
-                $this->user->notify(new UserBookSuccessfulNotification($book));
-                broadcast( new UserBookSuccessfulEvent($book, $this->user));
-            }catch (\Throwable $throwable){
-                report($throwable);
-            }
-
             return response([
                 'status'=>true,
                 'message'=>'Product(s) booked proceed to make payment',
-                'data'=>[
-                    'book'=>Book::with('reference')->find($book->id),
-                    'link'=>$link
-                ]
+                'data'=>$book
             ]);
         }
         return response([
@@ -125,32 +83,7 @@ class OrderController extends Controller
 
     public function customBook($book)
     {
-        $book =  Book::create([
-            'user_id'=>$this->user->id,
-            'vendor_id'=>$book->vendor_id,
-            'product_id'=>json_encode([$book->product_id]),
-            'schedule'=>$book->scheduled,
-            'amount'=>$book->amount,
-            'note'=>$book->extras,
-            'type'=>'custom',
-            'proposed_by'=>($book->vendor_id == $book->user_id)?'vendor':'client'
-        ]);
-
-        Appointment::create([
-            'user_id'=>$book->user_id,
-            'vendor_id'=>$book->vendor_id,
-            'scheduled'=>Carbon::parse($book->scheduled),
-            'book_id'=>$book->id
-        ]);
-
-        TransactionReference::create([
-            'referenceable_id'=>$book->id,
-            'store_card_id'=>0,
-            'reference'=>Str::random(),
-            'referenceable_type'=>'App\Models\Book'
-        ]);
-
-        return Book::with('reference')->find($book->id);
+        return (new BookActions())->createCustomBook($book, $this->user);
     }
 
     public function getSingleOrder(Request $request)
@@ -178,34 +111,7 @@ class OrderController extends Controller
 
     public function completeOrder($book_id)
     {
-        $book = Book::find($book_id);
-        if($book->status == 1)
-        {
-            return true;
-        }
-        //mark the bok as done
-        $book->status = 1;
-        //get the vendor and alert them
-        try {
-            $vendor = Vendor::find($book->vendor_id);
-            User::find($book->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
-            User::find($vendor->user_id)->notify(new UserBookCompleteNotification($book, $vendor));
-
-            //before returning result, save the vendor's client
-            Client::firstOrNew([
-                'user_id'=>$book->user_id,
-                'vendor_id'=>$book->vendor_id
-            ]);
-
-            //move money to escrow account
-            EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
-        }catch (\Throwable $throwable)
-        {
-            report($throwable);
-        }
-
-        //finally save the book
-        return $book->save();
+        return (new BookActions())->markBookAsPaid($book_id);
     }
 
     public function acceptOrderProposal(Request $request)
@@ -276,36 +182,15 @@ class OrderController extends Controller
                 'data' => $v->errors()
             ], 422);
         }
-        $book = Book::find($request->book_id);
+        $book = (new BookActions())->markOrderAsComplete($request->book_id, $this->user);
 
-        $vendor = Vendor::find($book->vendor_id);
-        if ($this->user->can('participate', $book, $vendor))
+        if ($book)
         {
-            if ($book->status == 1)
-            {
-                //notify the vendor that a user marked order as paid or vise versa
-                try {
-                    User::find($book->user_id)->notify(new VendorMarkedOrderAsCompletedNotification($vendor, $book));
-                    User::find($book->vendor_id)->notify(new UserMarkedOrderAsCompletedNotification($book));
-                }catch (\Throwable $throwable)
-                {
-                    report($throwable);
-                }
-
-                //change book status to complete
-                $book->status = 2;
-
-                //we credit vendor from escrow
-                EscrowController::subtractFund($vendor->user_id, 'vendor', $book->amount);
-                WalletController::credit($vendor->user_id, 'vendor', $book->amount);
-
-                $book->save();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'This book as been marked as completed',
-                    'data' => []
-                ]);
-            }
+            return response()->json([
+                'status' => true,
+                'message' => 'This book as been marked as completed',
+                'data' => []
+            ]);
         }
         return response()->json([
             'status' => false,
@@ -423,7 +308,7 @@ class OrderController extends Controller
             ]);
         }
 
-        $books = Book::with(['reference', 'vendor', 'user'])
+        $books = Book::with(['reference', 'vendor', 'user', 'products'])
             ->where('user_id', $this->user->id)
             ->where(function ($query) use ($request) {
                 $flag = NULL;
