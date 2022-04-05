@@ -15,6 +15,8 @@ class CreateProductBookRelationsTable extends Migration
     {
         Schema::create('product_book_relations', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('book_id');
+            $table->bigInteger('product_id');
             $table->timestamps();
         });
     }
