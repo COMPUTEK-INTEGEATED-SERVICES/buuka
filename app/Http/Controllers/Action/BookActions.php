@@ -62,7 +62,7 @@ class BookActions
                 'referenceable_type'=>'App\Models\Book'
             ]);
 
-            $link = (new PaymentController())->initiateFlutterwave($ref);
+            $link = (new PaymentController())->initiateFlutterwaveForBook($ref);
 
             if ($link)
             {
