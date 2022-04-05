@@ -66,8 +66,8 @@ class BookActions
 
             if ($link)
             {
-                $this->user->notify(new UserBookSuccessfulNotification($book));
-                broadcast( new UserBookSuccessfulEvent($book, $this->user));
+                $user->notify(new UserBookSuccessfulNotification($book));
+                broadcast( new UserBookSuccessfulEvent($book, $user));
 
                 DB::commit();
                 return [
