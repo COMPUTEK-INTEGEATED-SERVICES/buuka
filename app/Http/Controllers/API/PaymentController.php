@@ -626,7 +626,7 @@ class PaymentController extends \App\Http\Controllers\Controller
 
             //mark order as paid
             (new BookActions())->markBookAsPaid($book->id);
-            return response([
+            return response()->json([
                 'status'=>true,
                 'message'=>'Order Booked Successfully',
                 'data'=>[]
@@ -635,7 +635,7 @@ class PaymentController extends \App\Http\Controllers\Controller
             report($throwable);
         }
 
-        return response([
+        return response()->json([
             'status'=>false,
             'message'=>'An error occurred please try again',
         ]);
