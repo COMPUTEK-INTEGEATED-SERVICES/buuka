@@ -143,7 +143,7 @@ class BookActions
             ]);
 
             Appointment::create([
-                'user_id'=>$this->user->id,
+                'user_id'=>$book->user_id,
                 'vendor_id'=>$book->vendor_id,
                 'scheduled'=>$book->schedule,
                 'book_id'=>$book->id
