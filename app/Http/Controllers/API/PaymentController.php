@@ -610,8 +610,8 @@ class PaymentController extends \App\Http\Controllers\Controller
         try {
             $book_id = TransactionReference::where('reference', $request->reference)
                 ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id;
-            $user = auth()->guard()->user();
             $book = Book::find($book_id);
+            $user = User::find($book->user_id);
 
             if ($user->wallet->balance < $book->amount){
                 return response()->json([
