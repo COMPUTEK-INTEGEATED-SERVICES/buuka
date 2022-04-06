@@ -9,6 +9,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\PusherPushNotifications\PusherChannel;
+use NotificationChannels\PusherPushNotifications\PusherMessage;
 
 class UserBookCompleteNotification extends Notification
 {
@@ -42,7 +44,7 @@ class UserBookCompleteNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
@@ -79,5 +81,20 @@ class UserBookCompleteNotification extends Notification
             'message'=>"{$this->vendor->business_name} has received your order",
             'action'=>''
         ];
+    }
+
+    public function toPushNotification($notifiable)
+    {
+        $message = "Your {$notifiable->service} account was approved!";
+
+        return PusherMessage::create()
+            ->iOS()
+            ->badge(1)
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    ->icon('icon')
+            );
     }
 }

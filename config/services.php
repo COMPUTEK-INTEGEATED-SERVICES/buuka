@@ -34,6 +34,11 @@ return [
         'username'      => env('AT_USERNAME'),
         'key'           => env('AT_KEY'),
         'from'          => env('AT_FROM'),
-    ]
+    ],
+
+    'pusher' => [
+        'beams_instance_id' => '171416160848',
+        'beams_secret_key' => 'AAAAJ-kzClA:APA91bGr1QwpD9ACHF0grSq6ds3upuXAGs3e8zVbYqSaUoaQENunbr_WCDinzgq50IYQX6_v4jdMlCJyVGQMnPiq09nA-R2Hqdgi6CnP8p3-OijK2GWnhmOcLL8kfMVA9WWRyECmmVPO',
+    ],
 
 ];

@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\PusherPushNotifications\PusherChannel;
+use NotificationChannels\PusherPushNotifications\PusherMessage;
 
 class VendorMarkedOrderAsCompletedNotification extends Notification
 {
@@ -33,7 +35,7 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
@@ -70,5 +72,20 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
             'message'=>"Vendor has marked this order as completed",
             'action'=>''
         ];
+    }
+
+    public function toPushNotification($notifiable)
+    {
+        $message = "Your {$notifiable->service} account was approved!";
+
+        return PusherMessage::create()
+            ->iOS()
+            ->badge(1)
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    ->icon('icon')
+            );
     }
 }
