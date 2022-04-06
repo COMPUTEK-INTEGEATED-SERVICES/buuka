@@ -625,14 +625,12 @@ class PaymentController extends \App\Http\Controllers\Controller
             WalletController::debit($user->id, 'user', $book->amount);
 
             //mark order as paid
-            $paid = (new BookActions())->markBookAsPaid($book->id);
-            if ($paid){
-                return response([
-                    'status'=>true,
-                    'message'=>'Order Booked Successfully',
-                    'data'=>[]
-                ]);
-            }
+            (new BookActions())->markBookAsPaid($book->id);
+            return response([
+                'status'=>true,
+                'message'=>'Order Booked Successfully',
+                'data'=>[]
+            ]);
         }catch (\Throwable $throwable){
             report($throwable);
         }
