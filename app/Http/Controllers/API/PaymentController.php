@@ -592,4 +592,54 @@ class PaymentController extends \App\Http\Controllers\Controller
         }
 
     }
+
+    public function processPaymentWithWalletBalance(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'reference' => 'required|string|exists:transaction_references,reference',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        try {
+            $book_id = TransactionReference::where('reference', $request->reference)
+                ->where('referenceable_type', 'App\Models\Book')->first()->referenceable_id;
+            $user = auth()->guard()->user();
+            $book = Book::find($book_id);
+
+            if ($user->wallet->balance < $book->amount){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Insufficient funds in your wallet',
+                    'data' => []
+                ]);
+            }
+
+            //debit the user
+            WalletController::debit($user->id, 'user', $book->amount);
+
+            //mark order as paid
+            $paid = (new BookActions())->markBookAsPaid($book->id);
+            if ($paid){
+                return response([
+                    'status'=>true,
+                    'message'=>'Order Booked Successfully',
+                    'data'=>[]
+                ]);
+            }
+        }catch (\Throwable $throwable){
+            report($throwable);
+        }
+
+        return response([
+            'status'=>false,
+            'message'=>'An error occurred please try again',
+        ]);
+    }
 }

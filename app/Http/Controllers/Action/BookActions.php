@@ -151,13 +151,13 @@ class BookActions
 
             //move money to escrow account
             EscrowController::addFund($book->vendor_id, 'vendor', $book->amount);
+            //finally save the book
+            return $book->save();
         }catch (\Throwable $throwable)
         {
             report($throwable);
+            return false;
         }
-
-        //finally save the book
-        return $book->save();
     }
 
     public function markOrderAsComplete($book_id, $user)
