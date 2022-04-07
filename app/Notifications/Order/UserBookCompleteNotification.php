@@ -46,7 +46,7 @@ class UserBookCompleteNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', PusherBeams::class];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
@@ -95,6 +95,21 @@ class UserBookCompleteNotification extends Notification
                 ->body("Your {$notifiable->service} account was approved!")
                 ->badge(1)
                 ->sound('success')
+            );
+    }
+
+    public function toPushNotification($notifiable)
+    {
+        $message = "Book Successful!";
+
+        return PusherMessage::create()
+            ->iOS()
+            ->badge(1)
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    ->icon('icon')
             );
     }
 }

@@ -70,4 +70,15 @@ class User extends Authenticatable
     {
         return $this->phone;
     }
+
+    public function routeNotificationFor($channel)
+    {
+        if($channel === 'PusherPushNotifications'){
+            return 'notify-'.$this->id;
+        }
+
+        $class = str_replace('\\', '.', get_class($this));
+
+        return $class.'.'.$this->getKey();
+    }
 }
