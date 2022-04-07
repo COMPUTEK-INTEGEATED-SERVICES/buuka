@@ -89,7 +89,7 @@ class UserMarkedOrderAsCompletedNotification extends Notification
 
     public function toPushNotification($notifiable)
     {
-        $message = "Book Successful!";
+        $message = "A user marked an order as completed!";
 
         return PusherMessage::create()
             ->iOS()

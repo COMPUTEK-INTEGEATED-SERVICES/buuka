@@ -101,7 +101,7 @@ class VendorBookCompleteNotification extends Notification
 
     public function toPushNotification($notifiable)
     {
-        $message = "Book Successful!";
+        $message = "Vendor marked book as completed!";
 
         return PusherMessage::create()
             ->iOS()

@@ -89,7 +89,7 @@ class UserCanceledOrderNotification extends Notification
 
     public function toPushNotification($notifiable)
     {
-        $message = "Book Successful!";
+        $message = "A user cancelled an order!";
 
         return PusherMessage::create()
             ->iOS()
