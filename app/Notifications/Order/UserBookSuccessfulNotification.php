@@ -33,7 +33,7 @@ class UserBookSuccessfulNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', PusherChannel::class];
+        return ['mail', 'database'];
     }
 
     /**
