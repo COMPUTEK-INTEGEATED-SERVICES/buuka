@@ -31,7 +31,7 @@ class UserBookSuccessfulNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return [PusherChannel::class];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
