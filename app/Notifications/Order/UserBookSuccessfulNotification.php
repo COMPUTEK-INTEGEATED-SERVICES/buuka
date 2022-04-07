@@ -72,19 +72,6 @@ class UserBookSuccessfulNotification extends Notification
         ];
     }
 
-    public function toPusherBeamsNotification($notifiable)
-    {
-        return PusherBeamsMessage::create()
-            ->android()
-            ->sound('success')
-            ->body("Your {$notifiable->service} account was approved!")
-            ->withiOS(PusherBeamsMessage::create()
-                ->body("Your {$notifiable->service} account was approved!")
-                ->badge(1)
-                ->sound('success')
-            );
-    }
-
     public function toPushNotification($notifiable)
     {
         $message = "Book Successful!";
