@@ -8,10 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\PusherPushNotifications\PusherChannel;
 use NotificationChannels\PusherPushNotifications\PusherMessage;
-use Rich2k\PusherBeams\PusherBeams;
-use Rich2k\PusherBeams\PusherBeamsMessage;
 
-class UserBookSuccessfulNotification extends Notification
+class UserBookSuccessfulNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -33,7 +31,7 @@ class UserBookSuccessfulNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', PusherChannel::class];
+        return [PusherChannel::class];
     }
 
     /**
