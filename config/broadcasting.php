@@ -39,6 +39,10 @@ return [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
                 'useTLS' => true,
             ],
+            'beams' => [
+                'secret_key' => env('PUSHER_BEAMS_SECRET'),
+                'instance_id' => env('PUSHER_BEAMS_INSTANCE_ID'),
+            ],
         ],
 
         'ably' => [

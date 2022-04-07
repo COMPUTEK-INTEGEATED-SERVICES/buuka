@@ -177,6 +177,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Spatie\Permission\PermissionServiceProvider::class,
+        Rich2k\PusherBeams\PusherBeamsServiceProvider::class,
+
     ],
 
     /*

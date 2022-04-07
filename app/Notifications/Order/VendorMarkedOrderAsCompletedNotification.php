@@ -8,6 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\PusherPushNotifications\PusherChannel;
 use NotificationChannels\PusherPushNotifications\PusherMessage;
+use Rich2k\PusherBeams\PusherBeams;
+use Rich2k\PusherBeams\PusherBeamsMessage;
 
 class VendorMarkedOrderAsCompletedNotification extends Notification
 {
@@ -35,7 +37,7 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', PusherChannel::class];
+        return ['mail', 'database', PusherBeams::class];
     }
 
     /**
@@ -74,18 +76,16 @@ class VendorMarkedOrderAsCompletedNotification extends Notification
         ];
     }
 
-    public function toPushNotification($notifiable)
+    public function toPusherBeamsNotification($notifiable)
     {
-        $message = "Your {$notifiable->service} account was approved!";
-
-        return PusherMessage::create()
-            ->iOS()
-            ->badge(1)
-            ->body($message)
-            ->withAndroid(
-                PusherMessage::create()
-                    ->title($message)
-                    ->icon('icon')
+        return PusherBeamsMessage::create()
+            ->android()
+            ->sound('success')
+            ->body("Your {$notifiable->service} account was approved!")
+            ->withiOS(PusherBeamsMessage::create()
+                ->body("Your {$notifiable->service} account was approved!")
+                ->badge(1)
+                ->sound('success')
             );
     }
 }
