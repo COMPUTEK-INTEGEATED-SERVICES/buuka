@@ -81,7 +81,7 @@ class User extends Authenticatable
             case 'mail':
                 return $this->email;
             case 'PusherPushNotifications':
-                return "user-notify-$this->id";
+                return "notify-$this->id";
             default:
                 $method = 'routeNotificationFor'.Str::studly($channel);
                 return $this->{$method}($notification);
