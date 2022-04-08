@@ -77,6 +77,13 @@ class User extends Authenticatable
             return "notify-$this->id";
         }
 
+        switch ($channel) {
+            case 'database':
+                return $this->notifications();
+            case 'mail':
+                return $this->email;
+        }
+
         $class = str_replace('\\', '.', get_class($this));
 
         return $class.'.'.$this->getKey();
