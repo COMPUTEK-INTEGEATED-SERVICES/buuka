@@ -81,8 +81,7 @@ class User extends Authenticatable
             case 'mail':
                 return $this->email;
             case 'PusherPushNotifications':
-                Log::error("notify-$this->id");
-                return "notify-$this->id";
+                return "debug-notify-$this->id";
         }
     }
 }
