@@ -75,8 +75,13 @@ class UserBookSuccessfulNotification extends Notification implements ShouldQueue
         $message = "Book Successful!";
 
         return PusherMessage::create()
-            ->android()
+            ->iOS()
             ->badge(1)
-            ->body($message);
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    ->icon('icon')
+            );
     }
 }
