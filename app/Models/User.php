@@ -73,12 +73,13 @@ class User extends Authenticatable
 
     public function routeNotificationFor($channel)
     {
-        if($channel === 'PusherPushNotifications'){
-            return "notify-$this->id";
+        switch ($channel) {
+            case 'database':
+                return $this->notifications();
+            case 'mail':
+                return $this->email;
+            case 'PusherPushNotifications':
+                return "notify-$this->id";
         }
-
-        $class = str_replace('\\', '.', get_class($this));
-
-        return $class.'.'.$this->getKey().$channel;
     }
 }
