@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -72,16 +73,18 @@ class User extends Authenticatable
         return $this->phone;
     }
 
-    public function routeNotificationFor($channel)
+    public function routeNotificationFor($channel, $notification = null)
     {
-        Log::error($channel);
         switch ($channel) {
             case 'database':
                 return $this->notifications();
             case 'mail':
                 return $this->email;
             case 'PusherPushNotifications':
-                return "debug-notify-$this->id";
+                return "user-notify-$this->id";
+            default:
+                $method = 'routeNotificationFor'.Str::studly($channel);
+                return $this->{$method}($notification);
         }
     }
 }
