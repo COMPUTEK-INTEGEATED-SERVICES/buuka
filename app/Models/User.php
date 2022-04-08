@@ -79,6 +79,6 @@ class User extends Authenticatable
 
         $class = str_replace('\\', '.', get_class($this));
 
-        return $class.'.'.$this->getKey();
+        return $class.'.'.$this->getKey().$channel;
     }
 }
