@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -73,12 +74,14 @@ class User extends Authenticatable
 
     public function routeNotificationFor($channel)
     {
+        Log::error($channel);
         switch ($channel) {
             case 'database':
                 return $this->notifications();
             case 'mail':
                 return $this->email;
             case 'PusherPushNotifications':
+                Log::error("notify-$this->id");
                 return "notify-$this->id";
         }
     }
