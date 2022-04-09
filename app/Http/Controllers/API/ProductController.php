@@ -44,7 +44,7 @@ class ProductController extends Controller
             'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
             'staff.*'=>'required_with:staff|int',
-            'tax'=>'required|int'
+            'tax'=>'required|numeric'
         ]);
 
         if($v->fails()){

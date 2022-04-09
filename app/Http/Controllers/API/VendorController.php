@@ -114,7 +114,7 @@ class VendorController extends Controller
         //you are your number one staff
         Staff::create([
             'vendor_id'=>$vendor->id,
-            'user_id'=>$this->user_id,
+            'user_id'=>$user->id,
             'confirm_staff_request'=>1,
         ]);
 
