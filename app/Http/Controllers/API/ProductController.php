@@ -44,7 +44,7 @@ class ProductController extends Controller
             'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'staff'=>'nullable|array',
             'staff.*'=>'required_with:staff|int',
-            'tax'=>'nullable|int'
+            'tax'=>'required|int'
         ]);
 
         if($v->fails()){
@@ -102,7 +102,7 @@ class ProductController extends Controller
             'status'=>false,
             'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 403);
     }
 
     public function editProduct(Request $request)
