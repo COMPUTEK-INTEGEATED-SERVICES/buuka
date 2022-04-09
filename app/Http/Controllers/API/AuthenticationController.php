@@ -312,7 +312,7 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
-        if (app('general_settings')->sms_verify == 1)
+        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0)
         {
             //send verification code to sms
             $otp = random_int(100000, 999999);
@@ -367,7 +367,7 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
-        if (app('general_settings')->email_verify == 1)
+        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0)
         {
             $otp = random_int(100000, 999999);
             //send verification code to email
