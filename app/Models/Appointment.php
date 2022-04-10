@@ -27,7 +27,7 @@ class Appointment extends Model
     public static function today(Vendor $vendor)
     {
         return self::with('book')->where('vendor_id', $vendor->id)
-            ->where('scheduled', '=', Carbon::today())
+            ->whereDate('scheduled', Carbon::today())
             ->get();
     }
 }
