@@ -37,11 +37,10 @@ class ChatController extends Controller
             'from' => 'required|string|in:'.strtoupper(implode(',',$allowed_from)),
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
             'book'=>'nullable|array',
-            'book.product'=>'integer|exists:products,id',
-            'book.amount'=>'string',
-            'book.scheduled'=>'date_format:Y-m-d H:i|required',
-            'book.extras'=>'string',
-            'book.vendor_id'=>'int',
+            'book.product'=>'required|integer|exists:products,id',
+            'book.amount'=>'required|string',
+            'book.scheduled'=>'required|date_format:Y-m-d H:i|required',
+            'book.extras'=>'required|string',
         ]);
 
         if($v->fails()){
@@ -54,6 +53,9 @@ class ChatController extends Controller
 
         if ($this->canSendMessage($request->user_id, $request->vendor_id, strtoupper($request->from)))
         {
+            //vendor
+            $vendor = Vendor::find($request->vendor_id);
+
             if($request->file){
                 //upload file
                 $message =  $request->file('file')->store('public/attachments');
@@ -72,12 +74,11 @@ class ChatController extends Controller
 
             if ($request->book)
             {
-                $message = (new OrderController())->customBook($request->input('book'))->id;
+                $message = (new OrderController())->customBook($request->input('book'), $this->user, $vendor)->id;
                 //type is book to show that a book was made here
                 $type = 'book';
             }
 
-            $vendor = Vendor::find($request->vendor_id);
             $chat = Chat::create([
                 'vendor_id'=>$request->input('vendor_id'),
                 'user_id'=>$request->input('user_id'),

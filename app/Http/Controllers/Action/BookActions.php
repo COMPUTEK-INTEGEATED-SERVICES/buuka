@@ -82,18 +82,18 @@ class BookActions
         return false;
     }
 
-    public function createCustomBook($book, $user)
+    public function createCustomBook($book, $user, $vendor)
     {
         try {
             $booked =  Book::create([
                 'user_id'=>$user->id,
-                'vendor_id'=>$book->vendor_id,
+                'vendor_id'=>$vendor->id,
                 'product_id'=>json_encode([$book->product_id]),
                 'schedule'=>$book->scheduled,
                 'amount'=>$book->amount,
                 'note'=>$book->extras,
                 'type'=>'custom',
-                'proposed_by'=>($book->vendor_id == $book->user_id)?'vendor':'client'
+                'proposed_by'=>($vendor->id == $user->id)?'vendor':'client'
             ]);
 
             //here i will want to get the total amount

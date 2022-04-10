@@ -81,9 +81,9 @@ class OrderController extends Controller
         ]);
     }
 
-    public function customBook($book)
+    public function customBook($book, $user, $vendor)
     {
-        return (new BookActions())->createCustomBook($book, $this->user);
+        return (new BookActions())->createCustomBook($book, $user, $vendor);
     }
 
     public function getSingleOrder(Request $request)
