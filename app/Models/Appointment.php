@@ -16,7 +16,7 @@ class Appointment extends Model
 
     public function book()
     {
-        return $this->hasOne(Book::class, 'id', 'book_id')->with(['products', 'user']);
+        return $this->hasOne(Book::class, 'id', 'book_id')->with(['products']);
     }
 
     public function user()
@@ -26,7 +26,7 @@ class Appointment extends Model
 
     public static function today(Vendor $vendor)
     {
-        return self::with('book')->where('vendor_id', $vendor->id)
+        return self::with(['book', 'user'])->where('vendor_id', $vendor->id)
             ->whereDate('scheduled', Carbon::today())
             ->get();
     }
