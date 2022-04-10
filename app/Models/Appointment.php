@@ -16,7 +16,7 @@ class Appointment extends Model
 
     public function book()
     {
-        return $this->hasOne(Book::class, 'id', 'book_id')->with('products');
+        return $this->hasOne(Book::class, 'id', 'book_id')->with(['products', 'user']);
     }
 
     public function user()
