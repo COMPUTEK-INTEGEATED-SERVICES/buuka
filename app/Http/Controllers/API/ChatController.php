@@ -39,7 +39,7 @@ class ChatController extends Controller
             'book'=>'nullable|array',
             'book.product'=>'required_with:book|integer|exists:products,id',
             'book.amount'=>'required_with:book|string',
-            'book.scheduled'=>'required_with:book|date_format:Y-m-d H:i|required',
+            'book.scheduled'=>'required_with:book|date_format:Y-m-d H:i',
             'book.extras'=>'required_with:book|string',
         ]);
 
