@@ -148,7 +148,7 @@ class AuthenticationController extends Controller
         return response([
             'status'=>true,
             'message'=>'Registration is successful',
-            'data'=>[]
+            'data'=>$user
         ]);
     }
 
