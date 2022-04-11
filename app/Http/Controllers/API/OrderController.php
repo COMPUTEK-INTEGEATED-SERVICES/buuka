@@ -226,7 +226,7 @@ class OrderController extends Controller
 
             //todo: store cancellation reason
 
-            if ($book->status != 3){
+            if ($book->status != 3 && $book->status != 2){
                 $book->status = 3;
                 $book->save();
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\NewMessageNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -51,7 +52,7 @@ class ChatController extends Controller
             ], 422);
         }
 
-        if ($this->canSendMessage($request->user_id, $request->vendor_id, strtoupper($request->from)))
+        if ($this->canSendMessage($this->user->id, $request->vendor_id, strtoupper($request->from)))
         {
             //vendor
             $vendor = Vendor::find($request->vendor_id);
@@ -89,7 +90,12 @@ class ChatController extends Controller
             ]);
 
             try {
-                broadcast( new NewChatMessage($chat, $this->user, $vendor));
+                if ($this->user->id != $vendor->user_id){
+                    $this->user->notify(new NewMessageNotification($this->user, $chat));
+                }else{
+                    User::find($vendor->user_id)->notify(new NewMessageNotification(User::find($vendor->user_id), $chat));
+                }
+
             }catch (\Throwable $throwable){
                 report($throwable);
             }

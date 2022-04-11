@@ -1,30 +1,39 @@
 <?php
 
-namespace App\Notifications\Order;
+namespace App\Notifications;
 
+use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 use NotificationChannels\PusherPushNotifications\PusherChannel;
 use NotificationChannels\PusherPushNotifications\PusherMessage;
-use Rich2k\PusherBeams\PusherBeams;
-use Rich2k\PusherBeams\PusherBeamsMessage;
 
-class OrderCancellationNotification extends Notification
+class NewMessageNotification extends Notification
 {
     use Queueable;
 
-    private $book;
+    /**
+     * @var Chat
+     */
+    private $chat;
+    /**
+     * @var User
+     */
+    private $user;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($book)
+    public function __construct(User $user, Chat $chat)
     {
-        $this->book = $book;
+        $this->chat = $chat;
+        $this->user = $user;
     }
 
     /**
@@ -47,7 +56,8 @@ class OrderCancellationNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
+                    ->subject($this->user->first_name." sent you a message")
+                    ->line($this->chat->type == 'text'?$this->chat->message: new HtmlString('<a href="#"><strong>file</strong></a>'))
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
     }
@@ -77,12 +87,13 @@ class OrderCancellationNotification extends Notification
 
     public function toPushNotification($notifiable)
     {
-        $message = "An Order was cancelled!";
+        $message = "You have a new message!";
+        $title = $this->user->first_name." sent you a message";
 
         return PusherMessage::create()
             ->iOS()
             ->badge(1)
-            ->body($message)
+            ->body($title)
             ->withAndroid(
                 PusherMessage::create()
                     ->title($message)
