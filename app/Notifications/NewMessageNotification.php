@@ -98,6 +98,7 @@ class NewMessageNotification extends Notification
                 PusherMessage::create()
                     ->title($message)
                     ->icon('icon')
+                    ->body($title)
             );
     }
 }
