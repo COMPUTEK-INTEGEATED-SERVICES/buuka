@@ -66,14 +66,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
 
     Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
 
-    Route::get('google/auth', function (){
-        return Socialite::driver('google')->stateless()->redirect();
-        return response([
-            'status'=>true,
-            'message'=>'',
-            'data'=>Socialite::driver('google')->stateless()->redirect()
-        ]);
-    });
+    Route::get('google/auth', [\App\Http\Controllers\API\AuthenticationController::class, 'googleOAUTHRegister']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 

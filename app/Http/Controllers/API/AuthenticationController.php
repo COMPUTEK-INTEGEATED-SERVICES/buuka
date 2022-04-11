@@ -386,33 +386,33 @@ class AuthenticationController extends Controller
     public function googleOAUTHRegister(Request $request)
     {
         $p = Socialite::driver('google')->stateless()->user();
-        $name = $p->getName();
         $email = $p->getEmail();
 
-        $names = implode($name, " ");
-        $first_name = $names[0];
-        $last_name = $names[1];
+        $first_name = ucfirst($p->user['given_name']);
+        $last_name = ucfirst($p->user['family_name']);
 
         $user = User::firstOrNew(['email' => $email]);
 
-        if (!$user->exists) {
+        if (!$user) {
             $user->first_name = $first_name;
             $user->last_name = $last_name;
             $user->email_verified = 1;
             $user->save();
-
-            //here i will return the user data for whoever is concerned to complete and send it in back
-            return response([
-                'status'=>false,
-                'message'=>"$msg",
-                'data'=>[
-                    'user'=>$user->fresh(),
-                    'phone'=>auth()->user()->phone,
-                    'required'=>$require
-                ]
-            ], 403);
-        }else{
-
         }
+
+        $require['gender'] = true;
+        if (app('general_settings')->sms_verify == 1)
+        {
+            $require['sms']=true;
+        }
+        $token = $user->createToken(Str::random(5))->accessToken;
+        return response([
+            'status'=>true,
+            'message'=>'Logged in',
+            'data'=>[
+                'token'=>$token,
+                'required'=>$require,
+            ]
+        ]);
     }
 }
