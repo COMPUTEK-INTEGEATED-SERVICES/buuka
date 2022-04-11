@@ -12,6 +12,7 @@ use App\Models\Vendor;
 use App\Notifications\NewMessageNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
@@ -93,11 +94,12 @@ class ChatController extends Controller
 
             try {
                 if ($user->id != $vendor->user_id){
+                    Log::error('to user '.$user->id);
                     $user->notify(new NewMessageNotification($user, $chat));
                 }else{
+                    Log::error('to vendor '.$vendor->user_id);
                     User::find($vendor->user_id)->notify(new NewMessageNotification(User::find($vendor->user_id), $chat));
                 }
-
             }catch (\Throwable $throwable){
                 report($throwable);
             }
