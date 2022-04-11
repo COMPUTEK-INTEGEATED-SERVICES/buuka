@@ -23,6 +23,6 @@ Route::get('test' ,function (){
     return Socialite::driver('google')->stateless()->redirect();
 });
 
-Route::post('callback-url', function (\Illuminate\Http\Request $request){
+Route::get('callback-url', function (\Illuminate\Http\Request $request){
     var_dump(Socialite::driver('google')->stateless()->user());
 });
