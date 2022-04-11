@@ -24,5 +24,6 @@ Route::get('test' ,function (){
 });
 
 Route::get('callback-url', function (\Illuminate\Http\Request $request){
-    var_dump(Socialite::driver('google')->stateless()->user());
+    $p = Socialite::driver('google')->stateless()->user();
+    var_dump($p->user);
 });
