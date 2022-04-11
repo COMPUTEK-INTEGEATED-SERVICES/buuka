@@ -25,12 +25,12 @@ Route::get('test' ,function (){
 
 Route::get('callback-url', function (\Illuminate\Http\Request $request){
     $p = Socialite::driver('google')->stateless()->user();
-    $name = $p->getName();
+    /*$name = $p->getName();
     $email = $p->getEmail();
 
     $names = explode($name, " ");
     $first_name = $names[0];
-    $last_name = $names[1];
+    $last_name = $names[1];*/
 
     //$user = \App\Models\User::
     dd($p);
