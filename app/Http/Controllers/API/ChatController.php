@@ -93,7 +93,7 @@ class ChatController extends Controller
             ]);
 
             try {
-                if ($user->id != $vendor->user_id){
+                if ($user->id === $vendor->user_id){
                     Log::error('to user '.$user->id);
                     $user->notify(new NewMessageNotification($user, $chat));
                 }else{
