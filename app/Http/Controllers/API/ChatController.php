@@ -37,10 +37,10 @@ class ChatController extends Controller
             'from' => 'required|string|in:'.strtoupper(implode(',',$allowed_from)),
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
             'book'=>'nullable|array',
-            'book.product'=>'required|integer|exists:products,id',
-            'book.amount'=>'required|string',
-            'book.scheduled'=>'required|date_format:Y-m-d H:i|required',
-            'book.extras'=>'required|string',
+            'book.product'=>'required_with:book|integer|exists:products,id',
+            'book.amount'=>'required_with:book|string',
+            'book.scheduled'=>'required_with:book|date_format:Y-m-d H:i|required',
+            'book.extras'=>'required_with:book|string',
         ]);
 
         if($v->fails()){
