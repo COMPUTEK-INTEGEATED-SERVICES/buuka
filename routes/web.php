@@ -28,7 +28,7 @@ Route::get('callback-url', function (\Illuminate\Http\Request $request){
     $name = $p->getName();
     $email = $p->getEmail();
 
-    $names = implode($name, " ");
+    $names = explode($name, " ");
     $first_name = $names[0];
     $last_name = $names[1];
 
