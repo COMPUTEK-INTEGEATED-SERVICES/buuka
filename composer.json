@@ -17,6 +17,7 @@
         "laravel/helpers": "^1.4",
         "laravel/passport": "^10.2",
         "laravel/sanctum": "^2.11",
+        "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.5",
         "pusher/pusher-php-server": "^7.0",
         "rich2k/pusher-beams": "^1.0",

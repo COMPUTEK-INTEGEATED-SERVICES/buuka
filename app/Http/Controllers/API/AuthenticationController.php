@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticationController extends Controller
 {
@@ -94,7 +95,7 @@ class AuthenticationController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users",
-            'date_of_birth' => 'required|date_format:Y-m-d|before:'.now()->subYears(12)->toDateString(),
+            //'date_of_birth' => 'required|date_format:Y-m-d|before:'.now()->subYears(12)->toDateString(),
             'gender' => 'required|string|in:'.strtolower(implode(',', $gender)),
         ]);
 
@@ -380,5 +381,15 @@ class AuthenticationController extends Controller
             'message'=>'OTP has been sent to '.$user->email,
             'data'=>[]
         ]);
+    }
+
+    public function googleOAUTHRegister(Request $request)
+    {
+        $providerUser = Socialite::driver('facebook')->stateless()->user();
+
+        $providerUser->getNickname();
+        $providerUser->getName();
+        $providerUser->getEmail();
+        $providerUser->getAvatar();
     }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,5 +20,9 @@ Route::get('/', function () {
 });
 
 Route::get('test' ,function (){
+    return Socialite::driver('google')->stateless()->redirect();
+});
 
+Route::post('callback-url', function (\Illuminate\Http\Request $request){
+    var_dump(Socialite::driver('google')->stateless()->user());
 });

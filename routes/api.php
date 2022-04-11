@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,15 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('search', [\App\Http\Controllers\API\SearchController::class, 'searchServices']);
 
     Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
+
+    Route::get('google/auth', function (){
+        return Socialite::driver('google')->stateless()->redirect();
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>Socialite::driver('google')->stateless()->redirect()
+        ]);
+    });
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 
