@@ -52,11 +52,13 @@ class ChatController extends Controller
             ], 422);
         }
 
-        if ($this->canSendMessage($this->user->id, $request->vendor_id, strtoupper($request->from)))
-        {
-            //vendor
-            $vendor = Vendor::find($request->vendor_id);
+        //vendor
+        $vendor = Vendor::find($request->vendor_id);
+        //user
+        $user = User::find($request->user_id);
 
+        if ($this->canSendMessage($user->id, $vendor->id, strtoupper($request->from)))
+        {
             if($request->file){
                 //upload file
                 $message =  $request->file('file')->store('public/attachments');
@@ -75,14 +77,14 @@ class ChatController extends Controller
 
             if ($request->book)
             {
-                $message = (new OrderController())->customBook($request->input('book'), $this->user, $vendor)->id;
+                $message = (new OrderController())->customBook($request->input('book'), $user, $vendor)->id;
                 //type is book to show that a book was made here
                 $type = 'book';
             }
 
             $chat = Chat::create([
-                'vendor_id'=>$request->input('vendor_id'),
-                'user_id'=>$request->input('user_id'),
+                'vendor_id'=>$vendor->id,
+                'user_id'=>$user->id,
                 'type'=>$type??'text',
                 'message'=>$message,
                 'from'=>strtoupper($request->from),
@@ -90,7 +92,7 @@ class ChatController extends Controller
             ]);
 
             try {
-                if ($this->user->id != $vendor->user_id){
+                if ($user->id != $vendor->user_id){
                     $this->user->notify(new NewMessageNotification($this->user, $chat));
                 }else{
                     User::find($vendor->user_id)->notify(new NewMessageNotification(User::find($vendor->user_id), $chat));
