@@ -385,11 +385,34 @@ class AuthenticationController extends Controller
 
     public function googleOAUTHRegister(Request $request)
     {
-        $providerUser = Socialite::driver('facebook')->stateless()->user();
+        $p = Socialite::driver('google')->stateless()->user();
+        $name = $p->getName();
+        $email = $p->getEmail();
 
-        $providerUser->getNickname();
-        $providerUser->getName();
-        $providerUser->getEmail();
-        $providerUser->getAvatar();
+        $names = implode($name, " ");
+        $first_name = $names[0];
+        $last_name = $names[1];
+
+        $user = User::firstOrNew(['email' => $email]);
+
+        if (!$user->exists) {
+            $user->first_name = $first_name;
+            $user->last_name = $last_name;
+            $user->email_verified = 1;
+            $user->save();
+
+            //here i will return the user data for whoever is concerned to complete and send it in back
+            return response([
+                'status'=>false,
+                'message'=>"$msg",
+                'data'=>[
+                    'user'=>$user->fresh(),
+                    'phone'=>auth()->user()->phone,
+                    'required'=>$require
+                ]
+            ], 403);
+        }else{
+
+        }
     }
 }
