@@ -94,7 +94,8 @@ class ChatController extends Controller
 
             try {
                 if ($user->id === $vendor->user_id){
-                    $user->notify(new NewMessageNotification(User::find($vendor->user_id), $chat));
+                    //the user is notified
+                    $user->notify(new NewMessageNotification(User::find($vendor->user_id), $chat, $vendor));
                 }else{
                     User::find($vendor->user_id)->notify(new NewMessageNotification($user, $chat));
                 }

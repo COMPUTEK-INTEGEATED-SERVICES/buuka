@@ -24,16 +24,21 @@ class NewMessageNotification extends Notification
      * @var User
      */
     private $user;
+    /**
+     * @var mixed|string
+     */
+    private $sender;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(User $user, Chat $chat)
+    public function __construct(User $user, Chat $chat, $sender = 'Customer')
     {
         $this->chat = $chat;
         $this->user = $user;
+        $this->sender = $sender;
     }
 
     /**
@@ -56,7 +61,8 @@ class NewMessageNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject($this->user->first_name." sent you a message")
+                    ->subject(($this->sender == 'Customer')?$this->user->first_name." sent you a message":$this->sender->name." sent you a message")
+                    ->greeting(($this->sender == 'Customer')?'A Customer dropped sent':$this->user->first_name.' from '.$this->sender->name.' sent')
                     ->line($this->chat->type == 'text'?$this->chat->message: new HtmlString('<a href="#"><strong>file</strong></a>'))
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
@@ -88,7 +94,7 @@ class NewMessageNotification extends Notification
     public function toPushNotification($notifiable)
     {
         $message = "You have a new message!";
-        $title = $this->user->first_name." sent you a message";
+        $title = ($this->sender == 'Customer')?$this->user->first_name." sent you a message":$this->sender->name." sent you a message";
 
         return PusherMessage::create()
             ->iOS()
