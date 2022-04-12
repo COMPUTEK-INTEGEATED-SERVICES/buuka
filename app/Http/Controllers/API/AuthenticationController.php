@@ -56,14 +56,14 @@ class AuthenticationController extends Controller
                 $msg = 'Please verify your email';
             }
         }
-        if (app('general_settings')->sms_verify == 1)
+        /*if (app('general_settings')->sms_verify == 1)
         {
             if (auth()->user()->phone_verified == 0)
             {
                 $require['sms']=true;
                 $msg = (!empty($msg))?$msg.' and your phone number':'Please verify your phone number';
             }
-        }
+        }*/
         if (!empty($require))
         {
             return response([

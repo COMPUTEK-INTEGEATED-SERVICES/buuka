@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class PasswordResetNotification extends Notification
 {
@@ -18,7 +19,7 @@ class PasswordResetNotification extends Notification
      *
      * @return void
      */
-    public function __construct($token)
+    public function __construct($token, $user)
     {
         $this->token = $token;
     }
@@ -43,10 +44,14 @@ class PasswordResetNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('Your password reset link has arrived')
-                    ->line($this->token)
-                    ->action('Notification Action', url('/'))
-                    ->line("Contact support if you didn't make this request");
+                    ->subject('Your password reset token has arrived')
+                    ->greeting("Hi {$this->user->first_name}!")
+                    ->line('We received a request to reset your password.')
+                    ->line('Please find your reset token below')
+                    ->action($this->token, url('#'))
+                    ->line("Kindly disregard this email, if you did not make the request.")
+                    ->line('Best regards.')
+                    ->line('Team Buuka');
     }
 
     /**

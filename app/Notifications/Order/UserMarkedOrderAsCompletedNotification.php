@@ -98,7 +98,7 @@ class UserMarkedOrderAsCompletedNotification extends Notification
             ->withAndroid(
                 PusherMessage::create()
                     ->title($message)
-                    ->icon('icon')
+                    //->icon('icon')
             );
     }
 }
