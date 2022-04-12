@@ -124,16 +124,16 @@ class AuthenticationController extends Controller
             $verification = RegistrationVerification::firstOrNew([
                 'user_id'=>$user->id
             ]);
-            if (app('general_settings')->sms_verify == 1)
+            /*if (app('general_settings')->sms_verify == 1)
             {
                 //send verification code to sms
-                $otp = random_int(100000, 999999);
+                //$otp = random_int(100000, 999999);
                 //send verification code to email
-                $verification->sms_otp = Hash::make($otp);
-                /*$message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
-                send_sms($request->phone, $message);*/
-                $user->notify(new PhoneVerificationNotification($otp));
-            }
+                //$verification->sms_otp = Hash::make($otp);
+                //$message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
+                //send_sms($request->phone, $message);
+                //$user->notify(new PhoneVerificationNotification($otp));
+            }*/
             if (app('general_settings')->email_verify == 1)
             {
                 $otp = random_int(100000, 999999);
