@@ -270,7 +270,7 @@ class ChatController extends Controller
             if ($request->input('as') == 'USER'){
                 $query->where('user_id', $this->user->id);
             }else{
-                $query->where('staff_id', $this->user->id);
+                $query->where('vendor_id', Vendor::where('user_id', $this->user->id)->first());
             }
         })->where('deleted', 1)
             ->latest()->paginate(10);
