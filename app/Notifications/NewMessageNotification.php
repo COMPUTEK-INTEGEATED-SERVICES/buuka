@@ -94,7 +94,7 @@ class NewMessageNotification extends Notification
     public function toPushNotification($notifiable)
     {
         $message = "You have a new message!";
-        $title = ($this->sender == 'Customer')?$this->user->first_name." sent you a message":$this->sender->name." sent you a message";
+        $title = ($this->sender == 'Customer')?$this->user->first_name." sent you a message":strtoupper($this->sender->business_name)." sent you a message";
 
         return PusherMessage::create()
             ->iOS()
