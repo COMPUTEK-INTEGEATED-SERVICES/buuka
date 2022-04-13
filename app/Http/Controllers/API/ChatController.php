@@ -93,7 +93,7 @@ class ChatController extends Controller
             ]);
 
             try {
-                if ($user->id === $vendor->user_id){
+                if ($this->user->id === $vendor->user_id){
                     //the user is notified
                     $user->notify(new NewMessageNotification(User::find($vendor->user_id), $chat, $vendor));
                 }else{
@@ -233,7 +233,7 @@ class ChatController extends Controller
                 if ($request->input('as') == 'USER'){
                     $query->where('user_id', $this->user->id);
                 }else{
-                    $query->where('staff_id', $this->user->id);
+                    $query->where('vendor_id', Vendor::where('user_id', $this->user->id)->first()->id);
                 }
             })
             ->latest()->paginate(10);

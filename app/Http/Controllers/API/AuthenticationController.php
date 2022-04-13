@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Http\Controllers\Action\AuthenticationAction;
 use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationVerification;
@@ -77,7 +78,7 @@ class AuthenticationController extends Controller
             ], 403);
         }
 
-        $token = auth()->user()->createToken(Str::random(5))->accessToken;
+        $token = (new AuthenticationAction())->returnToken(auth()->user());
         return response([
             'status'=>true,
             'message'=>'Logged in',
@@ -401,11 +402,11 @@ class AuthenticationController extends Controller
         }
 
         $require['gender'] = true;
-        if (app('general_settings')->sms_verify == 1)
+        /*if (app('general_settings')->sms_verify == 1)
         {
             $require['sms']=true;
-        }
-        $token = $user->createToken(Str::random(5))->accessToken;
+        }*/
+        $token = (new AuthenticationAction())->returnToken($user);
         return response([
             'status'=>true,
             'message'=>'Logged in',
