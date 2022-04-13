@@ -61,8 +61,8 @@ class NewMessageNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject(($this->sender == 'Customer')?$this->user->first_name." sent you a message":$this->sender->name." sent you a message")
-                    ->greeting(($this->sender == 'Customer')?'A Customer dropped sent':$this->user->first_name.' from '.$this->sender->name.' sent')
+                    ->subject(($this->sender == 'Customer')?$this->user->first_name." sent you a message":$this->sender->business_name." sent you a message")
+                    ->greeting(($this->sender == 'Customer')?'A Customer dropped sent':$this->user->first_name.' from '.$this->sender->business_name.' sent')
                     ->line($this->chat->type == 'text'?$this->chat->message: new HtmlString('<a href="#"><strong>file</strong></a>'))
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
