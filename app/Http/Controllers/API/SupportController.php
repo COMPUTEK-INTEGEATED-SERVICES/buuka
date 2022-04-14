@@ -552,7 +552,7 @@ class SupportController
             ], 422);
         }
 
-        $service = Service::with(['images', 'products', 'categories', 'vendor'])->find($request->service_id);
+        $service = Service::with([ 'products', 'categories', 'vendor'])->find($request->service_id);
 
         return response([
             'status'=>true,

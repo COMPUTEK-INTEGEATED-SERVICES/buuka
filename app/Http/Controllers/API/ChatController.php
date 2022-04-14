@@ -43,6 +43,7 @@ class ChatController extends Controller
             'book.amount'=>'required_with:book|string',
             'book.scheduled'=>'required_with:book|date_format:Y-m-d H:i',
             'book.extras'=>'required_with:book|string',
+            'book.id'=>'nullable|int|exists:books,id',
         ]);
 
         if($v->fails()){
