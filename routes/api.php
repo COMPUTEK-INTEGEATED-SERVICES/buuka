@@ -126,6 +126,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('book/mark_as_complete', [\App\Http\Controllers\API\OrderController::class, 'markOrderAsCompleted']);
     Route::post('book/cancel_order', [\App\Http\Controllers\API\OrderController::class, 'markOrderAsCanceled']);
     Route::get('book/history', [\App\Http\Controllers\API\OrderController::class, 'getBooks']);
+    Route::get('book', [\App\Http\Controllers\API\OrderController::class, 'getSingleOrder']);
 
     //credit card routes
     Route::post('card/save/initiate', [\App\Http\Controllers\API\CreditCardController::class, 'initiateSaveCard']);

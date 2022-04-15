@@ -104,7 +104,7 @@ class OrderController extends Controller
             'status'=>true,
             'message'=>'',
             'data'=>[
-                'book'=>Book::with('reference')->find($request->book_id),
+                'book'=>Book::with(['reference', 'products'])->find($request->book_id),
             ]
         ]);
     }
