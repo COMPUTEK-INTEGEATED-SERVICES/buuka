@@ -88,18 +88,6 @@ class OrderController extends Controller
 
     public function getSingleOrder(Request $request)
     {
-        $v = Validator::make( $request->all(), [
-            'book_id' => 'required|int|exists:books,id',
-        ]);
-
-        if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation Failed',
-                'data' => $v->errors()
-            ], 422);
-        }
-
         return response([
             'status'=>true,
             'message'=>'',
