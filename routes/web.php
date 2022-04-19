@@ -41,7 +41,7 @@ Route::get('callback-url', function (\Illuminate\Http\Request $request){
 Route::get('banks', function (){
     $url = "https://api.flutterwave.com/v3/banks/NG";
     $response = Http::get($url);
-    var_dump($response->data);
+    var_dump($response);
     exit();
     $country = \App\Models\Country::where('name', 'Nigeria')->first()->id;
     foreach ($response->data as $datum){
