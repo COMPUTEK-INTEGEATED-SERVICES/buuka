@@ -40,7 +40,7 @@ Route::get('callback-url', function (\Illuminate\Http\Request $request){
 });
 Route::get('banks', function (){
     $url = "https://api.flutterwave.com/v3/banks/NG";
-    $response = Http::withToken(env('FLW_PUBLIC_KEY'))->get($url);
+    $response = Http::withToken(env('FLW_SECRET_KEY'))->get($url);
     //$response = file_get_contents($url);
     var_dump($response->json());
     exit();
