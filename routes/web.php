@@ -45,6 +45,8 @@ Route::get('banks', function (){
     $country = \App\Models\Country::where('name', 'Nigeria')->first()->id;
     $response = $response->json()['data'];
     foreach ($response as $datum){
+        var_dump($datum);
+        exit();
         \App\Models\Bank::create([
             'name'=>$datum['name'],
             'code'=>$datum['code'],
