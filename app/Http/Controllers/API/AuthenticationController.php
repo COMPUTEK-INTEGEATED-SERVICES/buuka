@@ -386,7 +386,8 @@ class AuthenticationController extends Controller
 
     public function googleOAUTHRegister(Request $request)
     {
-        $p = Socialite::driver('google')->stateless()->user();
+        //$p = Socialite::driver('google')->stateless()->user();
+        $p = Socialite::driver('google')->userFromToken($request->token);
         $email = $p->getEmail();
 
         $first_name = ucfirst($p->user['given_name']);
