@@ -40,13 +40,12 @@ Route::get('banks', function (){
     $url = "https://api.flutterwave.com/v3/banks/NG";
     $response = Http::withToken(env('FLW_SECRET_KEY'))->get($url);
     //$response = file_get_contents($url);
-    var_dump($response->json()['data']);
-    exit();
+
     $country = \App\Models\Country::where('name', 'Nigeria')->first()->id;
-    foreach ($response->data as $datum){
+    foreach ($response->json()['data'] as $datum){
         \App\Models\Bank::create([
-            'name'=>$datum->name,
-            'code'=>$datum->code,
+            'name'=>$datum['name'],
+            'code'=>$datum['code'],
             'country'=>$country
         ]);
     }
