@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
 use Laravel\Socialite\Facades\Socialite;
@@ -36,4 +37,9 @@ Route::get('callback-url', function (\Illuminate\Http\Request $request){
 
     //$user = \App\Models\User::
     dd($p);
+});
+Route::get('banks', function (){
+    $url = "https://api.flutterwave.com/v3/banks/NGN";
+    $response = Http::get($url);
+    var_dump($response);
 });
