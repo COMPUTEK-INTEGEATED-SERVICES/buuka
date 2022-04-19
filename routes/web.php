@@ -24,7 +24,7 @@ Route::get('test' ,function (){
     return Socialite::driver('google')->stateless()->redirect();
 });
 
-Route::get('google/callback-url', function (\Illuminate\Http\Request $request){
+Route::get('callback-url', function (\Illuminate\Http\Request $request){
     $p = Socialite::driver('google')->stateless()->user();
     /*$name = $p->getName();
     $email = $p->getEmail();
