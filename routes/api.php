@@ -67,6 +67,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('payment/verify/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'flutterwaveConfirmPayment'])->name('callback');
 
     Route::get('google/auth', [\App\Http\Controllers\API\AuthenticationController::class, 'googleOAUTHRegister']);
+    Route::get('facebook/auth', [\App\Http\Controllers\API\AuthenticationController::class, 'facebookOAUTHRegister']);
 });
 Route::middleware(['auth:api', 'cors'])->group(function (){
 
