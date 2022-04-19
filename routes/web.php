@@ -40,8 +40,8 @@ Route::get('callback-url', function (\Illuminate\Http\Request $request){
 });
 Route::get('banks', function (){
     $url = "https://api.flutterwave.com/v3/banks/NG";
-    //$response = Http::get($url);
-    $response = file_get_contents($url);
+    $response = Http::withToken(env('FLW_PUBLIC_KEY'))->get($url);
+    //$response = file_get_contents($url);
     var_dump($response);
     exit();
     $country = \App\Models\Country::where('name', 'Nigeria')->first()->id;
