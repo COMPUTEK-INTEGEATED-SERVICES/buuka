@@ -670,7 +670,7 @@ class PaymentController extends \App\Http\Controllers\Controller
         ];
         $response = Http::withToken(env('FLW_SECRET_KEY'))
             ->post($url, $field);
-        return response()->json($response->json());
+        return response($response->json());
         if ($response->ok() && $response->json()['status'] =='success'){
             return response()->json([
                 'status' => true,
