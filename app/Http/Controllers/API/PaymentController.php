@@ -666,8 +666,8 @@ class PaymentController extends \App\Http\Controllers\Controller
         try {
             $url = "https://api.flutterwave.com/v3/accounts/resolve";
             $field = [
-                'account_number'=>"$request->account_number",
-                'account_bank'=>"$request->account_bank"
+                'account_number'=>$request->account_number,
+                'account_bank'=>$request->account_bank
             ];
             $response = Http::withToken(env('FLW_SECRET_KEY'))
                 ->asForm()->post($url, $field);
