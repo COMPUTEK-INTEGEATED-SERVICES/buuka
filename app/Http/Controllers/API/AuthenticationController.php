@@ -386,36 +386,45 @@ class AuthenticationController extends Controller
 
     public function googleOAUTHRegister(Request $request)
     {
-        //$p = Socialite::driver('google')->stateless()->user();
-        $p = Socialite::driver('google')->userFromToken($request->token);
-        $email = $p->getEmail();
+        try {
+            //$p = Socialite::driver('google')->stateless()->user();
+            $p = Socialite::driver('google')->userFromToken($request->token);
+            $email = $p->getEmail();
 
-        $first_name = ucfirst($p->user['given_name']);
-        $last_name = ucfirst($p->user['family_name']);
+            $first_name = ucfirst($p->user['given_name']);
+            $last_name = ucfirst($p->user['family_name']);
 
-        $user = User::firstOrNew(['email' => $email]);
+            $user = User::firstOrNew(['email' => $email]);
 
-        if (!$user) {
-            $user->first_name = $first_name;
-            $user->last_name = $last_name;
-            $user->email_verified = 1;
-            $user->save();
+            if (!$user) {
+                $user->first_name = $first_name;
+                $user->last_name = $last_name;
+                $user->email_verified = 1;
+                $user->save();
+            }
+
+            $require['gender'] = true;
+            /*if (app('general_settings')->sms_verify == 1)
+            {
+                $require['sms']=true;
+            }*/
+            $token = (new AuthenticationAction())->returnToken($user);
+            return response([
+                'status'=>true,
+                'message'=>'Logged in',
+                'data'=>[
+                    'token'=>$token,
+                    'required'=>$require,
+                ]
+            ]);
+        }catch (\Throwable $throwable){
+            report($throwable);
+            return response([
+                'status'=>false,
+                'message'=>'An error occurred',
+                'data'=>[]
+            ]);
         }
-
-        $require['gender'] = true;
-        /*if (app('general_settings')->sms_verify == 1)
-        {
-            $require['sms']=true;
-        }*/
-        $token = (new AuthenticationAction())->returnToken($user);
-        return response([
-            'status'=>true,
-            'message'=>'Logged in',
-            'data'=>[
-                'token'=>$token,
-                'required'=>$require,
-            ]
-        ]);
     }
 
     public function facebookOAUTHRegister(Request $request)
