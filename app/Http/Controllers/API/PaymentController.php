@@ -668,25 +668,17 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'Content-Type'=>'application/json'
             ])
             ->post($url, $field);
-        if($response->ok()){
-            if ($response->json()['status'] ==='success'){
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Account details',
-                    'data' => $response->json()['data']
-                ]);
-            }else{
-                return response()->json([
-                    'status' => false,
-                    'message' => $response->json()['message'],
-                    'data' => []
-                ]);
-            }
+        if ($response->json()['status'] ==='success'){
+            return response()->json([
+                'status' => true,
+                'message' => 'Account details',
+                'data' => $response->json()['data']
+            ]);
         }else{
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred, our engineers have been notified',
-                'data' => [$response->json()]
+                'message' => $response->json()['message'],
+                'data' => []
             ]);
         }
     }
