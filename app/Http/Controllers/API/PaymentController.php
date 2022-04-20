@@ -17,6 +17,7 @@ use App\Models\TransactionReference;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -641,5 +642,40 @@ class PaymentController extends \App\Http\Controllers\Controller
             'status'=>false,
             'message'=>'An error occurred please try again',
         ]);
+    }
+
+    public function resolveBankAccountFlutter(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'account_number' => 'required|string',
+            'account_bank' => 'required|string',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $url = "https://api.flutterwave.com/v3/accounts/resolve";
+        $field = [
+            'account_number'=>$request->account_number,
+            'account_bank'=>$request->account_bank
+        ];
+        $response = Http::withToken(env('FLW_SECRET_KEY'))->post($url, $field);
+        if($response->ok()){
+            return response()->json([
+                'status' => true,
+                'message' => 'Account details',
+                'data' => $response->json()['data']
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred, our engineers have been notified',
+                'data' => []
+            ]);
+        }
     }
 }

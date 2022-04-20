@@ -150,6 +150,7 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::get('payment/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForBook']);
     Route::get('deposit/initiate/flutterwave', [\App\Http\Controllers\API\PaymentController::class, 'initiateFlutterwaveForWallet']);
     Route::post('payment/giftcard/verify', [\App\Http\Controllers\API\PaymentController::class, 'verifyGiftCardPurchase']);
+    Route::post('account/resolve', [\App\Http\Controllers\API\PaymentController::class, 'resolveBankAccountFlutter']);
 
     //vendor packages routes
     Route::post('vendor_package/add_vendor_package', [\App\Http\Controllers\API\Admin\VendorPackageController::class, 'createVendorType']);
