@@ -663,27 +663,30 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'data' => $v->errors()
             ], 422);
         }
-        $url = "https://api.flutterwave.com/v3/accounts/resolve";
-        $field = [
-            'account_number'=>"$request->account_number",
-            'account_bank'=>"$request->account_bank"
-        ];
-        $response = Http::withToken(env('FLW_SECRET_KEY'))
-            ->post($url, $field);
-        return response(gettype($response->json()));
-        if ($response->ok() && $response->json()['status'] =='success'){
-            return response()->json([
-                'status' => true,
-                'message' => 'Account details',
-                'data' => $response->json()['data']
-            ]);
-        }else{
-            return response()->json([
-                'status' => false,
-                'message' => $response->json()['message'],
-                'data' => []
-            ]);
+        try {
+            $url = "https://api.flutterwave.com/v3/accounts/resolve";
+            $field = [
+                'account_number'=>"$request->account_number",
+                'account_bank'=>"$request->account_bank"
+            ];
+            $response = Http::withToken(env('FLW_SECRET_KEY'))
+                ->post($url, $field);
+            //return response(gettype($response->json()));
+            if ($response->ok() && $response->json()['status'] =='success'){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Account details',
+                    'data' => $response->json()['data']
+                ]);
+            }
+        }catch (\Throwable $throwable){
+            report($throwable);
         }
+        return response()->json([
+            'status' => false,
+            'message' => $response->json()['message'],
+            'data' => []
+        ]);
     }
 
     public function withdrawVendor(Request $request): \Illuminate\Http\JsonResponse
