@@ -682,7 +682,7 @@ class PaymentController extends \App\Http\Controllers\Controller
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred, our engineers have been notified',
-                'data' => []
+                'data' => [$response->reason()]
             ]);
         }
     }
