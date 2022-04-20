@@ -87,4 +87,9 @@ class User extends Authenticatable
                 return $this->{$method}($notification);
         }
     }
+
+    public function accounts()
+    {
+        return $this->morphOne(BankAccount::class, 'account');
+    }
 }

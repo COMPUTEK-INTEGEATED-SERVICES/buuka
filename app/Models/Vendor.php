@@ -67,4 +67,8 @@ class Vendor extends Model
                 ->where('id', '!=', $vendor_id);
         })->inRandomOrder()->take(10)->get();
     }
+    public function accounts()
+    {
+        return $this->morphOne(BankAccount::class, 'account');
+    }
 }

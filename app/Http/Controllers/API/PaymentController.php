@@ -7,15 +7,20 @@ namespace App\Http\Controllers\API;
 use App\Events\PaymentEvent;
 use App\Http\Controllers\Action\BookActions;
 use App\Http\Controllers\Action\PaymentAction;
+use App\Models\Bank;
+use App\Models\BankAccount;
 use App\Models\Book;
 use App\Models\CreditCard;
 use App\Models\GiftCard;
 use App\Models\GiftCardPurchase;
 use App\Models\PaymentChannel;
 use App\Models\PaymentMethod;
+use App\Models\TransactionHistory;
 use App\Models\TransactionReference;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Models\Wallet;
+use App\Notifications\WithdrawalSubmittedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -668,7 +673,7 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'Content-Type'=>'application/json'
             ])
             ->post($url, $field);
-        if ($response->json()['status'] ==='success'){
+        if ($response->ok() && $response->json()['status'] ==='success'){
             return response()->json([
                 'status' => true,
                 'message' => 'Account details',
@@ -681,5 +686,99 @@ class PaymentController extends \App\Http\Controllers\Controller
                 'data' => []
             ]);
         }
+    }
+
+    public function withdrawVendor(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->guard('auth:api')->user();
+        $vendor = Vendor::where('user_id', $user->id)->first();
+
+        $v = Validator::make( $request->all(), [
+            'account_number' => 'required|string',
+            'bank_id' => 'required|int|exists:banks,id',
+            'amount' => 'required|string|max:'.$user->wallet->balance,
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        try {
+            if ($request->amount <= $user->wallet->balance){
+                //firstornew account details
+                $account = BankAccount::firstOrNew(
+                    ['account_id'=>$vendor->id],
+                    ['account_type'=>"App\Models\Vendor"],
+                    ['account_number'=>$request->account_number],
+                    ['bank_id'=>$request->bank_id]
+                );
+                $bank = Bank::find($account->bank_id);
+                $ref = TransactionReference::create([
+                    'referenceable_id'=>$vendor->id,
+                    'reference'=>Str::random(),
+                    'referenceable_type'=>"App\Models\Vendor"
+                ]);
+
+                $history = TransactionHistory::create([
+                    'history_id'=>$vendor->id,
+                    'history_type'=>"App\Models\Vendor",
+                    'amount'=>$request->amount,
+                    'note'=>'vendor withdrew money'
+                ]);
+
+                //withdraw from vendor balance
+                WalletController::debit($vendor->wallet->id, 'vendor', $request->amount);
+
+                $endpoint = "https://api.flutterwave.com/v3/transfers";
+                $field = [
+                    "account_bank" => $bank->code,
+                    "account_number" => $account->account_number,
+                    "amount" => $request->amount,
+                    "narration" => "Buuka Withdrawal",
+                    "currency" => "NGN",
+                    "reference" => $ref->reference,
+                    "callback_url" => url('callback'),
+                    "debit_currency" => "NGN"
+                ];
+                $response = Http::withToken(env('FLW_SECRET_KEY'))->post($endpoint, $field);
+                if($response->ok()){
+                    $response = $response->json();
+                    if($response['status'] == "success"){
+                        $history -> status = 1;
+                        $history->save();
+
+                        //notify the vendor
+                        $user->notify(new WithdrawalSubmittedNotification($vendor));
+                        return response()->json([
+                            'status'=>true,
+                            'message'=>'Withdrawal request submitted',
+                            'data'=>[]
+                        ]);
+                    }
+                }else{
+                    $history -> status = 1;
+                    $history->save();
+
+                    //notify the vendor
+                    $user->notify(new WithdrawalSubmittedNotification($vendor));
+                    return response()->json([
+                        'status'=>false,
+                        'message'=>'An error occurred please contact support',
+                        'data'=>[]
+                    ]);
+                }
+            }
+        }catch (\Throwable $throwable){
+            report($throwable);
+        }
+        return response()->json([
+            'status'=>false,
+            'message'=>'An error occurred please contact support',
+            'data'=>[]
+        ], 500);
     }
 }
