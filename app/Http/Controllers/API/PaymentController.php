@@ -663,7 +663,11 @@ class PaymentController extends \App\Http\Controllers\Controller
             'account_number'=>$request->account_number,
             'account_bank'=>$request->account_bank
         ];
-        $response = Http::withToken(env('FLW_SECRET_KEY'))->post($url, $field);
+        $response = Http::withToken(env('FLW_SECRET_KEY'))
+            ->withHeaders([
+                'Content-Type'=>'application/json'
+            ])
+            ->post($url, $field);
         if($response->ok()){
             if ($response->json()['status'] ==='success'){
                 return response()->json([
