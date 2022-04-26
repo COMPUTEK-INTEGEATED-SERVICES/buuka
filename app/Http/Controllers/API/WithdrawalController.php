@@ -57,7 +57,7 @@ class WithdrawalController extends Controller
                 'status' => false,
                 'message' => 'Insufficient Fund',
                 'data' => []
-            ]);
+            ],422);
         }
 
         $checkrequest = WithdrawalRequest::where('user_id', $this->user->id)
