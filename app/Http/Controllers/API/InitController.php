@@ -31,7 +31,7 @@ class InitController extends Controller
                 'bank_accounts'=>$this->user->accounts,
                 'vendor'=>[
                     'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
-                    'vendor'=> Vendor::with('accounts')->where('user_id', $this->user->id)->first()??null,
+                    'vendor'=> Vendor::with(['accounts', 'wallet'])->where('user_id', $this->user->id)->first()??null,
                 ],
                'admin'=>[
                    'is_admin'=>$this->user->hasRole('admin'),
