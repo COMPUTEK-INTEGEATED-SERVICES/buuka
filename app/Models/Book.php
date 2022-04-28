@@ -60,6 +60,6 @@ class Book extends Model
 
     public static function totalSales($vendor_id)
     {
-        return self::with(['appointment', 'products'])->latest()->take(10)->get();
+        return self::with(['appointment', 'products'])->where('status', 2)->latest()->take(10)->get();
     }
 }
