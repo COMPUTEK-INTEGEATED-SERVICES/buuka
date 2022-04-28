@@ -72,13 +72,11 @@ class ChatController extends Controller
                     $type = 'document';
                 }
                 //$type = $request->file('file')->getMimeType();
-            }else{
+            }elseif($request->message){
 
                 $message = $request->message;
             }
-
-            if ($request->book)
-            {
+            else {
                 $message = (new OrderController())->customBook($request->book, $user, $vendor)->id;
                 //type is book to show that a book was made here
                 $type = 'book';
