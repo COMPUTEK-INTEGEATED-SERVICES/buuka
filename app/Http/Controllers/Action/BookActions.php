@@ -184,7 +184,7 @@ class BookActions
                 {
                     //notify the vendor that a user marked order as paid or vise versa
                     User::find($book->user_id)->notify(new VendorMarkedOrderAsCompletedNotification($vendor, $book));
-                    User::find($book->vendor_id)->notify(new UserMarkedOrderAsCompletedNotification($book));
+                    User::find($vendor->user_id)->notify(new UserMarkedOrderAsCompletedNotification($book));
 
                     //change book status to complete
                     $book->status = 2;
