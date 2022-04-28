@@ -58,13 +58,11 @@ Route::get('test', function (){
     $g = json_decode($g)->features;
     foreach ($g as $key => $value){
         //var_dump($value->properties);
-        foreach ($value->properties as $n){
-            if ($n->NAME_1 == 'Federal Capital Territory'){
-                \App\Models\City::create([
-                    'state_id'=>2019,
-                    'name'=>$n->NAME_2
-                ]);
-            }
+        if ($value->properties->NAME_1 === 'Federal Capital Territory'){
+            \App\Models\City::create([
+                'state_id'=>2019,
+                'name'=>$value->properties->NAME_2
+            ]);
         }
     }
 });
