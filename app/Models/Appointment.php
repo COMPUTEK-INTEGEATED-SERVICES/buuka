@@ -30,9 +30,4 @@ class Appointment extends Model
             ->whereDate('scheduled', Carbon::today())
             ->get();
     }
-
-    public static function pending()
-    {
-
-    }
 }
