@@ -189,8 +189,8 @@ class BookActions
                     $book->status = 2;
 
                     //we credit vendor from escrow
-                    EscrowController::subtractFund($vendor->user_id, 'vendor', $book->amount);
-                    WalletController::credit($vendor->user_id, 'vendor', $book->amount);
+                    EscrowController::subtractFund($vendor->id, 'vendor', $book->amount);
+                    WalletController::credit($vendor->id, 'vendor', $book->amount);
 
                     $book->save();
                     return true;
