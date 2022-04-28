@@ -78,7 +78,8 @@ class ChatController extends Controller
                     $message = $request->message;
                 }
                 else {
-                    $message = (new OrderController())->customBook($request->book, $user, $vendor)->id;
+                    $book = (new OrderController())->customBook($request->book, $user, $vendor);
+                    $message = $book->id;
                     //type is book to show that a book was made here
                     $type = 'book';
                 }
