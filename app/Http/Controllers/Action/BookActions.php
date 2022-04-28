@@ -178,7 +178,7 @@ class BookActions
             $book = Book::find($book_id);
 
             $vendor = Vendor::find($book->vendor_id);
-            if ($user->can('participate', $book, $vendor))
+            if ($user->can('participate', [$book, $vendor]))
             {
                 if ($book->status == 1)
                 {
