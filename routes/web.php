@@ -20,9 +20,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test' ,function (){
+/*Route::get('test' ,function (){
     return Socialite::driver('google')->stateless()->redirect();
-});
+});*/
 
 Route::get('callback-url', function (\Illuminate\Http\Request $request){
     $p = Socialite::driver('google')->stateless()->user();
