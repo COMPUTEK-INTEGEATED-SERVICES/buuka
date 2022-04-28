@@ -88,7 +88,7 @@ class BookActions
         try {
             //convert book to object if it is array
             $book = (object)$book;
-            Log::error($book);
+            Log::error($book->product);
             if ($book->id){
                 $booked = Book::find($book->id);
                 $booked->product_id = json_encode([$book->product]);
