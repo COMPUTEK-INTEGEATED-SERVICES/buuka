@@ -53,7 +53,7 @@ Route::get('banks', function (){
     }
 });
 
-Route::get('test', function (){
+/*Route::get('test', function (){
     $g = file_get_contents('https://data.humdata.org/dataset/e66dbc70-17fe-4230-b9d6-855d192fc05c/resource/83dba4b0-992f-4748-b037-4b55ecc0c3b4/download/nigeria_lga.json');
     $g = json_decode($g)->features;
     foreach ($g as $key => $value){
@@ -65,4 +65,4 @@ Route::get('test', function (){
             ]);
         }
     }
-});
+});*/
