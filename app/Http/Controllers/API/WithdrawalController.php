@@ -67,7 +67,7 @@ class WithdrawalController extends Controller
                 'status' => false,
                 'message' => 'You have a pending withdrawal request',
                 'data' => []
-            ]);
+            ],422);
         }
 
         (new WalletController())->debit(($request->type == 'user')?$this->user->id:$vendor->id, ($request->type == 'user')?'user':'vendor', $request->input('amount'));
