@@ -42,4 +42,24 @@ class Book extends Model
     {
         return $this->hasMany(ProductBookRelation::class, 'book_id', 'id')->with('product');
     }
+
+    public function appointment()
+    {
+        return $this->hasOne(Appointment::class, 'book_id', 'id');
+    }
+
+    public static function pendingSales($vendor_id)
+    {
+        return self::with(['appointment', 'products'])->where('status', 0)->latest()->take(10)->get();
+    }
+
+    public static function inProgress($vendor_id)
+    {
+        return self::with(['appointment', 'products'])->where('status', 1)->latest()->take(10)->get();
+    }
+
+    public static function totalSales($vendor_id)
+    {
+        return self::with(['appointment', 'products'])->latest()->take(10)->get();
+    }
 }

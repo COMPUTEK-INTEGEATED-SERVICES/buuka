@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Vendor;
 
 class InitController extends Controller
@@ -22,23 +23,31 @@ class InitController extends Controller
 
     public function config()
     {
-        return response([
-            'status'=>true,
-            'message'=>'',
-            'data'=>[
-                'user'=>$this->user,
-                'notifications'=>$this->user->unreadNotifications,
-                'bank_accounts'=>$this->user->accounts,
-                'vendor'=>[
-                    'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
-                    'vendor'=> Vendor::with(['accounts', 'wallet'])->where('user_id', $this->user->id)->first()??null,
-                ],
-               'admin'=>[
-                   'is_admin'=>$this->user->hasRole('admin'),
-                   'admin'
-               ],
-               'wallet'=>$this->user->wallet,
-            ]
-        ]);
+        try {
+            $vendor = Vendor::with(['accounts', 'wallet'])->where('user_id', $this->user->id)->first();
+            return response([
+                'status'=>true,
+                'message'=>'',
+                'data'=>[
+                    'user'=>$this->user,
+                    'notifications'=>$this->user->unreadNotifications,
+                    'bank_accounts'=>$this->user->accounts,
+                    'vendor'=>[
+                        'is_vendor'=> boolval(($vendor)?1:0),
+                        'vendor'=> $vendor??null,
+                        'pending_sales'=>($vendor)?Book::pendingSales($vendor->id):null,
+                        'in_progress_sales'=>($vendor)?Book::inProgress($vendor->id):null,
+                        'total_sales'=>($vendor)?Book::totalSales($vendor->id):null,
+                    ],
+                    'admin'=>[
+                        'is_admin'=>$this->user->hasRole('admin'),
+                        'admin'
+                    ],
+                    'wallet'=>$this->user->wallet,
+                ]
+            ]);
+        }catch (\Throwable $throwable){
+            report($throwable);
+        }
     }
 }
