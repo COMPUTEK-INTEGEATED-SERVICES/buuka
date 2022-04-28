@@ -85,6 +85,8 @@ class BookActions
     public function createCustomBook($book, $user, $vendor)
     {
         try {
+            //convert book to object if it is array
+            $book = (object)$book;
             if ($book->id){
                 $booked = Book::find($book->id);
                 $booked->product_id = json_encode([$book->product_id]);
