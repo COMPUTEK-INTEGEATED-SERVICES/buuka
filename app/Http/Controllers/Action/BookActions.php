@@ -118,12 +118,12 @@ class BookActions
             $booked->amount = $total_amount;
             $booked->save();
 
-            TransactionReference::create([
-                'referenceable_id'=>$booked->id,
-                'store_card_id'=>0,
-                'reference'=>Str::random(),
-                'referenceable_type'=>'App\Models\Book'
-            ]);
+            TransactionReference::updateOrCreate(
+                ['referenceable_id'=>$booked->id],
+                ['store_card_id'=>0],
+                ['reference'=>Str::random()],
+                ['referenceable_type'=>'App\Models\Book']
+            );
 
             return Book::with('reference')->find($booked->id);
         }catch (\Throwable $throwable){
