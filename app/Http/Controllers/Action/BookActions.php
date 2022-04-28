@@ -89,7 +89,7 @@ class BookActions
             $book = (object)$book;
             if ($book->id){
                 $booked = Book::find($book->id);
-                $booked->product_id = json_encode([$book->product_id]);
+                $booked->product_id = json_encode([$book->product]);
                 $booked->schdule = $book->scheduled;
                 $booked->amount = $book->amount;
                 $booked->note = $book->extras;
@@ -100,7 +100,7 @@ class BookActions
                 $booked =  Book::create([
                     'user_id'=>$user->id,
                     'vendor_id'=>$vendor->id,
-                    'product_id'=>json_encode([$book->product_id]),
+                    'product_id'=>json_encode([$book->product]),
                     'schedule'=>$book->scheduled,
                     'amount'=>$book->amount,
                     'note'=>$book->extras,
@@ -110,7 +110,7 @@ class BookActions
             }
 
             //here i will want to get the total amount
-            $product = Product::find($book->product_id);
+            $product = Product::find($book->product);
             $total_amount = $product->price;
             ProductBookRelation::updateOrCreate(
                 ['book_id'=>$book->id],
