@@ -33,7 +33,7 @@ class ChatController extends Controller
         $allowed_image = ['jpeg', 'png', 'gif', 'jpg'];
         $allowed_from = ['USER', 'VENDOR'];
         $v = Validator::make( $request->all(), [
-            'message' => 'required_without:file|string',
+            'message' => 'required_without:file,book|string',
             'user_id' => 'required|integer|exists:users,id',
             'vendor_id' => 'required|integer|exists:vendors,id',
             'from' => 'required|string|in:'.strtoupper(implode(',',$allowed_from)),
