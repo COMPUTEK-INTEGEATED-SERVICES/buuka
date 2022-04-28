@@ -61,53 +61,57 @@ class ChatController extends Controller
 
         if ($this->canSendMessage($user->id, $vendor->id, strtoupper($request->from)))
         {
-            if($request->file){
-                //upload file
-                $message =  $request->file('file')->store('public/attachments');
-
-                if (in_array($request->file->extension(), $allowed_image))
-                {
-                    $type = 'image';
-                }else{
-                    $type = 'document';
-                }
-                //$type = $request->file('file')->getMimeType();
-            }elseif($request->message){
-
-                $message = $request->message;
-            }
-            else {
-                $message = (new OrderController())->customBook($request->book, $user, $vendor)->id;
-                //type is book to show that a book was made here
-                $type = 'book';
-            }
-
-            $chat = Chat::create([
-                'vendor_id'=>$vendor->id,
-                'user_id'=>$user->id,
-                'type'=>$type??'text',
-                'message'=>$message,
-                'from'=>strtoupper($request->from),
-                'staff_id'=> $vendor->user_id
-            ]);
-
             try {
+                if($request->file){
+                    //upload file
+                    $message =  $request->file('file')->store('public/attachments');
+
+                    if (in_array($request->file->extension(), $allowed_image))
+                    {
+                        $type = 'image';
+                    }else{
+                        $type = 'document';
+                    }
+                    //$type = $request->file('file')->getMimeType();
+                }elseif($request->message){
+
+                    $message = $request->message;
+                }
+                else {
+                    $message = (new OrderController())->customBook($request->book, $user, $vendor)->id;
+                    //type is book to show that a book was made here
+                    $type = 'book';
+                }
+
+                $chat = Chat::create([
+                    'vendor_id'=>$vendor->id,
+                    'user_id'=>$user->id,
+                    'type'=>$type??'text',
+                    'message'=>$message,
+                    'from'=>strtoupper($request->from),
+                    'staff_id'=> $vendor->user_id
+                ]);
+
                 if ($this->user->id === $vendor->user_id){
                     //the user is notified
                     $user->notify(new NewMessageNotification(User::find($vendor->user_id), $chat, $vendor));
                 }else{
                     User::find($vendor->user_id)->notify(new NewMessageNotification($user, $chat));
                 }
+                return response([
+                    'status'=>true,
+                    'message'=>'Chat sent',
+                    'data'=>[
+                    ]
+                ]);
             }catch (\Throwable $throwable){
                 report($throwable);
+                return response([
+                    'status'=>true,
+                    'message'=>'Sorry an error occurred',
+                    'data'=>[]
+                ],422);
             }
-
-            return response([
-                'status'=>true,
-                'message'=>'Chat sent',
-                'data'=>[
-                ]
-            ]);
         }
 
         return response([
