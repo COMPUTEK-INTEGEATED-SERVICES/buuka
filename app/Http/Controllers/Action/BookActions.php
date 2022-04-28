@@ -22,6 +22,7 @@ use App\Notifications\Order\UserMarkedOrderAsCompletedNotification;
 use App\Notifications\Order\VendorMarkedOrderAsCompletedNotification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BookActions
@@ -87,6 +88,7 @@ class BookActions
         try {
             //convert book to object if it is array
             $book = (object)$book;
+            Log::error($book);
             if ($book->id){
                 $booked = Book::find($book->id);
                 $booked->product_id = json_encode([$book->product]);
