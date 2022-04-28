@@ -113,7 +113,7 @@ class BookActions
             $product = Product::find($book->product);
             $total_amount = $product->price;
             ProductBookRelation::updateOrCreate(
-                ['book_id'=>$book->id],
+                ['book_id'=>$booked->id],
                 ['product_id'=>$product->id]
             );
 
