@@ -36,7 +36,7 @@ class InitController extends Controller
                         'is_vendor'=> boolval(($vendor)?1:0),
                         'vendor'=> $vendor??null,
                         'pending_sales'=>($vendor)?Book::pendingSales($vendor->id):null,
-                        'in_progress_sales'=>($vendor)?Book::inProgress($vendor->id):null,
+                        'in_process_sales'=>($vendor)?Book::inProgress($vendor->id):null,
                         'total_sales'=>($vendor)?Book::totalSales($vendor->id):null,
                     ],
                     'admin'=>[
