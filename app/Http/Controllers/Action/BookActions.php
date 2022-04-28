@@ -173,6 +173,7 @@ class BookActions
 
     public function markOrderAsComplete($book_id, $user)
     {
+        DB::beginTransaction();
         try {
             $book = Book::find($book_id);
 
@@ -193,10 +194,12 @@ class BookActions
                     WalletController::credit($vendor->id, 'vendor', $book->amount);
 
                     $book->save();
+                    DB::commit();
                     return true;
                 }
             }
         }catch (\Throwable $throwable){
+            DB::rollBack();
             report($throwable);
         }
         return false;
