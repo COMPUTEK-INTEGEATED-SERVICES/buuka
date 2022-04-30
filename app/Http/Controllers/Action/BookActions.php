@@ -107,7 +107,7 @@ class BookActions
                     'amount'=>$book->amount,
                     'note'=>$book->extras,
                     'type'=>'custom',
-                    'proposed_by'=>($vendor->id == $user->id)?'vendor':'client'
+                    'proposed_by'=>($vendor->user_id == $user->id)?'vendor':'client'
                 ]);
             }
 
