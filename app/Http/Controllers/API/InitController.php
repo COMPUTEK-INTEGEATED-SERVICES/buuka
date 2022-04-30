@@ -38,6 +38,10 @@ class InitController extends Controller
                         'pending_sales'=>($vendor)?Book::pendingSales($vendor->id):null,
                         'in_process_sales'=>($vendor)?Book::inProgress($vendor->id):null,
                         'total_sales'=>($vendor)?Book::totalSales($vendor->id):null,
+                        'total_bookings'=>($vendor)?Book::totalBookings($vendor->id):null,
+                        'active_bookings'=>($vendor)?Book::activeBookings($vendor->id):null,
+                        'pending_sales_amount'=>($vendor)?Book::pendingSalesAmount($vendor->id):null,
+                        'total_sales_amount'=>($vendor)?Book::totalSalesAmount($vendor->id):null,
                     ],
                     'admin'=>[
                         'is_admin'=>$this->user->hasRole('admin'),
