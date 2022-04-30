@@ -88,7 +88,6 @@ class BookActions
         try {
             //convert book to object if it is array
             $book = (object)$book;
-            Log::error($book->product);
             if (isset($book->id)){
                 $booked = Book::find($book->id);
                 $booked->product_id = json_encode([$book->product]);
@@ -112,15 +111,15 @@ class BookActions
             }
 
             //here i will want to get the total amount
-            $product = Product::find($book->product);
-            $total_amount = $product->price;
+            /*$product = Product::find($book->product);
+            $total_amount = $product->price;*/
             ProductBookRelation::updateOrCreate(
                 ['book_id'=>$booked->id],
-                ['product_id'=>$product->id]
+                ['product_id'=>$book->product]
             );
 
-            $booked->amount = $total_amount;
-            $booked->save();
+            /*$booked->save();
+            $booked->amount = $total_amount;*/
 
             TransactionReference::updateOrCreate(
                 ['referenceable_id'=>$booked->id],
