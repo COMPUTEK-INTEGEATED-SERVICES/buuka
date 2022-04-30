@@ -81,7 +81,7 @@ class UserBookSuccessfulNotification extends Notification implements ShouldQueue
             ->withAndroid(
                 PusherMessage::create()
                     ->title($message)
-                    ->icon('icon')
+                    //->icon('icon')
             );
     }
 }
