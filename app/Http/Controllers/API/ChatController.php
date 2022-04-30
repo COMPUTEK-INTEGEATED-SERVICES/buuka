@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 
 use App\Events\Chat\NewChatMessage;
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Chat;
 use App\Models\User;
 use App\Models\Vendor;
@@ -167,7 +168,8 @@ class ChatController extends Controller
                     'status'=>true,
                     'message'=>'',
                     'data'=>[
-                        'chat'=>$chat
+                        'chat'=>$chat,
+                        'book'=>$chat->type == 'book'?Book::find($chat->message):null
                     ]
                 ]);
             }
