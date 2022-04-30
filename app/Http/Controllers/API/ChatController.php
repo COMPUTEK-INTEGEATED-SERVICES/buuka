@@ -160,7 +160,7 @@ class ChatController extends Controller
             $chat = Chat::with(['user', 'vendor'])->where(function ($query) use ($request) {
                 $query->where('vendor_id', $request->input('vendor_id'))
                     ->where('user_id', $request->input('user_id'));
-            })->latest()->paginate(20);
+            })->get();
 
             if ($chat)
             {
