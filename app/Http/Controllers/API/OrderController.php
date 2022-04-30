@@ -116,39 +116,31 @@ class OrderController extends Controller
             ], 422);
         }
         $book = Book::find($request->book_id);
-        if ($book->type === 'custom')
+        if ($this->user->can('accept_proposal', $book))
         {
-            if (($book->proposed_by == 'vendor' && $this->user->id != $book->vendor_id) || ($book->proposed_by == 'user' && $this->user->id != $book->user_id))
-            {
-                $book->custom_book_accepted = 1;
-                $book->save();
-                TransactionReference::create([
-                    'book_id'=>$book->id,
-                    'reference'=>Str::random(),
-                    'type'=>'book'
-                ]);
+            $book->custom_book_accepted = 1;
+            $book->save();
+            TransactionReference::create([
+                'book_id'=>$book->id,
+                'reference'=>Str::random(),
+                'type'=>'book'
+            ]);
 
-                try {
-                    $user = User::find($book->user_id);
-                    $user->notify(new UserBookSuccessfulNotification($book));
-                    broadcast( new UserBookSuccessfulEvent($book, $user));
-                }catch (\Throwable $throwable){
-                    report($throwable);
-                }
-
-                return response([
-                    'status'=>true,
-                    'message'=>'Product(s) booked proceed to make payment',
-                    'data'=>[
-                        'book'=>$book,
-                    ]
-                ]);
+            try {
+                $user = User::find($book->user_id);
+                $user->notify(new UserBookSuccessfulNotification($book));
+                broadcast( new UserBookSuccessfulEvent($book, $user));
+            }catch (\Throwable $throwable){
+                report($throwable);
             }
+
             return response([
-                'status'=>false,
-                'message'=>'Invalid permission',
-                'data'=>[]
-            ], 403);
+                'status'=>true,
+                'message'=>'Product(s) booked proceed to make payment',
+                'data'=>[
+                    'book'=>$book,
+                ]
+            ]);
         }
         return response([
             'status'=>false,
