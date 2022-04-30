@@ -168,8 +168,7 @@ class ChatController extends Controller
                     'status'=>true,
                     'message'=>'',
                     'data'=>[
-                        'chat'=>$chat,
-                        'book'=>$chat->type == 'book'?Book::find($chat->message):null
+                        'chat'=>$chat
                     ]
                 ]);
             }

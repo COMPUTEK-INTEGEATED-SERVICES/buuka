@@ -17,6 +17,8 @@ class Chat extends Model
         'created_at' => 'datetime',
     ];
 
+    protected $appends = ['book'];
+
     public function user(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_id');
@@ -36,5 +38,12 @@ class Chat extends Model
             $query->where('user_1', $receiver)
                 ->where('user_2', $sender);
         })->get();
+    }
+
+    public function getBookAttribute()
+    {
+
+        return $this->type === 'book'?Book::find($this->message):null;
+
     }
 }
