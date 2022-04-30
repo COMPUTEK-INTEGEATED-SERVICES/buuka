@@ -95,7 +95,7 @@ class BookActions
                 $booked->schdule = $book->scheduled;
                 $booked->amount = $book->amount;
                 $booked->note = $book->extras;
-                $booked->proposed_by = ($vendor->id == $user->id)?'vendor':'client';
+                $booked->proposed_by = ($vendor->user_id == $user->id)?'vendor':'client';
                 $booked->save();
                 $booked = $booked->fresh();
             }else{
