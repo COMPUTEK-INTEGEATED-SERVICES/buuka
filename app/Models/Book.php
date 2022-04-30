@@ -75,7 +75,7 @@ class Book extends Model
     public static function totalBookings($vendor_id)
     {
         return self::where('status', 1)
-            ->where('status', 2)
+            ->orWhere('status', 2)
             ->where('vendor_id', $vendor_id)
             ->count();
     }
@@ -100,7 +100,7 @@ class Book extends Model
     {
         return self::where('vendor_id', $vendor_id)
             ->where('status', 1)
-            ->where('status', 2)
+            ->orWhere('status', 2)
             ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
             ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
             ->sum('products.price');
