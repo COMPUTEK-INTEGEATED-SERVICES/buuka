@@ -103,6 +103,7 @@ class ChatController extends Controller
                     'status'=>true,
                     'message'=>'Chat sent',
                     'data'=>[
+                        'book'=>$book??null
                     ]
                 ]);
             }catch (\Throwable $throwable){
