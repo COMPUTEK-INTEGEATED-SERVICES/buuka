@@ -74,7 +74,7 @@ class Vendor extends Model
 
     public static function topServiceProvider()
     {
-        return self::with(['reviews','services'])
+        return self::with(['reviews','images'])
             ->leftJoin('books', 'books.vendor_id', '=', 'vendors.id')
             ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
             ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
