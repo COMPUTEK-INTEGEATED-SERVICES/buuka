@@ -94,7 +94,7 @@ class Vendor extends Model
         $count = $r->count();
         $sum = $r->sum('star');
 
-        return $sum/$count;
+        return ($count == 0 || $sum == 0)?0:$sum/$count;
     }
 
     public function getTotalReviewCountAttribute()
