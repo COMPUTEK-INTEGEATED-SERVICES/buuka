@@ -79,6 +79,7 @@ class Vendor extends Model
             ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
             ->where('books.status', 2)
             ->orderBy('products.price')
+            ->select('vendors*')
             ->take(10)->get();
     }
 }
