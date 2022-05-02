@@ -627,6 +627,14 @@ class PaymentController extends \App\Http\Controllers\Controller
                 ]);
             }
 
+            if ($book->status == 2){
+                return response()->json([
+                    'status'=>true,
+                    'message'=>'Order Booked Already',
+                    'data'=>[]
+                ]);
+            }
+
             //debit the user
             WalletController::debit($user->id, 'user', $book->amount);
 
