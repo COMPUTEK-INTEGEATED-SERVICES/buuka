@@ -100,7 +100,7 @@ class UserBookCompleteNotification extends Notification
 
     public function toPushNotification($notifiable)
     {
-        $message = "An Order was marked as completed!";
+        $message = "{$this->vendor->business_name} has received your order";
 
         return PusherMessage::create()
             ->iOS()

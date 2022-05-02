@@ -18,7 +18,7 @@ class UserBookSuccessfulNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($book)
+    public function __construct($book, $vendor)
     {
         //
     }
