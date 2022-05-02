@@ -43,7 +43,7 @@ class Chat extends Model
     public function getBookAttribute()
     {
 
-        return $this->type === 'book'?Book::with('products')->find($this->message):null;
+        return $this->type === 'book'?Book::with(['products','reference'])->find($this->message):null;
 
     }
 }
