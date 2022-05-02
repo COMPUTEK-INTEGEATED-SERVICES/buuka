@@ -91,7 +91,7 @@ class BookActions
             if (isset($book->id)){
                 $booked = Book::find($book->id);
                 $booked->product_id = json_encode([$book->product]);
-                $booked->schdule = $book->scheduled;
+                $booked->schedule = $book->scheduled;
                 $booked->amount = $book->amount;
                 $booked->note = $book->extras;
                 $booked->proposed_by = ($vendor->user_id == $user->id)?'vendor':'client';
