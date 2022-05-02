@@ -75,8 +75,8 @@ class Book extends Model
     public static function totalBookings($vendor_id, $user)
     {
         return self::where('status', 1)
-            ->where('user_id', '!=', $user->id)
             ->orWhere('status', 2)
+            ->where('user_id', '!=', $user->id)
             ->where('vendor_id', $vendor_id)
             ->count();
     }
