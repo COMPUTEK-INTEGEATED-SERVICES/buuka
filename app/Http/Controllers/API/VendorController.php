@@ -35,7 +35,8 @@ class VendorController extends Controller
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
             'instagram'=>'nullable|string|url',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'file'=>'nullable|array',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'category'=>'required|array',
             'category.*'=>'int|exists:categories,id'
         ]);
@@ -151,7 +152,9 @@ class VendorController extends Controller
             'week_end'=>'nullable|int',
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
-            'instagram'=>'nullable|string|url'
+            'instagram'=>'nullable|string|url',
+            'file'=>'nullable|array',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
         ]);
 
         if($v->fails()){
@@ -180,6 +183,21 @@ class VendorController extends Controller
                 'instagram'=>$request->input('instagram', $socials['instagram']),
             ]);
             $request->save();
+
+            if($request->file){
+                //upload file
+                foreach ($request->file('file') as $file)
+                {
+                    $message =  $file->store('public/images/vendor/attachments');
+                    $type = $file->getMimeType();
+
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$vendor->id,
+                        'resourceable_type'=>'App\Models\Vendor'
+                    ]);
+                }
+            }
 
             return response([
                 'status'=>true,
