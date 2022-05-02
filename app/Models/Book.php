@@ -48,57 +48,64 @@ class Book extends Model
         return $this->hasOne(Appointment::class, 'book_id', 'id');
     }
 
-    public static function pendingSales($vendor_id)
+    public static function pendingSales($vendor_id, $user)
     {
         return self::with(['appointment', 'products'])
+            ->where('user_id', '!=', $user->id)
             ->where('status', 0)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
     }
 
-    public static function inProgress($vendor_id)
+    public static function inProgress($vendor_id, $user)
     {
         return self::with(['appointment', 'products'])
+            ->where('user_id', '!=', $user->id)
             ->where('status', 1)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
     }
 
-    public static function totalSales($vendor_id)
+    public static function totalSales($vendor_id, $user)
     {
         return self::with(['appointment', 'products'])
+            ->where('user_id', '!=', $user->id)
             ->where('status', 2)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
     }
 
-    public static function totalBookings($vendor_id)
+    public static function totalBookings($vendor_id, $user)
     {
         return self::where('status', 1)
+            ->where('user_id', '!=', $user->id)
             ->orWhere('status', 2)
             ->where('vendor_id', $vendor_id)
             ->count();
     }
 
-    public static function activeBookings($vendor_id)
+    public static function activeBookings($vendor_id, $user)
     {
         return self::where('status', 1)
+            ->where('user_id', '!=', $user->id)
             ->where('vendor_id', $vendor_id)
             ->count();
     }
 
-    public static function pendingSalesAmount($vendor_id)
+    public static function pendingSalesAmount($vendor_id, $user)
     {
         return self::where('vendor_id', $vendor_id)
+            ->where('user_id', '!=', $user->id)
             ->where('status', 1)
             ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
             ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
             ->sum('products.price');
     }
 
-    public static function totalSalesAmount($vendor_id)
+    public static function totalSalesAmount($vendor_id, $user)
     {
         return self::where('vendor_id', $vendor_id)
+            ->where('user_id', '!=', $user->id)
             ->where('status', 1)
             ->orWhere('status', 2)
             ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
