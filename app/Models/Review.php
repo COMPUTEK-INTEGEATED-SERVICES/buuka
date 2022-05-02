@@ -17,4 +17,10 @@ class Review extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
+
+    public static function vendor_review($vendor_id)
+    {
+        return self::where('reviewable_type', 'App\Models\Vendor')
+            ->where('reviewable_id', $vendor_id);
+    }
 }

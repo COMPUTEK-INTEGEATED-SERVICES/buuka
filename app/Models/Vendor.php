@@ -74,7 +74,7 @@ class Vendor extends Model
 
     public static function topServiceProvider()
     {
-        return self::with(['reviews','images'])
+        return self::with(['reviews','images','services', 'staff'])
             ->leftJoin('books', 'books.vendor_id', '=', 'vendors.id')
             ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
             ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
@@ -82,5 +82,11 @@ class Vendor extends Model
             ->orderBy('products.price')
             ->select('vendors.*')
             ->take(10)->get();
+    }
+
+    public function getRatingAttribute()
+    {
+        $r = Review::vendor_review($this->id);
+        //$count =
     }
 }
