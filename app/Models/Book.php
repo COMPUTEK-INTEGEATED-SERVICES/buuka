@@ -48,28 +48,25 @@ class Book extends Model
         return $this->hasOne(Appointment::class, 'book_id', 'id');
     }
 
-    public static function pendingSales($vendor_id, $user)
+    public static function pendingSales($vendor_id)
     {
         return self::with(['appointment', 'products'])
-            ->where('user_id', '!=', $user->id)
             ->where('status', 0)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
     }
 
-    public static function inProgress($vendor_id, $user)
+    public static function inProgress($vendor_id)
     {
         return self::with(['appointment', 'products'])
-            ->where('user_id', '!=', $user->id)
             ->where('status', 1)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
     }
 
-    public static function totalSales($vendor_id, $user)
+    public static function totalSales($vendor_id)
     {
         return self::with(['appointment', 'products'])
-            ->where('user_id', '!=', $user->id)
             ->where('status', 2)
             ->where('vendor_id', $vendor_id)
             ->latest()->take(10)->get();
