@@ -23,7 +23,9 @@ class Vendor extends Model
         'socials'
     ];
 
-    protected $appends = ['rating'];
+    protected $appends = [
+        'rating', 'total_review_count'
+    ];
 
     public function services(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -93,5 +95,10 @@ class Vendor extends Model
         $sum = $r->sum('star');
 
         return $sum/$count;
+    }
+
+    public function getTotalReviewCountAttribute()
+    {
+        return Review::vendor_review($this->id)->count();
     }
 }
