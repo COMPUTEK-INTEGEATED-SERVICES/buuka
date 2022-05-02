@@ -714,4 +714,13 @@ class SupportController
             'data'=>Vendor::related_vendors($request->vendor_id)
         ]);
     }
+
+    public function topServiceProvider()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>Vendor::topServiceProvider()
+        ]);
+    }
 }

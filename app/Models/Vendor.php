@@ -71,4 +71,14 @@ class Vendor extends Model
     {
         return $this->morphOne(BankAccount::class, 'account');
     }
+
+    public static function topServiceProvider()
+    {
+        return self::leftJoin('books', 'books.vendor_id', '=', 'vendors.id')
+            ->leftJoin('product_book_relations', 'product_book_relations.book_id', '=', 'books.id')
+            ->leftJoin('products', 'product_book_relations.product_id', '=', 'products.id')
+            ->where('books.status', 2)
+            ->orderBy('products.price')
+            ->take(10)->get();
+    }
 }
