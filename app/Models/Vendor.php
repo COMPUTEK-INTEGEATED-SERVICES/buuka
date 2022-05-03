@@ -20,7 +20,9 @@ class Vendor extends Model
         'address',
         'week_start',
         'week_end',
-        'socials'
+        'socials',
+        'longitude',
+        'latitude'
     ];
 
     protected $appends = [

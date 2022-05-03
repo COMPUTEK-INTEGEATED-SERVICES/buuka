@@ -545,6 +545,29 @@ class PaymentController extends \App\Http\Controllers\Controller
                             }
                         }
                         break;
+                    case "App\Models\GiftCardPurchase'":
+                        $am = $data->amount;
+                        $gcard = GiftCardPurchase::find($ref->referenceable_id);
+                        $amount = $gcard->quantity * $gcard->unit_price;
+                        $sam = round($amount, 2) * 100;
+
+                        if ($am == $sam && $data->currency == 'NGN'  && $gcard->status == 0) {
+                            $gcard->status = 1;
+                            $gcard->save();
+                            for ($x = 0; $x <= $gcard->quantity; $x++) {
+                                GiftCard::create([
+                                    'purchase_id' => $gcard->id,
+                                    'code' => Str::upper(Str::random(12)),
+                                    'balance' => $gcard->unit_price
+                                ]);
+                            }
+                            return response([
+                                'status' => true,
+                                'message' => 'Order purchased confirmed',
+                                'data' => []
+                            ]);
+                        }
+                            break;
                 }
             }
             if ($data->status ==  'cancelled'){

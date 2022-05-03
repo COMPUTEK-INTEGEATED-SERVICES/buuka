@@ -12,6 +12,7 @@ class SearchController extends Controller
 {
     public function searchServices(Request $request)
     {
+        $user = auth()->guard('api')->user();
         $services = Service::with(['products', 'vendor'])
             ->where('services.status', 1)
             ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
@@ -22,7 +23,11 @@ class SearchController extends Controller
                 if ($request->input('q') != null && $request->input('q') != '')
                 {
                     $query->where('services.name', 'Like', '%' . $request->input('q') . '%')
-                        ->orWhere('services.description', 'Like', '%' . $request->input('q') . '%');
+                        ->orWhere('services.description', 'Like', '%' . $request->input('q') . '%')
+                        ->orWhere('vendors.business_name', 'Like', '%' . $request->input('q') . '%')
+                        ->orWhere('vendors.description', 'Like', '%' . $request->input('q') . '%')
+                        ->orWhere('products.description', 'Like', '%' . $request->input('q') . '%')
+                        ->orWhere('products.name', 'Like', '%' . $request->input('q') . '%');
                 }
                 if ($request->input('category_id') != null && $request->input('category_id') != '')
                 {

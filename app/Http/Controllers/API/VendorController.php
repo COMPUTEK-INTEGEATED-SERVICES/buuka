@@ -38,7 +38,9 @@ class VendorController extends Controller
             'file'=>'nullable|array',
             'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'category'=>'required|array',
-            'category.*'=>'int|exists:categories,id'
+            'category.*'=>'int|exists:categories,id',
+            'latitude'=>'required|nullable',
+            'longitude'=>'required|nullable'
         ]);
 
         if($v->fails()){
@@ -69,6 +71,8 @@ class VendorController extends Controller
             'address'=>$request->input('address'),
             'week_start'=>$request->input('week_start'),
             'week_end'=>$request->input('week_end'),
+            'latitude'=>$request->input('latitude'),
+            'longitude'=>$request->input('longitude'),
             'socials'=>json_encode([
                 'website'=>$request->input('website'),
                 'facebook'=>$request->input('facebook'),
@@ -154,6 +158,8 @@ class VendorController extends Controller
             'facebook'=>'nullable|string|url',
             'instagram'=>'nullable|string|url',
             'file'=>'nullable|array',
+            'longitude'=>'nullable|string',
+            'latitude'=>'nullable|string',
             'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
         ]);
 
@@ -176,6 +182,8 @@ class VendorController extends Controller
             $vendor->address = $request->input('address', $vendor->address);
             $vendor->week_start = $request->input('week_start', $vendor->week_start);
             $vendor->week_end = $request->input('week_end', $vendor->week_end);
+            $vendor->longitude = $request->input('longitude', $vendor->longitude);
+            $vendor->latitude = $request->input('latitude', $vendor->latitude);
             $socials = json_decode($request->socials);
             $vendor->socials = json_encode([
                 'website'=>$request->input('website', $socials['website']),
