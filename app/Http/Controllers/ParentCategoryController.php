@@ -25,7 +25,7 @@ class ParentCategoryController extends Controller
         $v = Validator::make( $request->all(), [
             'name' => 'required|string',
             'description' => 'required|string',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
+            'file' => 'required|mimes:jpeg,jpg,png,gif,pdf'
         ]);
 
         if($v->fails()){

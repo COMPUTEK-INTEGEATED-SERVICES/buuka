@@ -10,6 +10,6 @@ class ParentCategory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'description', 'file'
+        'name', 'description', 'image'
     ];
 }
