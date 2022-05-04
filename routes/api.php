@@ -39,7 +39,7 @@ Route::middleware(['cors', 'guest'])->group(function (){
     Route::get('countries', [\App\Http\Controllers\API\SupportController::class, 'getCountries']);
     Route::get('states', [\App\Http\Controllers\API\SupportController::class, 'getStates']);
     Route::get('cities', [\App\Http\Controllers\API\SupportController::class, 'getCities']);
-    Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllCategories']);
+    Route::get('category/all', [\App\Http\Controllers\API\SupportController::class, 'getAllParentCategories']);
     Route::get('weeks', [\App\Http\Controllers\API\SupportController::class, 'getWeeks']);
     Route::get('banks', [\App\Http\Controllers\API\SupportController::class, 'getBanks']);
     Route::get('top_service_provider', [\App\Http\Controllers\API\SupportController::class, 'topServiceProvider']);
@@ -94,6 +94,11 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     Route::post('category/add', [\App\Http\Controllers\API\CategoryController::class, 'addCategory']);
     Route::post('category/edit', [\App\Http\Controllers\API\CategoryController::class, 'editCategory']);
     Route::get('category/delete', [\App\Http\Controllers\API\CategoryController::class, 'deleteCategory']);
+
+    //parent category routes
+    Route::post('parent_category/add', [\App\Http\Controllers\ParentCategoryController::class, 'addCategory']);
+    Route::post('parent_category/edit', [\App\Http\Controllers\ParentCategoryController::class, 'editCategory']);
+    Route::get('parent_category/delete', [\App\Http\Controllers\ParentCategoryController::class, 'deleteCategory']);
 
     //review routes
     Route::post('review/add', [\App\Http\Controllers\API\ReviewController::class, 'addReview']);
@@ -180,24 +185,4 @@ Route::middleware(['auth:api', 'cors'])->group(function (){
     //appointment routes
     Route::get('appointments/today/vendor', [\App\Http\Controllers\API\AppointmentController::class, 'get_vendor_appointments_today']);
     Route::get('appointments/vendor', [\App\Http\Controllers\API\AppointmentController::class, 'get_vendor_appointments']);
-});
-
-Route::get('test', function (){
-    //once person dn login, i dn set in type keep already,  unless in switch to vendor
-    //if in switch to vendor i update the type sharp sharp
-    $type = 'USER';
-
-    //now i it endpoint for get messages
-    $endp = file_get_contents('/api/chat/get_messages_with_user?vendor_id=1&user_id=35');
-
-    //now i loop through the messages any how i wish to loop through
-    foreach ($endp as $e){
-        //since i dey logged in as user all the messages wey the from na USER
-        //na me send am so in go automatically stay for right else left
-        if ($e->from == $type){
-            //message was sent by the current logged in user
-        }else{
-            //message was sent by the other person
-        }
-    }
 });

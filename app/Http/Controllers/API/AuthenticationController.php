@@ -98,9 +98,9 @@ class AuthenticationController extends Controller
             'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users",
             //'date_of_birth' => 'required|date_format:Y-m-d|before:'.now()->subYears(12)->toDateString(),
             'gender' => 'required|string|in:'.strtolower(implode(',', $gender)),
-            'city_id'=>'required|int|exists:cities,id',
-            'country_id'=>'required|int|exists:countries,id',
-            'state_id'=>'required|int|exists:states,id',
+            'city_id'=>'nullable|int|exists:cities,id',
+            'country_id'=>'nullable|int|exists:countries,id',
+            'state_id'=>'nullable|int|exists:states,id',
         ]);
 
         if($v->fails()){

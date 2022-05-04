@@ -10,6 +10,7 @@ use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\Rating;
 use App\Models\Service;
@@ -465,6 +466,17 @@ class SupportController
         ]);
     }
 
+    public function getAllParentCategories()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'category'=>ParentCategory::all()
+            ]
+        ]);
+    }
+
     public function getServices(Request $request)
     {
         $services = Service::with(['products', 'vendor'])
@@ -473,33 +485,12 @@ class SupportController
             ->where('vendors.status', 1)
             ->leftJoin('products', 'products.service_id', '=', 'services.id')
             ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
+            ->leftJoin('parent_category_relations', 'category_relations.category_id', '=', 'parent_category_relations.category_id')
             ->where(function($query) use ($request) {
-                if ($request->input('query') != null)
-                {
-                    $query->where('services.name', 'Like', '%' . $request->input('query') . '%');
-                }
                 if ($request->input('category_id') != null)
                 {
-                    $query->where('category_relations.category_id', $request->input('category_id'));
+                    $query->where('parent_category_relations.parent_id', $request->input('category_id'));
                 }
-                if ($request->input('city') != null)
-                {
-                    $query->where('vendors.city_id', $request->input('city'));
-                }/*else{
-                    $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
-                }*/
-                if ($request->input('state') != null)
-                {
-                    $query->where('vendors.state_id', $request->input('state'));
-                }/*else{
-                    $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
-                }*/
-                if ($request->input('country') != null)
-                {
-                    $query->where('vendors.country_id', $request->input('country'));
-                }/*else{
-                    $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
-                }*/
             })
             ->select('services.*', 'category_relations.category_id')
             ->orderBy('services.created_at', 'desc')

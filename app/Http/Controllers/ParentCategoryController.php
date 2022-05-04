@@ -1,15 +1,13 @@
 <?php
 
-
-namespace App\Http\Controllers\API;
-
+namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\ParentCategoryRelation;
+use App\Models\ParentCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CategoryController extends \App\Http\Controllers\Controller
+class ParentCategoryController extends Controller
 {
     /**
      * @var \Illuminate\Contracts\Auth\Authenticatable|null
@@ -27,7 +25,6 @@ class CategoryController extends \App\Http\Controllers\Controller
         $v = Validator::make( $request->all(), [
             'name' => 'required|string',
             'description' => 'required|string',
-            'parent_id' => 'required|int|exists:parent_categories,id',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
         ]);
 
@@ -39,22 +36,17 @@ class CategoryController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
-        if ($this->user->can('perform_admin_task', Category::class))
+        if ($this->user->can('perform_admin_task', ParentCategory::class))
         {
             if($request->file){
                 //upload file
                 $image =  $request->file('file')->store('public/attachments/category');
             }
 
-            $c = Category::create([
+            ParentCategory::create([
                 'name'=>$request->input('name'),
                 'description'=>$request->input('description'),
                 'image'=>$image??null
-            ]);
-
-            ParentCategoryRelation::create([
-                'parent_id'=>$request->parent_id,
-                'category_id'=>$c->id
             ]);
 
             return response([
@@ -77,8 +69,7 @@ class CategoryController extends \App\Http\Controllers\Controller
             'category_id' => 'required|integer|exists:categories,id',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
-            'parent_id' => 'required|int|exists:parent_categories,id',
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
         ]);
 
         if($v->fails()){
@@ -89,14 +80,14 @@ class CategoryController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
-        if ($this->user->can('perform_admin_task', Category::class))
+        if ($this->user->can('perform_admin_task', ParentCategory::class))
         {
             if($request->file){
                 //upload file
                 $image =  $request->file('file')->store('public/attachments/category');
             }
 
-            $category = Category::find($request->category_id);
+            $category = ParentCategory::find($request->category_id);
             $category->name = $request->input('name', $category->name);
             $category->description = $request->input('description', $category->description);
             $category->image = $image ?? $category->image;
@@ -130,9 +121,9 @@ class CategoryController extends \App\Http\Controllers\Controller
             ], 422);
         }
 
-        if ($this->user->can('perform_admin_task', Category::class))
+        if ($this->user->can('perform_admin_task', ParentCategory::class))
         {
-            Category::where('id', $request->input('category_id'))->delete();
+            ParentCategory::where('id', $request->input('category_id'))->delete();
             return response([
                 'status'=>true,
                 'message'=>'Category deleted',
