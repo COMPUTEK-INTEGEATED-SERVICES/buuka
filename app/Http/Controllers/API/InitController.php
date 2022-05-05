@@ -42,6 +42,7 @@ class InitController extends Controller
                         'active_bookings'=>($vendor)?Book::activeBookings($vendor->id, $this->user):null,
                         'pending_sales_amount'=>($vendor)?Book::pendingSalesAmount($vendor->id, $this->user):null,
                         'total_sales_amount'=>($vendor)?Book::totalSalesAmount($vendor->id, $this->user):null,
+                        'reviews'=>($vendor)?$vendor->reviews:null
                     ],
                     'admin'=>[
                         'is_admin'=>$this->user->hasRole('admin'),
