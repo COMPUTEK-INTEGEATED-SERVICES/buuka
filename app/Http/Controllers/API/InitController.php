@@ -24,7 +24,7 @@ class InitController extends Controller
     public function config()
     {
         try {
-            $vendor = Vendor::with(['accounts', 'wallet'])->where('user_id', $this->user->id)->first();
+            $vendor = Vendor::with(['accounts', 'wallet', 'reviews'])->where('user_id', $this->user->id)->first();
             return response([
                 'status'=>true,
                 'message'=>'',
@@ -42,7 +42,6 @@ class InitController extends Controller
                         'active_bookings'=>($vendor)?Book::activeBookings($vendor->id, $this->user):null,
                         'pending_sales_amount'=>($vendor)?Book::pendingSalesAmount($vendor->id, $this->user):null,
                         'total_sales_amount'=>($vendor)?Book::totalSalesAmount($vendor->id, $this->user):null,
-                        'reviews'=>($vendor)?$vendor->reviews:null
                     ],
                     'admin'=>[
                         'is_admin'=>$this->user->hasRole('admin'),
