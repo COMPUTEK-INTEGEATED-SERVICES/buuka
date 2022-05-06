@@ -29,7 +29,7 @@ class ProductController extends Controller
 
     public function createProduct(Request $request)
     {
-        $gender = ['male', 'female'];
+        $gender = ['male', 'female','all'];
         $price_type = ['from'];
         $v = Validator::make( $request->all(), [
             'service_id' => 'required|integer|exists:services,id',
