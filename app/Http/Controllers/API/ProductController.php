@@ -154,7 +154,7 @@ class ProductController extends Controller
             'status'=>false,
             'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 403);
     }
 
     public function deleteProduct(Request $request)
@@ -190,7 +190,7 @@ class ProductController extends Controller
             'status'=>false,
             'message'=>'Access denied',
             'data'=>[]
-        ]);
+        ], 403);
     }
 
     public function addProductImage(Request $request)
