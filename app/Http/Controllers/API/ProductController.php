@@ -130,8 +130,9 @@ class ProductController extends Controller
             ], 422);
         }
         $product = Product::find($request->product_id);
-        $service = Service::find($product->service_id);
-        if ($this->user->can('interact', [$product, $service]))
+        $services = Service::find($product->service_id);
+        $vendor = Vendor::find($services->vendor_id);
+        if ($this->user->can('interact', [$product, $services, $vendor]))
         {
             $product->name = $request->input('name', $product->name);
             $product->duration = $request->input('duration', $product->duration);
@@ -174,7 +175,8 @@ class ProductController extends Controller
 
         $product = Product::find($request->product_id);
         $services = Service::find($product->service_id);
-        if ($this->user->can('interact', [$product, $services]))
+        $vendor = Vendor::find($services->vendor_id);
+        if ($this->user->can('interact', [$product, $services, $vendor]))
         {
             //todo: must not have an open order
             $product->delete();
@@ -210,7 +212,8 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($product->service_id);
-        if ($this->user->can('interact', [$product, $services]))
+        $vendor = Vendor::find($services->vendor_id);
+        if ($this->user->can('interact', [$product, $services, $vendor]))
         {
             if($request->file){
                 foreach ($request->file as $file)
@@ -252,7 +255,8 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($product->service_id);
-        if ($this->user->can('interact', [$product, $services]))
+        $vendor = Vendor::find($services->vendor_id);
+        if ($this->user->can('interact', [$product, $services, $vendor]))
         {
             //todo: unlink the image
             Resource::destroy($request->input('image_id'));
