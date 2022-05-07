@@ -239,7 +239,7 @@ class ProductController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'product_id' => 'required|integer|exists:products,id',
-            'image_id' => 'required|integer|exists:service_images,id',
+            'image_id' => 'required|integer|exists:resources,id',
         ]);
 
         if($v->fails()){
