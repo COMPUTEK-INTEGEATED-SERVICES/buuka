@@ -210,7 +210,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, [$services]))
+        if ($this->user->can('interact', $product, $services))
         {
             if($request->file){
                 foreach ($request->file as $file)
@@ -252,7 +252,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, [$services]))
+        if ($this->user->can('interact', $product, $services))
         {
             //todo: unlink the image
             Resource::destroy($request->input('image_id'));
