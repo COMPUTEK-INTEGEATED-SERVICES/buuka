@@ -197,7 +197,8 @@ class ProductController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'product_id' => 'required|integer|exists:products,id',
-            'file' => 'required|mimes:jpeg,jpg,png'
+            'file'=>'required|array',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
         ]);
 
         if($v->fails()){
@@ -212,16 +213,15 @@ class ProductController extends Controller
         if ($this->user->can('interact', $product, [$services]))
         {
             if($request->file){
-                //upload file
-                $file =  $request->file('file')->store('public/attachments');
-
-                $type = $request->file('file')->getMimeType();
-
-                Resource::create([
-                    'path'=>$file,
-                    'resourceable_id'=>$request->input('product_id'),
-                    'resourceable_type'=>'App\Models\Product'
-                ]);
+                foreach ($request->file as $file)
+                {
+                    $message =  $file->store('public/attachments/products');
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$request->input('product_id'),
+                        'resourceable_type'=>'App\Models\Product'
+                    ]);
+                }
 
                 return response([
                     'status'=>true,
