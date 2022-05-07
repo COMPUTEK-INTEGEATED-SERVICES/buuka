@@ -207,7 +207,9 @@ class ProductController extends Controller
                 'data' => $v->errors()
             ], 422);
         }
-        if ($this->user->can('interact', Vendor::find(Service::find($request->service_id)->vendor_id)))
+        $product = Product::find($request->product_id);
+        $services = Service::find($request->service_id);
+        if ($this->user->can('interact', $product, [$services]))
         {
             if($request->file){
                 //upload file
@@ -249,7 +251,9 @@ class ProductController extends Controller
                 'data' => $v->errors()
             ], 422);
         }
-        if ($this->user->can('interact', Vendor::find(Service::find(Product::find($request->product_id)->service_id)->vendor_id)))
+        $product = Product::find($request->product_id);
+        $services = Service::find($request->service_id);
+        if ($this->user->can('interact', $product, [$services]))
         {
             //todo: unlink the image
             Resource::destroy($request->input('image_id'));
