@@ -131,7 +131,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $service = Service::find($product->service_id);
-        if ($this->user->can('interact', $product, [$service]))
+        if ($this->user->can('interact', [$product, $service]))
         {
             $product->name = $request->input('name', $product->name);
             $product->duration = $request->input('duration', $product->duration);
@@ -173,8 +173,8 @@ class ProductController extends Controller
         }
 
         $product = Product::find($request->product_id);
-        $services = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, $services))
+        $service = Service::find($product->service_id);
+        if ($this->user->can('interact', [$product, $service]))
         {
             //todo: must not have an open order
             $product->delete();
@@ -210,7 +210,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, $services))
+        if ($this->user->can('interact', [$product, $services]))
         {
             if($request->file){
                 foreach ($request->file as $file)
@@ -252,7 +252,7 @@ class ProductController extends Controller
         }
         $product = Product::find($request->product_id);
         $services = Service::find($request->service_id);
-        if ($this->user->can('interact', $product, $services))
+        if ($this->user->can('interact', [$product, $services]))
         {
             //todo: unlink the image
             Resource::destroy($request->input('image_id'));
