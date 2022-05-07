@@ -111,7 +111,7 @@ class ProductController extends Controller
         $price_type = ['from'];
         $v = Validator::make( $request->all(), [
             'product_id' => 'required|integer|exists:products,id',
-            'service_id' => 'required|integer|exists:services,id',
+            //'service_id' => 'required|integer|exists:services,id',
             'name'=>'nullable|string',
             'description'=>'required|string',
             'gender'=>'nullable|string|in:'.strtolower(implode(',',$gender)),
@@ -130,8 +130,8 @@ class ProductController extends Controller
             ], 422);
         }
         $product = Product::find($request->product_id);
-        $service = Service::find($request->service_id);
-        if ($this->user->can('interact', $service))
+        $service = Service::find($product->service_id);
+        if ($this->user->can('interact', $product, [$service]))
         {
             $product->name = $request->input('name', $product->name);
             $product->duration = $request->input('duration', $product->duration);
