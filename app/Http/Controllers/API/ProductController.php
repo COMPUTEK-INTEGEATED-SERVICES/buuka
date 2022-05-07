@@ -161,7 +161,7 @@ class ProductController extends Controller
     {
         $v = Validator::make( $request->all(), [
             'product_id' => 'required|integer|exists:products,id',
-            'service_id' => 'required|integer|exists:services,id',
+            //'service_id' => 'required|integer|exists:services,id',
         ]);
 
         if($v->fails()){
@@ -173,8 +173,8 @@ class ProductController extends Controller
         }
 
         $product = Product::find($request->product_id);
-        $service = Service::find($product->service_id);
-        if ($this->user->can('interact', [$product, $service]))
+        $services = Service::find($product->service_id);
+        if ($this->user->can('interact', [$product, $services]))
         {
             //todo: must not have an open order
             $product->delete();
@@ -209,7 +209,7 @@ class ProductController extends Controller
             ], 422);
         }
         $product = Product::find($request->product_id);
-        $services = Service::find($request->service_id);
+        $services = Service::find($product->service_id);
         if ($this->user->can('interact', [$product, $services]))
         {
             if($request->file){
@@ -251,7 +251,7 @@ class ProductController extends Controller
             ], 422);
         }
         $product = Product::find($request->product_id);
-        $services = Service::find($request->service_id);
+        $services = Service::find($product->service_id);
         if ($this->user->can('interact', [$product, $services]))
         {
             //todo: unlink the image
