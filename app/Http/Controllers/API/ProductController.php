@@ -113,11 +113,11 @@ class ProductController extends Controller
             'product_id' => 'required|integer|exists:products,id',
             //'service_id' => 'required|integer|exists:services,id',
             'name'=>'nullable|string',
-            'description'=>'required|string',
+            'description'=>'nullable|string',
             'gender'=>'nullable|string|in:'.strtolower(implode(',',$gender)),
             'duration'=>'string|nullable',
             'price'=>'string|nullable',
-            'price_type'=>'required|string|in:'.strtolower(implode(',',$price_type)),
+            'price_type'=>'nullable|string|in:'.strtolower(implode(',',$price_type)),
             'price_name'=>'nullable|string',
             'tax'=>'nullable|int'
         ]);
