@@ -222,13 +222,12 @@ class ProductController extends Controller
                         'resourceable_type'=>'App\Models\Product'
                     ]);
                 }
-
-                return response([
-                    'status'=>true,
-                    'message'=>'Product image added',
-                    'data'=>[]
-                ]);
             }
+            return response([
+                'status'=>true,
+                'message'=>'Product image added',
+                'data'=>[]
+            ]);
         }
         return response([
             'status'=>false,
