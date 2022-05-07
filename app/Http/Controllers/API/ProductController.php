@@ -249,7 +249,7 @@ class ProductController extends Controller
                 'data' => $v->errors()
             ], 422);
         }
-        if ($this->user->can('interact', Vendor::find(Service::find($request->service_id)->vendor_id)))
+        if ($this->user->can('interact', Vendor::find(Service::find(Product::find($request->product_id)->service_id)->vendor_id)))
         {
             Resource::destroy($request->input('image_id'));
 
