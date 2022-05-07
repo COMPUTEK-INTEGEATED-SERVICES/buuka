@@ -251,6 +251,7 @@ class ProductController extends Controller
         }
         if ($this->user->can('interact', Vendor::find(Service::find(Product::find($request->product_id)->service_id)->vendor_id)))
         {
+            //todo: unlink the image
             Resource::destroy($request->input('image_id'));
 
             return response([
