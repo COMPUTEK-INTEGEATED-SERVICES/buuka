@@ -134,14 +134,14 @@ class ProductController extends Controller
         $vendor = Vendor::find($services->vendor_id);
         if ($this->user->can('interact', [$product, $services, $vendor]))
         {
-            $product->name = $request->input('name', $product->name);
-            $product->duration = $request->input('duration', $product->duration);
-            $product->price = $request->input('price', $product->price);
-            $product->description = $request->input('description', $product->description);
-            $product->gender = $request->input('gender', $product->gender);
-            $product->price_type = $request->input('price_type', $product->pice_type);
-            $product->price_name = $request->input('price_name', $product->pice_name);
-            $product->tax = $request->input('tax', $product->tax);
+            $product->name = $request->input('name')??$product->name;
+            $product->duration = $request->input('duration')??$product->duration;
+            $product->price = $request->input('price')??$product->price;
+            $product->description = $request->input('description')??$product->description;
+            $product->gender = $request->input('gender')??$product->gender;
+            $product->price_type = $request->input('price_type')??$product->pice_type;
+            $product->price_name = $request->input('price_name')??$product->pice_name;
+            $product->tax = $request->input('tax')??$product->tax;
 
             $product->save();
 
