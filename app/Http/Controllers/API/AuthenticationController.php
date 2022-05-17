@@ -25,28 +25,20 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticationController extends Controller
 {
-    public function login (Request $request) {
-
+    public function login (Request $request): \Illuminate\Http\JsonResponse
+    {
         $v = Validator::make( $request->all(), [
             'email' => 'required|string|email|max:255',
             'password' => 'required|string',
         ]);
 
         if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Registration Failed',
-                'data' => $v->errors()
-            ], 422);
+            return $this->validationErrorResponse($v->errors());
         }
 
         if (!auth()->attempt($request->all()))
         {
-            return response([
-                'status'=>false,
-                'message'=>'Invalid credentials',
-                'data'=>[]
-            ], 422);
+            return $this->validationErrorResponse([], 'Invalid credentials');
         }
 
         if (app('general_settings')->email_verify == 1)
@@ -57,35 +49,18 @@ class AuthenticationController extends Controller
                 $msg = 'Please verify your email';
             }
         }
-        /*if (app('general_settings')->sms_verify == 1)
-        {
-            if (auth()->user()->phone_verified == 0)
-            {
-                $require['sms']=true;
-                $msg = (!empty($msg))?$msg.' and your phone number':'Please verify your phone number';
-            }
-        }*/
+
         if (!empty($require))
         {
-            return response([
-                'status'=>false,
-                'message'=>$msg,
-                'data'=>[
-                    'email'=>auth()->user()->email,
-                    'phone'=>auth()->user()->phone,
-                    'required'=>$require
-                ]
-            ], 403);
+            $this->errorResponse([
+                'email'=>auth()->user()->email,
+                'phone'=>auth()->user()->phone,
+                'required'=>$require
+            ], $msg, 403);
         }
 
         $token = (new AuthenticationAction())->returnToken(auth()->user());
-        return response([
-            'status'=>true,
-            'message'=>'Logged in',
-            'data'=>[
-                'token'=>$token
-            ]
-        ]);
+        return $this->successResponse(['token'=>$token], 'Logged in');
     }
 
     public function register (Request $request) {
@@ -160,11 +135,7 @@ class AuthenticationController extends Controller
     public function logout (Request $request) {
         $token = $request->user()->token();
         $token->revoke();
-        return response([
-            'status'=>true,
-            'message'=>'Logged out',
-            'data'=>[]
-        ]);
+        return $this->successResponse([], 'Logged out');
     }
 
     public function sendPasswordResetToken(Request $request)

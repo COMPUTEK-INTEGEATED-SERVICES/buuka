@@ -30,18 +30,10 @@ class AppointmentController extends Controller
         ]);
 
         if ($v->fails()){
-            return response()->json([
-                'status'=>false,
-                'message'=>'Validation error',
-                'data'=>$v->errors()
-            ]);
+            return $this->validationErrorResponse($v->errors());
         }
 
-        return response()->json([
-            'status'=>true,
-            'message'=>'',
-            'data'=>Appointment::today(Vendor::find($request->vendor_id))
-        ]);
+        return $this->successResponse(Appointment::today(Vendor::find($request->vendor_id)));
     }
 
     public function get_vendor_appointments(Request $request)
@@ -51,17 +43,9 @@ class AppointmentController extends Controller
         ]);
 
         if ($v->fails()){
-            return response()->json([
-                'status'=>false,
-                'message'=>'Validation error',
-                'data'=>$v->errors()
-            ]);
+            return $this->validationErrorResponse($v->errors());
         }
 
-        return response()->json([
-            'status'=>true,
-            'message'=>'',
-            'data'=>Appointment::with('book')->where('vendor_id', $request->vendor_id)->latest()->paginate(20)
-        ]);
+        return $this->successResponse(Appointment::with('book')->where('vendor_id', $request->vendor_id)->latest()->paginate(20));
     }
 }

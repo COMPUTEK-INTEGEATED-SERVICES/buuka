@@ -60,7 +60,7 @@ class ChatController extends Controller
         //user
         $user = User::find($request->user_id);
 
-        if ($this->canSendMessage($user->id, $vendor->id, strtoupper($request->from)))
+        if ($this->user->can('can_send_message', [User::class, $user, $vendor, $request]))
         {
             try {
                 if($request->file){
@@ -73,7 +73,6 @@ class ChatController extends Controller
                     }else{
                         $type = 'document';
                     }
-                    //$type = $request->file('file')->getMimeType();
                 }elseif($request->message){
 
                     $message = $request->message;
@@ -122,17 +121,6 @@ class ChatController extends Controller
             'message'=>'Not authorized',
             'data'=>[]
         ], 401);
-    }
-
-    private function canSendMessage($user_id, $vendor_id, $from)
-    {
-        if ($from == 'USER')
-        {
-            return $this->user->id == $user_id;
-        }else{
-            $vendor = Vendor::find($vendor_id);
-            return $this->user->id == $vendor->user_id;
-        }
     }
 
     private function canInteract():bool
