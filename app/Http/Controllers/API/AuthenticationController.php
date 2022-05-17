@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Http\Controllers\Action\AuthenticationAction;
 use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationVerification;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Models\PasswordReset;
 use App\Models\Wallet;
 use App\Notifications\Auth\EmailVerificationNotification;
+use App\Notifications\Auth\PhoneVerificationNotification;
 use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
@@ -19,31 +21,24 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticationController extends Controller
 {
-    public function login (Request $request) {
-
+    public function login (Request $request): \Illuminate\Http\JsonResponse
+    {
         $v = Validator::make( $request->all(), [
             'email' => 'required|string|email|max:255',
             'password' => 'required|string',
         ]);
 
         if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Registration Failed',
-                'data' => $v->errors()
-            ], 422);
+            return $this->validationErrorResponse($v->errors());
         }
 
         if (!auth()->attempt($request->all()))
         {
-            return response([
-                'status'=>false,
-                'message'=>'Invalid credentials',
-                'data'=>[]
-            ], 422);
+            return $this->validationErrorResponse([], 'Invalid credentials');
         }
 
         if (app('general_settings')->email_verify == 1)
@@ -51,46 +46,36 @@ class AuthenticationController extends Controller
             if (auth()->user()->email_verified == 0)
             {
                 $require['email']=true;
-                $msg= 'Please verify your email';
+                $msg = 'Please verify your email';
             }
-        }
-        if (app('general_settings')->sms_verify == 1)
-        {
-            if (auth()->user()->sms_verified == 0)
-            {
-                $require['sms']=true;
-                $msg = ($msg)?$msg.' and your phone number':'Please verify your phone number';
-            }
-        }
-        if (!empty($require))
-        {
-            return response([
-                'status'=>false,
-                'message'=>$msg,
-                'data'=>[
-                    'email'=>auth()->user()->email,
-                    'required'=>$require
-                ]
-            ], 403);
         }
 
-        $token = auth()->user()->createToken(Str::random(5))->accessToken;
-        return response([
-            'status'=>true,
-            'message'=>'Logged in',
-            'data'=>[
-                'token'=>$token
-            ]
-        ]);
+        if (!empty($require))
+        {
+            $this->errorResponse([
+                'email'=>auth()->user()->email,
+                'phone'=>auth()->user()->phone,
+                'required'=>$require
+            ], $msg, 403);
+        }
+
+        $token = (new AuthenticationAction())->returnToken(auth()->user());
+        return $this->successResponse(['token'=>$token], 'Logged in');
     }
 
     public function register (Request $request) {
+        $gender = ['male', 'female'];
         $v = Validator::make( $request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
+            'phone'=> "required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users",
+            //'date_of_birth' => 'required|date_format:Y-m-d|before:'.now()->subYears(12)->toDateString(),
+            'gender' => 'required|string|in:'.strtolower(implode(',', $gender)),
+            'city_id'=>'nullable|int|exists:cities,id',
+            'country_id'=>'nullable|int|exists:countries,id',
+            'state_id'=>'nullable|int|exists:states,id',
         ]);
 
         if($v->fails()){
@@ -118,15 +103,16 @@ class AuthenticationController extends Controller
             $verification = RegistrationVerification::firstOrNew([
                 'user_id'=>$user->id
             ]);
-            if (app('general_settings')->sms_verify == 1)
+            /*if (app('general_settings')->sms_verify == 1)
             {
                 //send verification code to sms
-                $otp = random_int(100000, 999999);
+                //$otp = random_int(100000, 999999);
                 //send verification code to email
-                $verification->sms_otp = Hash::make($otp);
-                $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
-                send_sms($request->phone, $message);
-            }
+                //$verification->sms_otp = Hash::make($otp);
+                //$message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
+                //send_sms($request->phone, $message);
+                //$user->notify(new PhoneVerificationNotification($otp));
+            }*/
             if (app('general_settings')->email_verify == 1)
             {
                 $otp = random_int(100000, 999999);
@@ -142,18 +128,14 @@ class AuthenticationController extends Controller
         return response([
             'status'=>true,
             'message'=>'Registration is successful',
-            'data'=>[]
+            'data'=>$user
         ]);
     }
 
     public function logout (Request $request) {
         $token = $request->user()->token();
         $token->revoke();
-        return response([
-            'status'=>true,
-            'message'=>'Logged out',
-            'data'=>[]
-        ]);
+        return $this->successResponse([], 'Logged out');
     }
 
     public function sendPasswordResetToken(Request $request)
@@ -221,9 +203,9 @@ class AuthenticationController extends Controller
     public function verifyRegistrationEmailOrPhone(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255',
-            'email_otp' => 'int|min:6',
-            'sms_otp' => 'int|min:6',
+            'email' => 'required|string|exists:users,email',
+            'email_otp' => 'required_without:sms_otp|int|min:6',
+            'sms_otp' => 'required_without:email_otp|int|min:6',
         ]);
 
         if($v->fails()){
@@ -244,7 +226,7 @@ class AuthenticationController extends Controller
             ], 403);
         }
         $otps = RegistrationVerification::where('user_id', $user->id)->first();
-        if (app('general_settings')->sms_verify == 1)
+        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0 && $request->sms_otp)
         {
             if (!Hash::check($request->sms_otp, $otps->sms_otp))
             {
@@ -258,7 +240,7 @@ class AuthenticationController extends Controller
             $user->phone_verified = 1;
         }
 
-        if (app('general_settings')->email_verify == 1)
+        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0 && $request->email_otp)
         {
             if (!Hash::check($request->email_otp, $otps->email_otp))
             {
@@ -282,7 +264,7 @@ class AuthenticationController extends Controller
     public function resendSmsVerification(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|exists:users',
             'phone'=> "nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users"
         ]);
 
@@ -306,14 +288,14 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
-        if (app('general_settings')->sms_verify == 1)
+        if (app('general_settings')->sms_verify == 1 && $user->phone_verified == 0)
         {
             //send verification code to sms
             $otp = random_int(100000, 999999);
             //send verification code to email
             $verification->sms_otp = Hash::make($otp);
             $message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
-            send_sms($request->input('phone')??$user->phone, $message);
+            $user->notify(new PhoneVerificationNotification($otp));
         }
         if ($request->phone)
         {
@@ -361,7 +343,7 @@ class AuthenticationController extends Controller
         $verification = RegistrationVerification::firstOrCreate([
             'user_id'=>$user->id
         ]);
-        if (app('general_settings')->email_verify == 1)
+        if (app('general_settings')->email_verify == 1 && $user->email_verified == 0)
         {
             $otp = random_int(100000, 999999);
             //send verification code to email
@@ -374,5 +356,91 @@ class AuthenticationController extends Controller
             'message'=>'OTP has been sent to '.$user->email,
             'data'=>[]
         ]);
+    }
+
+    public function googleOAUTHRegister(Request $request)
+    {
+        try {
+            //$p = Socialite::driver('google')->stateless()->user();
+            $p = Socialite::driver('google')->userFromToken($request->token);
+            $email = $p->getEmail();
+
+            $first_name = ucfirst($p->user['given_name']);
+            $last_name = ucfirst($p->user['family_name']);
+
+            $user = User::firstOrNew(['email' => $email]);
+
+            if (!$user) {
+                $user->first_name = $first_name;
+                $user->last_name = $last_name;
+                $user->email_verified = 1;
+                $user->save();
+            }
+
+            $require['gender'] = true;
+            /*if (app('general_settings')->sms_verify == 1)
+            {
+                $require['sms']=true;
+            }*/
+            $token = (new AuthenticationAction())->returnToken($user);
+            return response([
+                'status'=>true,
+                'message'=>'Logged in',
+                'data'=>[
+                    'token'=>$token,
+                    'required'=>$require,
+                ]
+            ]);
+        }catch (\Throwable $throwable){
+            report($throwable);
+            return response([
+                'status'=>false,
+                'message'=>'An error occurred',
+                'data'=>[]
+            ]);
+        }
+    }
+
+    public function facebookOAUTHRegister(Request $request)
+    {
+        try {
+            //$p = Socialite::driver('google')->stateless()->user();
+            $p = Socialite::driver('facebook')->userFromToken($request->token);
+            $email = $p->getEmail();
+
+            $first_name = ucfirst($p->user['given_name']);
+            $last_name = ucfirst($p->user['family_name']);
+
+            $user = User::firstOrNew(['email' => $email]);
+
+            if (!$user) {
+                $user->first_name = $first_name;
+                $user->last_name = $last_name;
+                $user->email_verified = 1;
+                $user->save();
+            }
+
+            $require['gender'] = true;
+            /*if (app('general_settings')->sms_verify == 1)
+            {
+                $require['sms']=true;
+            }*/
+            $token = (new AuthenticationAction())->returnToken($user);
+            return response([
+                'status'=>true,
+                'message'=>'Logged in',
+                'data'=>[
+                    'token'=>$token,
+                    'required'=>$require,
+                ]
+            ]);
+        }catch (\Throwable $throwable){
+            report($throwable);
+            return response([
+                'status'=>false,
+                'message'=>'An error occurred, our engineers have been notified',
+                'data'=>[]
+            ]);
+        }
     }
 }

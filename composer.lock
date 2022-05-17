@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a2ae4393e17072548b595c11a1c919a",
+    "content-hash": "0d9402a1452b27f150ffde7acc91870a",
     "packages": [
+        {
+            "name": "africastalking/africastalking",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AfricasTalkingLtd/africastalking-php.git",
+                "reference": "94e17a13eaaf782cf7697bfc7da020398a2b6f13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AfricasTalkingLtd/africastalking-php/zipball/94e17a13eaaf782cf7697bfc7da020398a2b6f13",
+                "reference": "94e17a13eaaf782cf7697bfc7da020398a2b6f13",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AfricasTalking\\SDK\\": "src/",
+                    "AfricasTalking\\SDK\\Tests\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Africas's Talking",
+                    "email": "support@africastalking.com",
+                    "homepage": "https://www.africastalking.com"
+                }
+            ],
+            "description": "Official Africa's Talking PHP SDK",
+            "homepage": "http://github.com/AfricasTalkingLtd/africastalking-php",
+            "keywords": [
+                "Africastalking",
+                "airtime",
+                "api",
+                "sms",
+                "text message",
+                "ussd",
+                "voice"
+            ],
+            "support": {
+                "issues": "https://github.com/AfricasTalkingLtd/africastalking-php/issues",
+                "source": "https://github.com/AfricasTalkingLtd/africastalking-php/tree/v3.0.0"
+            },
+            "time": "2020-10-11T00:52:15+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.3",
@@ -1567,6 +1623,224 @@
             "time": "2021-09-21T05:52:12+00:00"
         },
         {
+            "name": "kingflamez/laravelrave",
+            "version": "v4.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kingflamez/laravelrave.git",
+                "reference": "02ccc18e5f03fb25a12f898ddd180d88d0ed13d9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kingflamez/laravelrave/zipball/02ccc18e5f03fb25a12f898ddd180d88d0ed13d9",
+                "reference": "02ccc18e5f03fb25a12f898ddd180d88d0ed13d9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^5.0|^6.0|^7.0|^8.0",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2",
+                "orchestra/testbench": "^4.0",
+                "phpunit/phpunit": "^8.3",
+                "satooshi/php-coveralls": ">0.7",
+                "scrutinizer/ocular": "^1.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "KingFlamez\\Rave\\RaveServiceProvider"
+                    ],
+                    "aliases": {
+                        "Rave": "KingFlamez\\Rave\\Facades\\Rave"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "KingFlamez\\Rave\\": "src/"
+                },
+                "classmap": [
+                    "src/Rave.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "kingflamez",
+                    "email": "flamekeed@gmail.com"
+                }
+            ],
+            "description": "A Laravel 5 Package for Flutterwave Rave",
+            "keywords": [
+                "Flutterwave Rave",
+                "flutterwave",
+                "github",
+                "kingflamez",
+                "laravel",
+                "laravel 5",
+                "open source",
+                "payments",
+                "php",
+                "rave",
+                "ravepay.co"
+            ],
+            "support": {
+                "issues": "https://github.com/kingflamez/laravelrave/issues",
+                "source": "https://github.com/kingflamez/laravelrave/tree/v4.2.0"
+            },
+            "time": "2021-03-29T06:08:53+00:00"
+        },
+        {
+            "name": "laravel-notification-channels/africastalking",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-notification-channels/africastalking.git",
+                "reference": "2b91ed59820c2ccdde623345f719003a2ffcb4c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-notification-channels/africastalking/zipball/2b91ed59820c2ccdde623345f719003a2ffcb4c6",
+                "reference": "2b91ed59820c2ccdde623345f719003a2ffcb4c6",
+                "shasum": ""
+            },
+            "require": {
+                "africastalking/africastalking": "^3.0",
+                "guzzlehttp/guzzle": "^6.2 || ^7.0",
+                "illuminate/notifications": "5.5 - 9",
+                "illuminate/support": "5.5 - 9",
+                "php": ">=7.2.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3",
+                "orchestra/testbench": "~5.0 || ^6.0",
+                "phpunit/phpunit": "^7.5 || ^8.5.21 || ^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NotificationChannels\\AfricasTalking\\AfricasTalkingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NotificationChannels\\AfricasTalking\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Osaigbovo Emmanuel",
+                    "email": "osaigbovoemmanuel1@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This package makes it easy to send notifications via AfricasTalking with Laravel",
+            "homepage": "https://github.com/laravel-notification-channels/africastalking",
+            "keywords": [
+                "Africastalking",
+                "laravel",
+                "laravel-notification-channel",
+                "notification",
+                "notification-channel"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-notification-channels/africastalking/issues",
+                "source": "https://github.com/laravel-notification-channels/africastalking/tree/3.2.0"
+            },
+            "time": "2022-02-10T22:21:46+00:00"
+        },
+        {
+            "name": "laravel-notification-channels/pusher-push-notifications",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-notification-channels/pusher-push-notifications.git",
+                "reference": "a3bfe644808768ba89745c8d8f74d280bddd0688"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-notification-channels/pusher-push-notifications/zipball/a3bfe644808768ba89745c8d8f74d280bddd0688",
+                "reference": "a3bfe644808768ba89745c8d8f74d280bddd0688",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/events": "~7.0 || ~8.0 || ~9.0",
+                "illuminate/notifications": "~7.0 || ~8.0 || ~9.0",
+                "illuminate/queue": "~7.0 || ~8.0 || ~9.0",
+                "illuminate/support": "~7.0 || ~8.0 || ~9.0",
+                "php": ">=7.4",
+                "pusher/pusher-push-notifications": "^1.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NotificationChannels\\PusherPushNotifications\\PusherPushNotificationsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NotificationChannels\\PusherPushNotifications\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mohamed Said",
+                    "email": "themsaid@gmail.com",
+                    "homepage": "https://themsaid.com"
+                },
+                {
+                    "name": "Marcel Pociot",
+                    "email": "hello@marcelpociot.com",
+                    "homepage": "http://marcelpociot.com"
+                },
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be"
+                },
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://sebastiandedeyne.com"
+                }
+            ],
+            "description": "Pusher native Push Notifications driver.",
+            "homepage": "https://github.com/LaravelNotificationChannels/pusher-push-notifications",
+            "keywords": [
+                "laravel",
+                "notifications",
+                "pusher",
+                "pusher-push-notifications"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-notification-channels/pusher-push-notifications/issues",
+                "source": "https://github.com/laravel-notification-channels/pusher-push-notifications/tree/3.0.0"
+            },
+            "time": "2022-02-07T00:09:50+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v8.76.2",
             "source": {
@@ -1993,6 +2267,75 @@
                 "source": "https://github.com/laravel/serializable-closure"
             },
             "time": "2021-11-30T15:53:04+00:00"
+        },
+        {
+            "name": "laravel/socialite",
+            "version": "v5.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/socialite.git",
+                "reference": "68afb03259b82d898c68196cbcacd48596a9dd72"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/socialite/zipball/68afb03259b82d898c68196cbcacd48596a9dd72",
+                "reference": "68afb03259b82d898c68196cbcacd48596a9dd72",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.0|^7.0",
+                "illuminate/http": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "league/oauth1-client": "^1.0",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0",
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0",
+                "phpunit/phpunit": "^8.0|^9.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Socialite\\SocialiteServiceProvider"
+                    ],
+                    "aliases": {
+                        "Socialite": "Laravel\\Socialite\\Facades\\Socialite"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Socialite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "Laravel wrapper around OAuth 1 & OAuth 2 libraries.",
+            "homepage": "https://laravel.com",
+            "keywords": [
+                "laravel",
+                "oauth"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/socialite/issues",
+                "source": "https://github.com/laravel/socialite"
+            },
+            "time": "2022-03-10T15:26:19+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2587,6 +2930,82 @@
                 }
             ],
             "time": "2021-11-21T11:48:40+00:00"
+        },
+        {
+            "name": "league/oauth1-client",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/oauth1-client.git",
+                "reference": "88dd16b0cff68eb9167bfc849707d2c40ad91ddc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/oauth1-client/zipball/88dd16b0cff68eb9167bfc849707d2c40ad91ddc",
+                "reference": "88dd16b0cff68eb9167bfc849707d2c40ad91ddc",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "guzzlehttp/guzzle": "^6.0|^7.0",
+                "guzzlehttp/psr7": "^1.7|^2.0",
+                "php": ">=7.1||>=8.0"
+            },
+            "require-dev": {
+                "ext-simplexml": "*",
+                "friendsofphp/php-cs-fixer": "^2.17",
+                "mockery/mockery": "^1.3.3",
+                "phpstan/phpstan": "^0.12.42",
+                "phpunit/phpunit": "^7.5||9.5"
+            },
+            "suggest": {
+                "ext-simplexml": "For decoding XML-based responses."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev",
+                    "dev-develop": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\OAuth1\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Corlett",
+                    "email": "bencorlett@me.com",
+                    "homepage": "http://www.webcomm.com.au",
+                    "role": "Developer"
+                }
+            ],
+            "description": "OAuth 1.0 Client Library",
+            "keywords": [
+                "Authentication",
+                "SSO",
+                "authorization",
+                "bitbucket",
+                "identity",
+                "idp",
+                "oauth",
+                "oauth1",
+                "single sign on",
+                "trello",
+                "tumblr",
+                "twitter"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/oauth1-client/issues",
+                "source": "https://github.com/thephpleague/oauth1-client/tree/v1.10.0"
+            },
+            "time": "2021-08-15T23:05:49+00:00"
         },
         {
             "name": "league/oauth2-server",
@@ -4199,6 +4618,46 @@
             "time": "2021-12-07T13:09:00+00:00"
         },
         {
+            "name": "pusher/pusher-push-notifications",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pusher/push-notifications-php.git",
+                "reference": "c8926f956ba4f7e681b4261220efd77f008a131d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pusher/push-notifications-php/zipball/c8926f956ba4f7e681b4261220efd77f008a131d",
+                "reference": "c8926f956ba4f7e681b4261220efd77f008a131d",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "^5.0",
+                "guzzlehttp/guzzle": "~6.0 || ~7.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "doctrine/instantiator": "1.0.5",
+                "phpunit/phpunit": "~5.7.0",
+                "symfony/yaml": "~3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Pusher\\PushNotifications\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "support": {
+                "issues": "https://github.com/pusher/push-notifications-php/issues",
+                "source": "https://github.com/pusher/push-notifications-php/tree/1.1.2"
+            },
+            "time": "2020-10-23T09:37:07+00:00"
+        },
+        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -4418,6 +4877,75 @@
                 }
             ],
             "time": "2021-09-25T23:10:38+00:00"
+        },
+        {
+            "name": "rich2k/pusher-beams",
+            "version": "v1.0.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Rich2k/pusher-beams.git",
+                "reference": "4496e82504c6c8408eb50aa29f880581c7950a2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Rich2k/pusher-beams/zipball/4496e82504c6c8408eb50aa29f880581c7950a2f",
+                "reference": "4496e82504c6c8408eb50aa29f880581c7950a2f",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/events": "5.5.* || 5.6.* || 5.7.*|| 5.8.* || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/notifications": "5.5.* || 5.6.* || 5.7.*|| 5.8.* || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/queue": "5.5.* || 5.6.*|| 5.7.*|| 5.8.* || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/support": "5.5.* || 5.6.* || 5.7.*|| 5.8.* || ^6.0 || ^7.0 || ^8.0",
+                "php": ">=7.1",
+                "pusher/pusher-push-notifications": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.5",
+                "phpunit/phpunit": "7.*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Rich2k\\PusherBeams\\PusherBeamsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Rich2k\\PusherBeams\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Neo Ighodaro",
+                    "email": "neo@creativitykills.co"
+                },
+                {
+                    "name": "Richard Hyland",
+                    "email": "rhyland@gmail.com"
+                }
+            ],
+            "description": "Pusher Beams is a push notification service from Pusher.",
+            "homepage": "https://github.com/Rich2k/pusher-beams",
+            "keywords": [
+                "beams",
+                "laravel",
+                "notification",
+                "push",
+                "push-notifications",
+                "pusher"
+            ],
+            "support": {
+                "issues": "https://github.com/Rich2k/pusher-beams/issues",
+                "source": "https://github.com/Rich2k/pusher-beams"
+            },
+            "time": "2022-02-11T10:57:11+00:00"
         },
         {
             "name": "sabre/cache",

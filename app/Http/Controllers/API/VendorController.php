@@ -5,8 +5,11 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoryRelation;
 use App\Models\Escrow;
 use App\Models\Resource;
+use App\Models\Staff;
+use App\Models\State;
 use App\Models\Vendor;
 use App\Models\VendorImages;
 use App\Models\Wallet;
@@ -32,7 +35,12 @@ class VendorController extends Controller
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
             'instagram'=>'nullable|string|url',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'file'=>'nullable|array',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
+            'category'=>'required|array',
+            'category.*'=>'int|exists:categories,id',
+            'latitude'=>'required|nullable',
+            'longitude'=>'required|nullable'
         ]);
 
         if($v->fails()){
@@ -41,6 +49,15 @@ class VendorController extends Controller
                 'message' => 'Validation Failed',
                 'data' => $v->errors()
             ], 422);
+        }
+
+        $vendor = Vendor::where('user_id', $user->id)->first();
+        if ($vendor){
+            return response()->json([
+                'status' => false,
+                'message' => 'You have a business account already!',
+                'data' => []
+            ]);
         }
 
         $vendor = Vendor::create([
@@ -54,12 +71,23 @@ class VendorController extends Controller
             'address'=>$request->input('address'),
             'week_start'=>$request->input('week_start'),
             'week_end'=>$request->input('week_end'),
+            'latitude'=>$request->input('latitude'),
+            'longitude'=>$request->input('longitude'),
             'socials'=>json_encode([
                 'website'=>$request->input('website'),
                 'facebook'=>$request->input('facebook'),
                 'instagram'=>$request->input('instagram'),
             ]),
         ]);
+
+        foreach ($request->category as $c)
+        {
+            CategoryRelation::create([
+                'relateable_id'=>$vendor->id,
+                'relateable_type'=>'App\Models\Vendor',
+                'category_id'=>$c
+            ]);
+        }
 
         //store the images
         if($request->file){
@@ -86,6 +114,13 @@ class VendorController extends Controller
         Wallet::create([
             'walletable_id'=>$vendor->id,
             'walletable_type'=>'App\Models\Vendor'
+        ]);
+
+        //you are your number one staff
+        Staff::create([
+            'vendor_id'=>$vendor->id,
+            'user_id'=>$user->id,
+            'confirm_staff_request'=>1,
         ]);
 
         try {
@@ -121,7 +156,11 @@ class VendorController extends Controller
             'week_end'=>'nullable|int',
             'website'=>'nullable|string|url',
             'facebook'=>'nullable|string|url',
-            'instagram'=>'nullable|string|url'
+            'instagram'=>'nullable|string|url',
+            'file'=>'nullable|array',
+            'longitude'=>'nullable|string',
+            'latitude'=>'nullable|string',
+            'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
         ]);
 
         if($v->fails()){
@@ -143,6 +182,8 @@ class VendorController extends Controller
             $vendor->address = $request->input('address', $vendor->address);
             $vendor->week_start = $request->input('week_start', $vendor->week_start);
             $vendor->week_end = $request->input('week_end', $vendor->week_end);
+            $vendor->longitude = $request->input('longitude', $vendor->longitude);
+            $vendor->latitude = $request->input('latitude', $vendor->latitude);
             $socials = json_decode($request->socials);
             $vendor->socials = json_encode([
                 'website'=>$request->input('website', $socials['website']),
@@ -150,6 +191,21 @@ class VendorController extends Controller
                 'instagram'=>$request->input('instagram', $socials['instagram']),
             ]);
             $request->save();
+
+            if($request->file){
+                //upload file
+                foreach ($request->file('file') as $file)
+                {
+                    $message =  $file->store('public/images/vendor/attachments');
+                    $type = $file->getMimeType();
+
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$vendor->id,
+                        'resourceable_type'=>'App\Models\Vendor'
+                    ]);
+                }
+            }
 
             return response([
                 'status'=>true,

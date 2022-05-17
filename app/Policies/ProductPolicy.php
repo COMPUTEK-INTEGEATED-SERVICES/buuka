@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ProductPolicy
@@ -21,9 +22,9 @@ class ProductPolicy
         //
     }
 
-    public function interact(User $user, Product $product, Service $services): bool
+    public function interact(User $user, Product $product, Service $services, Vendor $vendor): bool
     {
-        return $user->id == $services->user_id && $services->id == $product->service_id;
+        return $user->id == $vendor->user_id && $vendor->id == $services->vendor_id && $services->id == $product->service_id;
     }
 
     public function create(User $user, Service $services)

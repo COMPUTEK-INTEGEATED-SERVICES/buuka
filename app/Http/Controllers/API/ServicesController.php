@@ -9,9 +9,6 @@ use App\Http\Controllers\Action\ValidationAction;
 use App\Http\Controllers\Controller;
 use App\Models\Resource;
 use App\Models\ServiceCategory;
-use App\Models\ServiceImages;
-use App\Models\ServiceLocation;
-use App\Models\ServicePrices;
 use App\Models\Service;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
@@ -39,7 +36,7 @@ class ServicesController extends Controller
         $v = Validator::make( $request->all(), [
             'name'=>'required|string',
             'description'=>'string|required',
-            'category_id'=>'required|array',
+            'category_id'=>'nullable|array',
         ]);
 
         if($v->fails()){
@@ -54,22 +51,22 @@ class ServicesController extends Controller
         {
             //store the service
             $service = Service::create([
-                'vendor_id'=>$this->user->id,
+                'vendor_id'=>Vendor::where('user_id', $this->user->id)->first()->id,
                 'name'=>$request->input('name'),
                 'description'=>$request->input('description'),
             ]);
 
             //store service categories
-            foreach ($request->input('category_id') as $category)
+            /*foreach ($request->input('category_id') as $category)
             {
                 ServiceCategory::create([
                     'service_id'=>$service->id,
                     'category_id'=>$category
                 ]);
-            }
+            }*/
 
             //store the images
-            if($request->file){
+            /*if($request->file){
                 //upload file
                 foreach ($request->file('file') as $file)
                 {
@@ -82,7 +79,7 @@ class ServicesController extends Controller
                         'resourceable_type'=>'App\Models\Service'
                     ]);
                 }
-            }
+            }*/
 
             return response([
                 'status'=>true,

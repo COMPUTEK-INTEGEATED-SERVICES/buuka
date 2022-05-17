@@ -10,8 +10,12 @@ use App\Models\Bank;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\ParentCategory;
+use App\Models\Product;
+use App\Models\Rating;
 use App\Models\Service;
 use App\Models\State;
+use App\Models\Vendor;
 use App\Models\Weeks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -462,36 +466,60 @@ class SupportController
         ]);
     }
 
+    public function getAllParentCategories()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'category'=>ParentCategory::all()
+            ]
+        ]);
+    }
+
     public function getServices(Request $request)
     {
-        $services = Service::with(['images', 'products', 'categories', 'vendor'])
-            ->where('status', 1)
+        $services = Service::with(['products', 'vendor'])
+            ->where('services.status', 1)
+            ->leftJoin('vendors', 'services.vendor_id', '=', 'vendors.id')
+            ->where('vendors.status', 1)
+            ->leftJoin('products', 'products.service_id', '=', 'services.id')
+            ->leftJoin('category_relations', 'category_relations.relateable_id', '=', 'vendors.id')
+            ->leftJoin('parent_category_relations', 'category_relations.category_id', '=', 'parent_category_relations.category_id')
             ->where(function($query) use ($request) {
-                if ($request->input('query') != null)
+                if ($request->input('category_id') != null)
                 {
-                    $query->where('name', 'Like', '%' . $request->input('query') . '%');
+                    $query->where('parent_category_relations.parent_id', $request->input('category_id'));
                 }
-                /*if ($request->input('city') != null)
-                {
-                    $query->leftJoin('vendors', 'vendors.city_id', '=', $request->input('city'));
-                }else{
-                    $query->leftJoin('vendors', 'vendors.city_id', '=', $this->city);
-                }
-                if ($request->input('state') != null)
-                {
-                    $query->leftJoin('vendors', 'vendors.state_id', '=', $request->input('state'));
-                }else{
-                    $query->leftJoin('vendors', 'vendors.state_id', '=', $this->state);
-                }
-                if ($request->input('country') != null)
-                {
-                    $query->leftJoin('vendors', 'vendors.country_id', '=', $request->input('country'));
-                }else{
-                    $query->leftJoin('vendors', 'vendors.country_id', '=', $this->country);
-                }*/
             })
-            ->latest()->paginate(10);
+            ->select('services.*', 'category_relations.category_id')
+            ->orderBy('services.created_at', 'desc')
+            ->orderBy('services.id', 'desc')
+            ->paginate(10);
 
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'services'=>$services
+            ]
+        ]);
+    }
+
+    public function getVendorServices(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+        $services = Service::with(['vendor', 'products', 'categories'])->where('vendor_id', $request->vendor_id)->get();
         return response([
             'status'=>true,
             'message'=>'',
@@ -515,7 +543,7 @@ class SupportController
             ], 422);
         }
 
-        $service = Service::with(['images', 'products', 'categories', 'vendor'])->find($request->service_id);
+        $service = Service::with([ 'products', 'categories', 'vendor'])->find($request->service_id);
 
         return response([
             'status'=>true,
@@ -531,9 +559,7 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
-            'data'=>[
-                'category'=>Weeks::all()
-            ]
+            'data'=>Weeks::all()
         ]);
     }
 
@@ -560,9 +586,132 @@ class SupportController
         return response([
             'status'=>true,
             'message'=>'',
+            'data'=>VendorPackage::where('status', 1)->get()
+        ]);
+    }
+
+    public function getVendorRating(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $ratings = Rating::where('rateable_id',$request->vendor_id)
+            ->where('rateable_type','App\Models\Vendor')->get();
+
+        return response([
+            'status'=>true,
+            'message'=>'',
             'data'=>[
-                'banks'=>VendorPackage::where('status', 1)->get()
+                'ratings'=>$ratings,
             ]
+        ]);
+    }
+
+    public function getServiceRating(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'service_id' => 'required|int|exists:services,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $ratings = Rating::where('rateable_id',$request->service_id)
+            ->where('rateable_type','App\Models\Service')->get();
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                'ratings'=>$ratings,
+            ]
+        ]);
+    }
+
+    public function getSingleProduct(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $product = Product::with(['service', 'resources'])->find($request->product_id);
+        if(!$product){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => ['Invalid Product']
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => '',
+            'data' => $product
+        ]);
+    }
+
+    public function getAVendor(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        $vendor = Vendor::with(['reviews', 'services', 'staff', 'images'])->find($request->vendor_id);
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>[
+                $vendor
+            ]
+        ]);
+    }
+
+    public function getVendorsNearVendor(Request $request)
+    {
+        $v = Validator::make( $request->all(), [
+            'vendor_id' => 'required|integer|exists:vendors,id',
+        ]);
+
+        if($v->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Failed',
+                'data' => $v->errors()
+            ], 422);
+        }
+
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>Vendor::related_vendors($request->vendor_id)
+        ]);
+    }
+
+    public function topServiceProvider()
+    {
+        return response([
+            'status'=>true,
+            'message'=>'',
+            'data'=>Vendor::topServiceProvider()
         ]);
     }
 }

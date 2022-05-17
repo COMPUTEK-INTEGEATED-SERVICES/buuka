@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Vendor;
 
 class InitController extends Controller
@@ -22,18 +23,35 @@ class InitController extends Controller
 
     public function config()
     {
-        return response([
-            'status'=>true,
-            'message'=>'',
-            'data'=>[
-                'user'=>$this->user,
-                'notifications'=>$this->user->unreadNotifications,
-                'vendor'=>[
-                    'is_vendor'=> boolval((Vendor::where('user_id', $this->user->id)->first())?1:0),
-                    'vendor_id'=> Vendor::where('user_id', $this->user->id)->first()->id??null,
-                ],
-               'wallet'=>$this->user->wallet,
-            ]
-        ]);
+        try {
+            $vendor = Vendor::with(['accounts', 'wallet', 'reviews'])->where('user_id', $this->user->id)->first();
+            return response([
+                'status'=>true,
+                'message'=>'',
+                'data'=>[
+                    'user'=>$this->user,
+                    'notifications'=>$this->user->unreadNotifications,
+                    'bank_accounts'=>$this->user->accounts,
+                    'vendor'=>[
+                        'is_vendor'=> boolval(($vendor)?1:0),
+                        'vendor'=> $vendor??null,
+                        'pending_sales'=>($vendor)?Book::pendingSales($vendor->id):null,
+                        'in_process_sales'=>($vendor)?Book::inProgress($vendor->id):null,
+                        'total_sales'=>($vendor)?Book::totalSales($vendor->id):null,
+                        'total_bookings'=>($vendor)?Book::totalBookings($vendor->id, $this->user):null,
+                        'active_bookings'=>($vendor)?Book::activeBookings($vendor->id, $this->user):null,
+                        'pending_sales_amount'=>($vendor)?Book::pendingSalesAmount($vendor->id, $this->user):null,
+                        'total_sales_amount'=>($vendor)?Book::totalSalesAmount($vendor->id, $this->user):null,
+                    ],
+                    'admin'=>[
+                        'is_admin'=>$this->user->hasRole('admin'),
+                        'admin'
+                    ],
+                    'wallet'=>$this->user->wallet,
+                ]
+            ]);
+        }catch (\Throwable $throwable){
+            report($throwable);
+        }
     }
 }

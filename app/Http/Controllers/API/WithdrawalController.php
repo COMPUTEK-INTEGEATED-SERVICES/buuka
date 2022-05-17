@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Bank;
 use App\Models\PaymentChannel;
+use App\Models\Vendor;
 use App\Models\Wallet;
 use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
@@ -26,11 +27,14 @@ class WithdrawalController extends Controller
 
     public function storeWithdrawalRequest(Request $request): \Illuminate\Http\JsonResponse
     {
+        //allowed types incase a user calls to withdraw in future
+        $allowed_types = ['vendor', 'user'];
         $v = Validator::make( $request->all(), [
             'bank_id' => 'required|integer|exists:banks,id',
             'amount'=>'required|string',
             'account_name'=>'string|required',
             'account_number'=>'string|required',
+            'type'=>'nullable|string|in:'.strtolower(implode(',', $allowed_types))
         ]);
 
         if($v->fails()){
@@ -41,17 +45,32 @@ class WithdrawalController extends Controller
             ], 422);
         }
 
-        $wallet = $this->user->wallet;
+        $vendor = Vendor::with('wallet')->where('user_id', $this->user->id)->first();
+        if ($request->type == 'user'){
+            $wallet = $this->user->wallet;
+        }else{
+            $wallet = $vendor->wallet;
+        }
 
         if($wallet->balance < $request->input('amount')){
             return response()->json([
                 'status' => false,
                 'message' => 'Insufficient Fund',
                 'data' => []
-            ]);
+            ],422);
         }
 
-        (new WalletController())->debit($request->input('amount'));
+        $checkrequest = WithdrawalRequest::where('user_id', $this->user->id)
+            ->where('status',0)->first();
+        if($checkrequest) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You have a pending withdrawal request',
+                'data' => []
+            ],422);
+        }
+
+        (new WalletController())->debit(($request->type == 'user')?$this->user->id:$vendor->id, ($request->type == 'user')?'user':'vendor', $request->input('amount'));
 
         WithdrawalRequest::create([
             'user_id'=>$this->user->id,

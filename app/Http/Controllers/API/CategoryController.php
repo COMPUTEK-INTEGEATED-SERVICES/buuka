@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\Category;
+use App\Models\ParentCategoryRelation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,6 +27,7 @@ class CategoryController extends \App\Http\Controllers\Controller
         $v = Validator::make( $request->all(), [
             'name' => 'required|string',
             'description' => 'required|string',
+            'parent_id' => 'required|int|exists:parent_categories,id',
             'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
         ]);
 
@@ -44,10 +46,15 @@ class CategoryController extends \App\Http\Controllers\Controller
                 $image =  $request->file('file')->store('public/attachments/category');
             }
 
-            Category::create([
+            $c = Category::create([
                 'name'=>$request->input('name'),
                 'description'=>$request->input('description'),
                 'image'=>$image??null
+            ]);
+
+            ParentCategoryRelation::create([
+                'parent_id'=>$request->parent_id,
+                'category_id'=>$c->id
             ]);
 
             return response([
@@ -70,7 +77,8 @@ class CategoryController extends \App\Http\Controllers\Controller
             'category_id' => 'required|integer|exists:categories,id',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
-            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf'
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
+            'parent_id' => 'required|int|exists:parent_categories,id',
         ]);
 
         if($v->fails()){

@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Broadcast;
 /*Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });*/
-Broadcast::channel('chat-room-{chat}', function ($user, $chat) {
-    $chat = \App\Models\Chat::find($chat);
-    return $user->id == $chat->user_1 || $user->id == $chat->user_2;
-    // return true;
+Broadcast::channel('chat-room-{user}-{vendor}', function ($user, $user_id, $vendor_id) {
+    return ($user->id == $user_id || $user->id == \App\Models\Vendor::find($vendor_id)->user_id);
 });
 
 Broadcast::channel('user-notify-{userID}', function ($user, $userID) {
+    return $user->id == $userID;
+});
+
+Broadcast::channel('payment-event-{reference}', function (){
     return true;
 });

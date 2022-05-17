@@ -20,7 +20,7 @@ class WalletController extends Controller
 
     public static function credit($id, $type, $amount)
     {
-        if ($type == 'user') {
+        if ($type === 'user') {
             $type = 'App\Models\User';
         } else {
             $type = 'App\Models\Vendor';
@@ -34,7 +34,7 @@ class WalletController extends Controller
 
     public static function debit($id, $type, $amount)
     {
-        if ($type == 'user') {
+        if ($type === 'user') {
             $type = 'App\Models\User';
         } else {
             $type = 'App\Models\Vendor';

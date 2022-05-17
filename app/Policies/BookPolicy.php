@@ -27,4 +27,9 @@ class BookPolicy
     {
         return $user->id == $book->user_id || $user->id == $vendor->user_id;
     }
+
+    public function accept_proposal(User $user, Book $book)
+    {
+        return $book->type === 'custom' && ($book->proposed_by == 'vendor'? $user->id != $book->vendor->user_id:$user->id == $book->vendor->user_id);
+    }
 }

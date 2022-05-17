@@ -9,6 +9,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\PusherPushNotifications\PusherChannel;
+use NotificationChannels\PusherPushNotifications\PusherMessage;
+use Rich2k\PusherBeams\PusherBeams;
+use Rich2k\PusherBeams\PusherBeamsMessage;
 
 class VendorBookCompleteNotification extends Notification
 {
@@ -42,7 +46,7 @@ class VendorBookCompleteNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
@@ -80,5 +84,33 @@ class VendorBookCompleteNotification extends Notification
             'message'=>"New order(s) totalling {$this->book->amount} has been sent to you",
             'action'=>''
         ];
+    }
+
+    public function toPusherBeamsNotification($notifiable)
+    {
+        return PusherBeamsMessage::create()
+            ->android()
+            ->sound('success')
+            ->body("Your {$notifiable->service} account was approved!")
+            ->withiOS(PusherBeamsMessage::create()
+                ->body("Your {$notifiable->service} account was approved!")
+                ->badge(1)
+                ->sound('success')
+            );
+    }
+
+    public function toPushNotification($notifiable)
+    {
+        $message = "Vendor marked book as completed!";
+
+        return PusherMessage::create()
+            ->iOS()
+            ->badge(1)
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    ->icon('icon')
+            );
     }
 }

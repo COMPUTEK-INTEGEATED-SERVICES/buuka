@@ -12,7 +12,7 @@ class Escrow extends Model
     protected $fillable = [
         'balance',
         'escrowable_id',
-        'escrowbale_type',
+        'escrowable_type',
         'book_id',
         'status'
     ];

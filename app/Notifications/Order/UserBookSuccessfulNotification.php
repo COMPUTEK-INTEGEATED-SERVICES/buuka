@@ -6,8 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\PusherPushNotifications\PusherChannel;
+use NotificationChannels\PusherPushNotifications\PusherMessage;
 
-class UserBookSuccessfulNotification extends Notification
+class UserBookSuccessfulNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,7 +18,7 @@ class UserBookSuccessfulNotification extends Notification
      *
      * @return void
      */
-    public function __construct($book)
+    public function __construct($book, $vendor)
     {
         //
     }
@@ -29,7 +31,7 @@ class UserBookSuccessfulNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', PusherChannel::class];
     }
 
     /**
@@ -57,5 +59,29 @@ class UserBookSuccessfulNotification extends Notification
         return [
             //
         ];
+    }
+
+    public function toDatabase($notifiable):array
+    {
+        return [
+            'subject'=>'Book Successful',
+            'message'=>"Book Successful",
+            'action'=>''
+        ];
+    }
+
+    public function toPushNotification($notifiable)
+    {
+        $message = "Book Successful!";
+
+        return PusherMessage::create()
+            ->iOS()
+            ->badge(1)
+            ->body($message)
+            ->withAndroid(
+                PusherMessage::create()
+                    ->title($message)
+                    //->icon('icon')
+            );
     }
 }

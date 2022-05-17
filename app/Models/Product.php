@@ -10,11 +10,16 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id','name', 'amount', 'duration'
+        'service_id','name', 'price', 'duration', 'price_type', 'price_name', 'description', 'gender', 'tax'
     ];
 
     public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Service::class, 'service_id', 'id');
+    }
+
+    public function resources()
+    {
+        return $this->morphMany(Resource::class, 'resourceable');
     }
 }
