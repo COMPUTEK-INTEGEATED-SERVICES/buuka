@@ -44,7 +44,7 @@ class CreditCardController extends Controller
     public function verifyCardAdd(Request $request)
     {
         $v = Validator::make( $request->all(), [
-            'reference' => 'required|string|exists:transaction_references, reference',
+            'reference' => 'required|string|exists:transaction_references,reference',
         ]);
 
         if($v->fails()){
