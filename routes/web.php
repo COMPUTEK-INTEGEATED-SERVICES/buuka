@@ -66,3 +66,10 @@ Route::get('banks', function (){
         }
     }
 });*/
+Route::get('hi', function (){
+    try {
+        new GSDSDSDSd::class;
+    }catch (\Throwable $throwable){
+        report($throwable);
+    }
+});
