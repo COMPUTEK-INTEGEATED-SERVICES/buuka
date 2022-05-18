@@ -24,19 +24,19 @@ Route::get('/', function () {
     return Socialite::driver('google')->stateless()->redirect();
 });*/
 
-Route::get('callback-url', function (\Illuminate\Http\Request $request){
+/*Route::get('callback-url', function (\Illuminate\Http\Request $request){
     $p = Socialite::driver('google')->stateless()->user();
-    /*$name = $p->getName();
+    $name = $p->getName();
     $email = $p->getEmail();
 
     $names = explode($name, " ");
     $first_name = $names[0];
-    $last_name = $names[1];*/
+    $last_name = $names[1];
 
     //$user = \App\Models\User::
     dd($p);
-});
-Route::get('banks', function (){
+});*/
+/*Route::get('banks', function (){
     $url = "https://api.flutterwave.com/v3/banks/NG";
     $response = Http::withToken(env('FLW_SECRET_KEY'))->get($url);
     //$response = file_get_contents($url);
@@ -51,7 +51,7 @@ Route::get('banks', function (){
             'country'=>$country
         ]);
     }
-});
+});*/
 
 /*Route::get('test', function (){
     $g = file_get_contents('https://data.humdata.org/dataset/e66dbc70-17fe-4230-b9d6-855d192fc05c/resource/83dba4b0-992f-4748-b037-4b55ecc0c3b4/download/nigeria_lga.json');
@@ -66,10 +66,3 @@ Route::get('banks', function (){
         }
     }
 });*/
-Route::get('hi', function (){
-    try {
-        new GSDSDSDSd::class;
-    }catch (\Throwable $throwable){
-        report($throwable);
-    }
-});
