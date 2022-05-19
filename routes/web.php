@@ -66,3 +66,13 @@ Route::get('/', function () {
         }
     }
 });*/
+
+Route::get('foo', function(){
+    $targetFolder = dirname($_SERVER['DOCUMENT_ROOT']).'/buuka/storage/app/public';
+    $linkFolder = $_SERVER['DOCUMENT_ROOT'].'/public';
+    $linkFolde = $_SERVER['DOCUMENT_ROOT'].'/storage';
+    //todo do for /storage too
+    symlink($targetFolder, $linkFolder);
+    symlink($targetFolder, $linkFolde);
+    return 'success';
+});
