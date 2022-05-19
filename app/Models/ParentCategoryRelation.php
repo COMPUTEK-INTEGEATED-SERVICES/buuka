@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ParentCategoryRelation extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'parent_id', 'category_id'
+    ];
 }
