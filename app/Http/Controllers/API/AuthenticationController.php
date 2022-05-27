@@ -61,7 +61,7 @@ class AuthenticationController extends Controller
 
         if (!empty($require))
         {
-            $this->errorResponse([
+            return $this->errorResponse([
                 'email'=>auth()->user()->email,
                 'phone'=>auth()->user()->phone,
                 'required'=>$require
@@ -116,7 +116,6 @@ class AuthenticationController extends Controller
             //send verification code to email
             $verification->email_otp = Hash::make($otp);
             $user->notify(new EmailVerificationNotification($otp));
-
             $verification->save();
         }catch (\Throwable $throwable)
         {
