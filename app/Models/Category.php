@@ -12,7 +12,7 @@ class Category extends Model
     protected $table = 'categories';
 
     protected $fillable = [
-        'name', 'description', 'image'
+        'name', 'description', 'image', 'parent_id'
     ];
 
     public function services(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
