@@ -52,6 +52,7 @@ class AuthenticationController extends Controller
                 //send verification code to email
                 $verification->email_otp = Hash::make($otp);
                 auth()->user()->notify(new EmailVerificationNotification($otp));
+                $verification->save();
 
                 $require['email']=true;
                 $msg = 'Please verify your email';
