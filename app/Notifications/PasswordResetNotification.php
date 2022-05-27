@@ -13,6 +13,7 @@ class PasswordResetNotification extends Notification
     use Queueable;
 
     private $token;
+    private $user;
 
     /**
      * Create a new notification instance.
@@ -22,6 +23,7 @@ class PasswordResetNotification extends Notification
     public function __construct($token, $user)
     {
         $this->token = $token;
+        $this->user = $user;
     }
 
     /**

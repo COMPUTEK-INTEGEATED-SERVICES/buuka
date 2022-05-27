@@ -45,6 +45,14 @@ class AuthenticationController extends Controller
         {
             if (auth()->user()->email_verified == 0)
             {
+                $verification = RegistrationVerification::firstOrNew([
+                    'user_id'=>auth()->user()->id
+                ]);
+                $otp = random_int(100000, 999999);
+                //send verification code to email
+                $verification->email_otp = Hash::make($otp);
+                auth()->user()->notify(new EmailVerificationNotification($otp));
+
                 $require['email']=true;
                 $msg = 'Please verify your email';
             }
@@ -103,23 +111,11 @@ class AuthenticationController extends Controller
             $verification = RegistrationVerification::firstOrNew([
                 'user_id'=>$user->id
             ]);
-            /*if (app('general_settings')->sms_verify == 1)
-            {
-                //send verification code to sms
-                //$otp = random_int(100000, 999999);
-                //send verification code to email
-                //$verification->sms_otp = Hash::make($otp);
-                //$message = "Welcome to ". getenv('APP_NAME'). " here is your OTP:".$otp;
-                //send_sms($request->phone, $message);
-                //$user->notify(new PhoneVerificationNotification($otp));
-            }*/
-            if (app('general_settings')->email_verify == 1)
-            {
-                $otp = random_int(100000, 999999);
-                //send verification code to email
-                $verification->email_otp = Hash::make($otp);
-                $user->notify(new EmailVerificationNotification($otp));
-            }
+            $otp = random_int(100000, 999999);
+            //send verification code to email
+            $verification->email_otp = Hash::make($otp);
+            $user->notify(new EmailVerificationNotification($otp));
+
             $verification->save();
         }catch (\Throwable $throwable)
         {
