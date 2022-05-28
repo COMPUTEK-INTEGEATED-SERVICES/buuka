@@ -38,7 +38,7 @@ class VendorController extends Controller
             'file'=>'nullable|array',
             'file.*' => 'required_with:file|mimes:jpeg,jpg,png',
             'category'=>'required|array',
-            'category.*'=>'int|exists:categories,id',
+            'category.*'=>'int|exists:parent_categories,id',
             'latitude'=>'required|nullable',
             'longitude'=>'required|nullable'
         ]);
