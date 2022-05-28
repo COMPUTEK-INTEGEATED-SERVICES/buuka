@@ -19,9 +19,19 @@ use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
 {
-    public function becomeAVendor(Request $request)
+    /**
+     * @var \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    private $user;
+
+    public function __construct()
     {
-        $user = auth()->guard('api')->user();
+        $this->middleware('auth:api');
+        $this->user = auth()->guard('api')->user();
+    }
+
+    public function becomeAVendor(Request $request): \Illuminate\Http\JsonResponse
+    {
         $v = Validator::make( $request->all(), [
             'vendor_package_id' => 'required|int|exists:vendor_packages,id',
             'business_name' => 'required|string|unique:vendors',
@@ -44,106 +54,92 @@ class VendorController extends Controller
         ]);
 
         if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation Failed',
-                'data' => $v->errors()
-            ], 422);
+            return $this->validationErrorResponse($v->errors());
         }
-
-        $vendor = Vendor::where('user_id', $user->id)->first();
-        if ($vendor){
-            return response()->json([
-                'status' => false,
-                'message' => 'You have a business account already!',
-                'data' => []
-            ]);
-        }
-
-        $vendor = Vendor::create([
-            'vendor_package_id' => $request->input('vendor_package_id'),
-            'user_id'=>$user->id,
-            'business_name'=>$request->input('business_name'),
-            'description'=>$request->input('description'),
-            'country_id'=>$request->input('country'),
-            'state_id'=>$request->input('state'),
-            'city_id'=>$request->input('city'),
-            'address'=>$request->input('address'),
-            'week_start'=>$request->input('week_start'),
-            'week_end'=>$request->input('week_end'),
-            'latitude'=>$request->input('latitude'),
-            'longitude'=>$request->input('longitude'),
-            'socials'=>json_encode([
-                'website'=>$request->input('website'),
-                'facebook'=>$request->input('facebook'),
-                'instagram'=>$request->input('instagram'),
-            ]),
-        ]);
-
-        foreach ($request->category as $c)
-        {
-            CategoryRelation::create([
-                'relateable_id'=>$vendor->id,
-                'relateable_type'=>'App\Models\Vendor',
-                'category_id'=>$c
-            ]);
-        }
-
-        //store the images
-        if($request->file){
-            //upload file
-            foreach ($request->file('file') as $file)
-            {
-                $message =  $file->store('public/images/vendor/attachments');
-                $type = $file->getMimeType();
-
-                Resource::create([
-                    'path'=>$message,
-                    'resourceable_id'=>$vendor->id,
-                    'resourceable_type'=>'App\Models\Vendor'
-                ]);
-            }
-        }
-
-        //create vendor wallet and escrow account
-        Escrow::create([
-            'escrowable_id'=>$vendor->id,
-            'escrowable_type'=>'App\Models\Vendor',
-        ]);
-
-        Wallet::create([
-            'walletable_id'=>$vendor->id,
-            'walletable_type'=>'App\Models\Vendor'
-        ]);
-
-        //you are your number one staff
-        Staff::create([
-            'vendor_id'=>$vendor->id,
-            'user_id'=>$user->id,
-            'confirm_staff_request'=>1,
-        ]);
 
         try {
-            $user->notify( new VendorCreatedNotification());
+            $vendor = Vendor::where('user_id', $this->user->id)->first();
+            if ($vendor){
+                return $this->successResponse([], 'You have a business account already!');
+            }
 
+            $vendor = Vendor::create([
+                'vendor_package_id' => $request->input('vendor_package_id'),
+                'user_id'=>$this->user->id,
+                'business_name'=>$request->input('business_name'),
+                'description'=>$request->input('description'),
+                'country_id'=>$request->input('country'),
+                'state_id'=>$request->input('state'),
+                'city_id'=>$request->input('city'),
+                'address'=>$request->input('address'),
+                'week_start'=>$request->input('week_start'),
+                'week_end'=>$request->input('week_end'),
+                'latitude'=>$request->input('latitude'),
+                'longitude'=>$request->input('longitude'),
+                'socials'=>json_encode([
+                    'website'=>$request->input('website'),
+                    'facebook'=>$request->input('facebook'),
+                    'instagram'=>$request->input('instagram'),
+                ]),
+            ]);
+
+            foreach ($request->category as $c)
+            {
+                CategoryRelation::create([
+                    'relateable_id'=>$vendor->id,
+                    'relateable_type'=>'AppModelsVendor',
+                    'category_id'=>$c
+                ]);
+            }
+
+            //store the images
+            if($request->file){
+                //upload file
+                foreach ($request->file('file') as $file)
+                {
+                    $message =  $file->store('public/images/vendor/attachments');
+                    $type = $file->getMimeType();
+
+                    Resource::create([
+                        'path'=>$message,
+                        'resourceable_id'=>$vendor->id,
+                        'resourceable_type'=>'AppModelsVendor'
+                    ]);
+                }
+            }
+
+            //create vendor wallet and escrow account
+            Escrow::create([
+                'escrowable_id'=>$vendor->id,
+                'escrowable_type'=>'AppModelsVendor',
+            ]);
+
+            Wallet::create([
+                'walletable_id'=>$vendor->id,
+                'walletable_type'=>'AppModelsVendor'
+            ]);
+
+            //you are your number one staff
+            Staff::create([
+                'vendor_id'=>$vendor->id,
+                'user_id'=>$this->user->id,
+                'confirm_staff_request'=>1,
+            ]);
+
+            try {
+                $this->user->notify( new VendorCreatedNotification());
+            }catch (\Throwable $throwable){
+                throw new \Exception($throwable->getMessage());
+            }
+            return $this->successResponse(['vendor'=>$vendor]);
         }catch (\Throwable $throwable){
             report($throwable);
+            return $this->errorResponse();
         }
-        return response([
-            'status'=>true,
-            'message'=>'Vendor account created',
-            'data'=>[
-                'vendor'=>$vendor
-            ]
-        ]);
     }
 
-    public function editVendorDetails(Request $request)
+    public function editVendorDetails(Request $request): \Illuminate\Http\JsonResponse
     {
-        //Todo: this route should be throttled to once in 3hrs and twice a month also
-        // should not go through if the vendor has an unfulfilled service/order
-
-        $user = auth()->guard('api')->user();
         $v = Validator::make( $request->all(), [
             'vendor_id'=> 'required|int|exists:vendors,id',
             'business_name' => 'nullable|string|unique:vendors',
@@ -164,61 +160,49 @@ class VendorController extends Controller
         ]);
 
         if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation Failed',
-                'data' => $v->errors()
-            ], 422);
+            return $this->validationErrorResponse($v->errors());
         }
 
-        $vendor = Vendor::find($request->input('vendor_id'));
-        if ($user->can('edit', $vendor))
-        {
-            $vendor->business_name = $request->input('business_name', $vendor->business_name);
-            $vendor->description = $request->input('description', $vendor->description);
-            $vendor->country_id = $request->input('country', $vendor->country_id);
-            $vendor->state_id = $request->input('state', $vendor->state_id);
-            $vendor->city_id = $request->input('city', $vendor->city_id);
-            $vendor->address = $request->input('address', $vendor->address);
-            $vendor->week_start = $request->input('week_start', $vendor->week_start);
-            $vendor->week_end = $request->input('week_end', $vendor->week_end);
-            $vendor->longitude = $request->input('longitude', $vendor->longitude);
-            $vendor->latitude = $request->input('latitude', $vendor->latitude);
-            $socials = json_decode($request->socials);
-            $vendor->socials = json_encode([
-                'website'=>$request->input('website', $socials['website']),
-                'facebook'=>$request->input('facebook', $socials['facebook']),
-                'instagram'=>$request->input('instagram', $socials['instagram']),
-            ]);
-            $request->save();
+        try {
+            $vendor = Vendor::find($request->input('vendor_id'));
+            if ($this->user->can('interact', $vendor))
+            {
+                $vendor->business_name = $request->input('business_name', $vendor->business_name);
+                $vendor->description = $request->input('description', $vendor->description);
+                $vendor->country_id = $request->input('country', $vendor->country_id);
+                $vendor->state_id = $request->input('state', $vendor->state_id);
+                $vendor->city_id = $request->input('city', $vendor->city_id);
+                $vendor->address = $request->input('address', $vendor->address);
+                $vendor->week_start = $request->input('week_start', $vendor->week_start);
+                $vendor->week_end = $request->input('week_end', $vendor->week_end);
+                $vendor->longitude = $request->input('longitude', $vendor->longitude);
+                $vendor->latitude = $request->input('latitude', $vendor->latitude);
+                $socials = json_decode($request->socials);
+                $vendor->socials = json_encode([
+                    'website'=>$request->input('website', $socials['website']),
+                    'facebook'=>$request->input('facebook', $socials['facebook']),
+                    'instagram'=>$request->input('instagram', $socials['instagram']),
+                ]);
+                $vendor->save();
 
-            if($request->file){
-                //upload file
-                foreach ($request->file('file') as $file)
-                {
-                    $message =  $file->store('public/images/vendor/attachments');
-                    $type = $file->getMimeType();
-
-                    Resource::create([
-                        'path'=>$message,
-                        'resourceable_id'=>$vendor->id,
-                        'resourceable_type'=>'App\Models\Vendor'
-                    ]);
+                if($request->file){
+                    foreach ($request->file('file') as $file)
+                    {
+                        $message =  $file->store('public/images/vendor/attachments');
+                        Resource::create([
+                            'path'=>$message,
+                            'resourceable_id'=>$vendor->id,
+                            'resourceable_type'=>'AppModelsVendor'
+                        ]);
+                    }
                 }
-            }
 
-            return response([
-                'status'=>true,
-                'message'=>'Vendor updated',
-                'data'=>[
-                    'vendor'=>$vendor
-                ]
-            ]);
+                return $this->successResponse(['vendor'=>$vendor], 'Vendor updated');
+            }
+            return $this->errorResponse('Access denied');
+        }catch (\Throwable $throwable){
+            report($throwable);
+            return $this->errorResponse([], 'Sorry an error occurred');
         }
-        return response([
-            'status'=>false,
-            'message'=>'Access denied',
-            'data'=>[]
-        ]);
     }
 }
