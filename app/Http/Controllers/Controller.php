@@ -33,7 +33,7 @@ class Controller extends BaseController
     {
         return response()->json([
             'status'=>false,
-            'message'=>'Validation error',
+            'message'=>$message,
             'data'=>$data
         ], $errorCode);
     }
