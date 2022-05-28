@@ -117,16 +117,8 @@ class AuthenticationController extends Controller
             $user->notify(new EmailVerificationNotification($otp));
             $verification->save();
 
-            $require['email']=true;
-            $msg = 'Please verify your email';
-
             DB::commit();
-            return $this->successResponse([
-                'email'=>auth()->user()->email,
-                'phone'=>auth()->user()->phone,
-                'required'=>$require
-            ], $msg, 403);
-
+            return $this->successResponse([], 'Registration success');
         }catch (\Throwable $throwable)
         {
             DB::rollBack();
