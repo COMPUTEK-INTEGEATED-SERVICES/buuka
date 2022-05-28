@@ -17,6 +17,7 @@ use App\Notifications\Auth\RegistrationNotification;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -72,7 +73,8 @@ class AuthenticationController extends Controller
         return $this->successResponse(['token'=>$token], 'Logged in');
     }
 
-    public function register (Request $request) {
+    public function register (Request $request): \Illuminate\Http\JsonResponse
+    {
         $gender = ['male', 'female'];
         $v = Validator::make( $request->all(), [
             'first_name' => 'required|string|max:255',
@@ -88,25 +90,22 @@ class AuthenticationController extends Controller
         ]);
 
         if($v->fails()){
-            return response()->json([
-                'status' => false,
-                'message' => 'Registration Failed',
-                'data' => $v->errors()
-            ], 422);
+            return $this->validationErrorResponse($v->errors());
         }
 
-        $request['password']=Hash::make($request['password']);
-        $request['remember_token'] = Str::random(10);
-        $request['last_seen'] = Carbon::now();
-        $user = User::create($request->toArray());
-
-        //This will handle creating a wallet for the user
-        Wallet::create([
-            'walletable_id'=>$user->id,
-            'walletable_type'=>'App\Models\User'
-        ]);
-
+        DB::beginTransaction();
         try {
+            $request['password']=Hash::make($request['password']);
+            $request['remember_token'] = Str::random(10);
+            $request['last_seen'] = Carbon::now();
+            $user = User::create($request->toArray());
+
+            //This will handle creating a wallet for the user
+            Wallet::create([
+                'walletable_id'=>$user->id,
+                'walletable_type'=>'AppModelsUser'
+            ]);
+
             $user->notify(new RegistrationNotification());
 
             $verification = RegistrationVerification::firstOrNew([
@@ -117,15 +116,23 @@ class AuthenticationController extends Controller
             $verification->email_otp = Hash::make($otp);
             $user->notify(new EmailVerificationNotification($otp));
             $verification->save();
+
+            $require['email']=true;
+            $msg = 'Please verify your email';
+
+            DB::commit();
+            return $this->successResponse([
+                'email'=>auth()->user()->email,
+                'phone'=>auth()->user()->phone,
+                'required'=>$require
+            ], $msg, 403);
+
         }catch (\Throwable $throwable)
         {
+            DB::rollBack();
             report($throwable);
+            return $this->errorResponse();
         }
-        return response([
-            'status'=>true,
-            'message'=>'Registration is successful',
-            'data'=>$user
-        ]);
     }
 
     public function logout (Request $request) {

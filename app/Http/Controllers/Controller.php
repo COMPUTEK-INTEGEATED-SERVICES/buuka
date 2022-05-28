@@ -11,13 +11,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function successResponse($data=[], $message="success"): \Illuminate\Http\JsonResponse
+    public function successResponse($data=[], $message="success", $errorCode = 200): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'status'=>true,
             'message'=>$message,
             'data'=>$data
-        ]);
+        ], $errorCode);
     }
 
     public function errorResponse($data=[], $message="Something went wrong, our engineers are on it", $errorCode = 500): \Illuminate\Http\JsonResponse
