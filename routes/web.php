@@ -67,7 +67,7 @@ Route::get('/', function () {
     }
 });*/
 
-Route::get('foo', function(){
+/*Route::get('foo', function(){
     $targetFolder = dirname($_SERVER['DOCUMENT_ROOT']).'/buuka/storage/app/public';
     $linkFolder = $_SERVER['DOCUMENT_ROOT'].'/public';
     $linkFolde = $_SERVER['DOCUMENT_ROOT'].'/storage';
@@ -75,4 +75,4 @@ Route::get('foo', function(){
     symlink($targetFolder, $linkFolder);
     symlink($targetFolder, $linkFolde);
     return 'success';
-});
+});*/
