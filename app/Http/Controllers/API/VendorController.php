@@ -15,6 +15,7 @@ use App\Models\VendorImages;
 use App\Models\Wallet;
 use App\Notifications\Vendor\VendorCreatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
@@ -57,6 +58,7 @@ class VendorController extends Controller
             return $this->validationErrorResponse($v->errors());
         }
 
+        DB::beginTransaction();
         try {
             $vendor = Vendor::where('user_id', $this->user->id)->first();
             if ($vendor){
@@ -126,13 +128,11 @@ class VendorController extends Controller
                 'confirm_staff_request'=>1,
             ]);
 
-            try {
-                $this->user->notify( new VendorCreatedNotification());
-            }catch (\Throwable $throwable){
-                throw new \Exception($throwable->getMessage());
-            }
+            $this->user->notify( new VendorCreatedNotification());
+            DB::commit();
             return $this->successResponse(['vendor'=>$vendor]);
         }catch (\Throwable $throwable){
+            DB::rollBack();
             report($throwable);
             return $this->errorResponse();
         }
