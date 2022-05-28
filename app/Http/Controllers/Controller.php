@@ -20,7 +20,7 @@ class Controller extends BaseController
         ]);
     }
 
-    public function errorResponse($data=[], $message="failed", $errorCode = 500): \Illuminate\Http\JsonResponse
+    public function errorResponse($data=[], $message="Something went wrong, our engineers are on it", $errorCode = 500): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'status'=>false,
